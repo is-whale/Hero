@@ -57,6 +57,11 @@ osStaticThreadDef_t shellTaskControlBlock;
 osThreadId printTaskHandle;
 uint32_t printTaskBuffer[ 512 ];
 osStaticThreadDef_t printTaskControlBlock;
+osMessageQId printQueueHandle;
+uint8_t printQueueBuffer[ 2 * 257 ];
+osStaticMessageQDef_t printQueueControlBlock;
+osMutexId usart3TxMutexHandle;
+osStaticMutexDef_t usart3TxMutexControlBlock;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -94,6 +99,10 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
+  /* Create the mutex(es) */
+  /* definition and creation of usart3TxMutex */
+  osMutexStaticDef(usart3TxMutex, &usart3TxMutexControlBlock);
+  usart3TxMutexHandle = osMutexCreate(osMutex(usart3TxMutex));
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -106,6 +115,11 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
+
+  /* Create the queue(s) */
+  /* definition and creation of printQueue */
+  osMessageQStaticDef(printQueue, 2, 257, printQueueBuffer, &printQueueControlBlock);
+  printQueueHandle = osMessageCreate(osMessageQ(printQueue), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
