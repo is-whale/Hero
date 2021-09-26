@@ -2,11 +2,15 @@
 #define __USART3_H_
 
 #include "stm32f4xx.h"
+#include <stdarg.h>
+#include "stdio.h"
 #include "usart.h"
 #include "stdio.h"
+
 void Usart3_Tx_Init(void);
 void Usart3_Transmit_Dma(uint32_t data_address, uint32_t len);
 void Usart3_It_Tc_Callback(void);
+int __printf(const char *format, ...);
 
 void Usart3_Rx_Init(void);
 uint8_t *Get_Usart3_DMA_RxBuffer(void);
