@@ -1,7 +1,8 @@
+
 #include "usart3.h"
 
 /**
- * @description: ´®¿Ú3µÄ¶îÍâ³õÊ¼»¯
+ * @description: ï¿½ï¿½ï¿½ï¿½3ï¿½Ä¶ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿?
  * @param {*}
  * @return {*}
  */
@@ -12,9 +13,9 @@ void Usart3_Tx_Init(void)
 }
 
 /**
- * @description: ´®¿Ú3Ê¹ÓÃDMA·½Ê½·¢ËÍÊý¾Ý
- * @param {uint32_t} data_address ·¢ËÍÊý¾ÝµÄµÄÊ×µØÖ·
- * @param {uint32_t} len ·¢ËÍÊý¾ÝµÄ³¤¶È
+ * @description: ï¿½ï¿½ï¿½ï¿½3Ê¹ï¿½ï¿½DMAï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * @param {uint32_t} data_address ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÝµÄµï¿½ï¿½×µï¿½Ö·
+ * @param {uint32_t} len ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÝµÄ³ï¿½ï¿½ï¿½
  * @return {*}
  */
 void Usart3_Transmit_Dma(uint32_t data_address, uint32_t len)
@@ -28,13 +29,45 @@ void Usart3_Transmit_Dma(uint32_t data_address, uint32_t len)
 }
 
 /**
- * @description: ·¢Éú´®¿Ú3 TCÖÐ¶ÏÊ±µ÷ÓÃ
+ * @description: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½3 TCï¿½Ð¶ï¿½Ê±ï¿½ï¿½ï¿½ï¿½
  * @param {*}
  * @return {*}
  */
 void Usart3_It_Tc_Callback(void)
 {
-	//TODO:½âËøprint»¥³â
+	//TODO:ï¿½ï¿½ï¿½ï¿½printï¿½ï¿½ï¿½ï¿½
 	LL_USART_DisableIT_TC(USART3);
 	LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_3);
+}
+static const uint16_t usart3_dma_rx_max_len = 50;
+volatile uint8_t usart3_dma_rx_buffer[usart3_dma_rx_max_len];
+
+/**
+ * @description	
+ * @param {*}
+ * @return {*}
+ */
+void Usart3_Rx_Init(void)
+{
+	LL_DMA_SetPeriphAddress(DMA1, LL_DMA_STREAM_1, LL_USART_DMA_GetRegAddr(USART3));
+	LL_DMA_SetMemoryAddress(DMA1, LL_DMA_STREAM_1, (uint32_t)(usart3_dma_rx_buffer));
+
+	LL_DMA_SetDataLength(DMA1, LL_DMA_STREAM_1, usart3_dma_rx_max_len);
+
+	LL_USART_ClearFlag_IDLE(USART3);
+	LL_USART_EnableIT_IDLE(USART3);
+
+	LL_USART_EnableDMAReq_RX(USART3);
+
+	LL_DMA_EnableStream(DMA1, LL_DMA_STREAM_1);
+}
+
+uint8_t *Get_Usart3_DMA_RxBuffer(void)
+{
+	return (uint8_t *)usart3_dma_rx_buffer;
+}
+
+const uint16_t *Get_Usart3_DMA_Rx_MaxLen(void)
+{
+	return &usart3_dma_rx_max_len;
 }
