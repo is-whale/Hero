@@ -23,6 +23,8 @@
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "usart3.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -191,9 +193,14 @@ void DMA1_Stream3_IRQHandler(void)
 /**
   * @brief This function handles USART3 global interrupt.
   */
+ #include "led.h"
 void USART3_IRQHandler(void)
 {
   /* USER CODE BEGIN USART3_IRQn 0 */
+  if(LL_USART_IsActiveFlag_TC(USART3))
+  {
+    Usart3_It_Tc_Callback();
+  }
 
   /* USER CODE END USART3_IRQn 0 */
   /* USER CODE BEGIN USART3_IRQn 1 */
