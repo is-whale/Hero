@@ -17,7 +17,7 @@ void Usart3_Tx_Init(void)
  * @param {uint32_t} len 发送数据的长度
  * @return {*}
  */
-void Usart3_Tx_Transmit_Dma(uint32_t data_address, uint32_t len)
+void Usart3_Transmit_Dma(uint32_t data_address, uint32_t len)
 {
 	LL_DMA_SetMemoryAddress(DMA1, LL_DMA_STREAM_3, data_address);
 	LL_DMA_SetDataLength(DMA1, LL_DMA_STREAM_3, len);
