@@ -51,6 +51,12 @@
 osThreadId defaultTaskHandle;
 uint32_t defaultTaskBuffer[ 512 ];
 osStaticThreadDef_t defaultTaskControlBlock;
+osThreadId shellTaskHandle;
+uint32_t shellTaskBuffer[ 1024 ];
+osStaticThreadDef_t shellTaskControlBlock;
+osThreadId printTaskHandle;
+uint32_t printTaskBuffer[ 512 ];
+osStaticThreadDef_t printTaskControlBlock;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -58,6 +64,8 @@ osStaticThreadDef_t defaultTaskControlBlock;
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void const * argument);
+void StartShellTask(void const * argument);
+void StartPrintTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -105,8 +113,16 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadStaticDef(defaultTask, StartDefaultTask, osPriorityLow, 0, 512, defaultTaskBuffer, &defaultTaskControlBlock);
+  osThreadStaticDef(defaultTask, StartDefaultTask, osPriorityIdle, 0, 512, defaultTaskBuffer, &defaultTaskControlBlock);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+
+  /* definition and creation of shellTask */
+  osThreadStaticDef(shellTask, StartShellTask, osPriorityBelowNormal, 0, 1024, shellTaskBuffer, &shellTaskControlBlock);
+  shellTaskHandle = osThreadCreate(osThread(shellTask), NULL);
+
+  /* definition and creation of printTask */
+  osThreadStaticDef(printTask, StartPrintTask, osPriorityLow, 0, 512, printTaskBuffer, &printTaskControlBlock);
+  printTaskHandle = osThreadCreate(osThread(printTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -130,6 +146,42 @@ __weak void StartDefaultTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartDefaultTask */
+}
+
+/* USER CODE BEGIN Header_StartShellTask */
+/**
+* @brief Function implementing the shellTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartShellTask */
+__weak void StartShellTask(void const * argument)
+{
+  /* USER CODE BEGIN StartShellTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartShellTask */
+}
+
+/* USER CODE BEGIN Header_StartPrintTask */
+/**
+* @brief Function implementing the printTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartPrintTask */
+__weak void StartPrintTask(void const * argument)
+{
+  /* USER CODE BEGIN StartPrintTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartPrintTask */
 }
 
 /* Private application code --------------------------------------------------*/
