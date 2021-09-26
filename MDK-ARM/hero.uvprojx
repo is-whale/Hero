@@ -760,15 +760,58 @@
         </Group>
         <Group>
           <GroupName>User/Device</GroupName>
+          <Files>
+            <File>
+              <FileName>usart3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Device\src\usart3.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>User/Hardware</GroupName>
+          <Files>
+            <File>
+              <FileName>can1_device.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Hardware\src\can1_device.c</FilePath>
+            </File>
+            <File>
+              <FileName>led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Hardware\src\led.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>User/Lib</GroupName>
+          <Files>
+            <File>
+              <FileName>math2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Lib\src\math2.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>User/Task</GroupName>
+          <Files>
+            <File>
+              <FileName>shell_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Task\src\shell_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>print_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Task\src\print_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>default_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Task\src\default_task.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
