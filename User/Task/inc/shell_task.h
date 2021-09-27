@@ -14,4 +14,6 @@
 
 void Usart3_Idle_ITCallback(void);
 
+void Print_Dragon(void);
+
 #endif // __SHELL_TASK_
