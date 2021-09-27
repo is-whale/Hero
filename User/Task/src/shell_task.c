@@ -21,7 +21,8 @@ void StartShellTask(void const *argument)
     {
         if (osOK == osSemaphoreWait(shellGetDataBinarySemHandle, osWaitForever))
         {
-            Shell_Str_Process(); //字符串预处理
+            ///< 字符串预处理
+            Shell_Str_Process();
             Shell_Command_Parse((char *)shell_rx_buffer);
         }
         osDelay(10);
@@ -46,9 +47,6 @@ void Usart3_Idle_ITCallback(void)
         ///< 计算收到额数据的长度
         shell_rxd_data_len = (*shell_rx_max_buffer_len) - LL_DMA_GetDataLength(DMA1, LL_DMA_STREAM_1);
 
-        // debug_print("rx len:%d\r\n", shell_rxd_data_len);
-        // debug_print("rx :%s\r\n", shell_rx_buffer);
-
         ///< 重新设置传输长度
         LL_DMA_SetDataLength(DMA1, LL_DMA_STREAM_1, *shell_rx_max_buffer_len);
 
@@ -60,14 +58,6 @@ void Usart3_Idle_ITCallback(void)
     }
 }
 
-// int fputc(int ch, FILE *f)
-// {
-//     LL_USART_TransmitData8(USART3, ch);
-//     while (!LL_USART_IsActiveFlag_TC(USART3))
-//     {
-//     }
-//     return ch;
-// }
 static void Shell_Str_Process(void)
 {
     // uint8_t u3_rx_len = Get_Usart3_Rx_Length();
