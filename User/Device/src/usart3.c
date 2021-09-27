@@ -1,7 +1,6 @@
-
 #include "usart3.h"
 
-static uint8_t usart3_tx_lock = 0;
+static volatile uint8_t usart3_tx_lock = 0;
 static char usart3_dma_transmit_buf[256];
 static const uint16_t usart3_dma_rx_max_len = 50;
 volatile uint8_t usart3_dma_rx_buffer[usart3_dma_rx_max_len];
@@ -19,12 +18,17 @@ void Usart3_Tx_Init(void)
 
 /**
  * @brief 串口3使用DMA方式发送
+ * @note 会占用红灯，当等待发送时红灯亮
  * @param {uint32_t} data_address 发送的数据地址
  * @param {uint32_t} len 发送的数据长度
  * @return {*}
  */
 void Usart3_Transmit_Dma(uint32_t data_address, uint32_t len)
 {
+	while(usart3_tx_lock)
+	{
+		LED_RED_ON();
+	}
 	if(usart3_tx_lock == 0)
 	{
 		usart3_tx_lock = 1;
@@ -34,6 +38,7 @@ void Usart3_Transmit_Dma(uint32_t data_address, uint32_t len)
 		LL_DMA_ClearFlag_TC3(DMA1);
 		LL_USART_EnableIT_TC(USART3);
 		LL_DMA_EnableStream(DMA1, LL_DMA_STREAM_3);
+		LED_RED_OFF();
 	}
 }
 

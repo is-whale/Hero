@@ -2,10 +2,39 @@
 #define __USART3_H_
 
 #include "stm32f4xx.h"
-#include <stdarg.h>
+#include "stdarg.h"
 #include "stdio.h"
 #include "usart.h"
-#include "stdio.h"
+#include "led.h"
+
+#define INFORMATION 1
+#define DEBUG 1
+
+#if INFORMATION
+	#define info_print(format, ...) __printf(format, ##__VA_ARGS__)
+	#define info_log(format, arg...) __printf("<INFO> " format "\r\n", ##arg)
+#else
+	#define info_print(format, ...)
+	#define info_log(format, arg...)
+#endif
+
+#if DEBUG
+	#define debug_print(format, ...) __printf(format, ##__VA_ARGS__)
+	#define debug_log(format, arg...) __printf("<DEBUG> " format "\r\n", ##arg)
+	#define debug_showdata1(name, data) __printf("<DEBUG> %s = %d\r\n",name,data)
+	#define debug_showdata2(name, data) __printf("<DEBUG> %s = %.2f\r\n",name,data)
+	#define debug_error(err) __printf("<ERROR> error:%d\r\n",err)
+	#define debug_array1(name, data, len) { __printf("<DEBUG>%s : {",name); for(u16 __tmp_i=0; __tmp_i<len; __tmp_i++) __printf("%d ", data[__tmp_i]);  __printf("}\r\n"); }
+    #define debug_array2(name, data, len) { __printf("<DEBUG>%s : {",name); for(u16 __tmp_i=0; __tmp_i<len; __tmp_i++) __printf("%.2f ", data[__tmp_i]);  __printf("}\r\n"); }
+#else
+	#define debug_print(format, ...)
+	#define debug_log(format, arg...)
+	#define debug_showdata1(name, data)
+	#define debug_showdata2(name, data)
+	#define debug_error(err)
+	#define debug_array1(name, data, len)
+    #define debug_array2(name, data, len)
+#endif
 
 void Usart3_Tx_Init(void);
 void Usart3_Transmit_Dma(uint32_t data_address, uint32_t len);
@@ -17,4 +46,3 @@ uint8_t *Get_Usart3_DMA_RxBuffer(void);
 const uint16_t *Get_Usart3_DMA_Rx_MaxLen(void);
 
 #endif //__USART3_H_
-
