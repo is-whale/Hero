@@ -17,9 +17,9 @@ void Usart1_RxDMA_Init(void)
     LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_2, usart1_dma_rx_max_len);
 
     ///< 开启 DMA 双缓冲
-    // LL_DMA_SetMemory1Address(DMA2, LL_DMA_STREAM_2, (uint32_t)(usart1_dma_rx_buffer_second));
-    // LL_DMA_SetCurrentTargetMem(DMA2, LL_DMA_STREAM_2, LL_DMA_CURRENTTARGETMEM0);
-    // LL_DMA_EnableDoubleBufferMode(DMA2, LL_DMA_STREAM_2);
+    LL_DMA_SetMemory1Address(DMA2, LL_DMA_STREAM_2, (uint32_t)(usart1_dma_rx_buffer_second));
+    LL_DMA_SetCurrentTargetMem(DMA2, LL_DMA_STREAM_2, LL_DMA_CURRENTTARGETMEM0);
+    LL_DMA_EnableDoubleBufferMode(DMA2, LL_DMA_STREAM_2);
 
     LL_USART_ClearFlag_IDLE(USART1);
     LL_USART_EnableIT_IDLE(USART1);
@@ -83,7 +83,7 @@ uint8_t Get_Rc_Available_Bufferx(void)
 {
     if (LL_DMA_GetCurrentTargetMem(DMA2, LL_DMA_STREAM_2))
     {
-        return 0;
+        return 1;
     }
-    return 1;
+    return 0;
 }
