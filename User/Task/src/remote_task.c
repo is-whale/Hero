@@ -1,4 +1,3 @@
-
 #include "remote_task.h"
 
 static uint8_t *sbus_rx_buffer[2];

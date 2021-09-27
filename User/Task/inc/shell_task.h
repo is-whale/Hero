@@ -8,6 +8,7 @@
 #include "usart3.h"
 #include "stm32f4xx_ll_usart.h."
 #include "usart3.h"
+#include "shell.h"
 
 #define PRINT_USART_INIT() {Usart3_Tx_Init();Usart3_Rx_Init();}
 

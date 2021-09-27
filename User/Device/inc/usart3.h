@@ -33,7 +33,7 @@
 	#define debug_showdata2(name, data)
 	#define debug_error(err)
 	#define debug_array1(name, data, len)
-    #define debug_array2(name, data, len)
+	#define debug_array2(name, data, len)
 #endif
 
 void Usart3_Tx_Init(void);
@@ -44,5 +44,4 @@ int __printf(const char *format, ...);
 void Usart3_Rx_Init(void);
 uint8_t *Get_Usart3_DMA_RxBuffer(void);
 const uint16_t *Get_Usart3_DMA_Rx_MaxLen(void);
-
 #endif //__USART3_H_
