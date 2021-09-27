@@ -193,7 +193,6 @@ void DMA1_Stream3_IRQHandler(void)
 /**
   * @brief This function handles USART3 global interrupt.
   */
- #include "led.h"
 void USART3_IRQHandler(void)
 {
   /* USER CODE BEGIN USART3_IRQn 0 */

@@ -54,14 +54,6 @@ osStaticThreadDef_t defaultTaskControlBlock;
 osThreadId shellTaskHandle;
 uint32_t shellTaskBuffer[ 1024 ];
 osStaticThreadDef_t shellTaskControlBlock;
-osThreadId printTaskHandle;
-uint32_t printTaskBuffer[ 512 ];
-osStaticThreadDef_t printTaskControlBlock;
-osMessageQId printQueueHandle;
-uint8_t printQueueBuffer[ 2 * 257 ];
-osStaticMessageQDef_t printQueueControlBlock;
-osMutexId usart3TxMutexHandle;
-osStaticMutexDef_t usart3TxMutexControlBlock;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -70,7 +62,6 @@ osStaticMutexDef_t usart3TxMutexControlBlock;
 
 void StartDefaultTask(void const * argument);
 void StartShellTask(void const * argument);
-void StartPrintTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -99,10 +90,6 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
-  /* Create the mutex(es) */
-  /* definition and creation of usart3TxMutex */
-  osMutexStaticDef(usart3TxMutex, &usart3TxMutexControlBlock);
-  usart3TxMutexHandle = osMutexCreate(osMutex(usart3TxMutex));
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -116,11 +103,6 @@ void MX_FREERTOS_Init(void) {
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
-  /* Create the queue(s) */
-  /* definition and creation of printQueue */
-  osMessageQStaticDef(printQueue, 2, 257, printQueueBuffer, &printQueueControlBlock);
-  printQueueHandle = osMessageCreate(osMessageQ(printQueue), NULL);
-
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -133,10 +115,6 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of shellTask */
   osThreadStaticDef(shellTask, StartShellTask, osPriorityBelowNormal, 0, 1024, shellTaskBuffer, &shellTaskControlBlock);
   shellTaskHandle = osThreadCreate(osThread(shellTask), NULL);
-
-  /* definition and creation of printTask */
-  osThreadStaticDef(printTask, StartPrintTask, osPriorityLow, 0, 512, printTaskBuffer, &printTaskControlBlock);
-  printTaskHandle = osThreadCreate(osThread(printTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -178,24 +156,6 @@ __weak void StartShellTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartShellTask */
-}
-
-/* USER CODE BEGIN Header_StartPrintTask */
-/**
-* @brief Function implementing the printTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartPrintTask */
-__weak void StartPrintTask(void const * argument)
-{
-  /* USER CODE BEGIN StartPrintTask */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END StartPrintTask */
 }
 
 /* Private application code --------------------------------------------------*/
