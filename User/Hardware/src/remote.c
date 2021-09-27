@@ -1,159 +1,159 @@
 #include "remote.h"
 
 /**
- * @brief                                   è§£æžä¸²å£æŽ¥æ”¶çš„é¥æŽ§å™¨æ•°æ®
- * @param[in]  {volatile_const_uint8_t_*}   sbus_buf å­˜å‚¨ä¸²å£æŽ¥æ”¶çš„æ•°æ®ç¼“å†²åŒº
- * @param[in]  {Rc_Ctrl_t_*}                rc_ctrl æŒ‡å‘é¥æŽ§å™¨çš„ç»“æž„ä½“æŒ‡é’ˆ
+ * @brief                                   ½âÎö´®¿Ú½ÓÊÕµÄÒ£¿ØÆ÷Êý¾Ý
+ * @param[in]  {volatile_const_uint8_t_*}   sbus_buf ´æ´¢´®¿Ú½ÓÊÕµÄÊý¾Ý»º³åÇø
+ * @param[in]  {Rc_Ctrl_t_*}                rc_ctrl Ö¸ÏòÒ£¿ØÆ÷µÄ½á¹¹ÌåÖ¸Õë
  * @retval                                  void
  */
 void Parse_Remoter_Data(volatile const uint8_t *sbus_buf, Rc_Ctrl_t *rc_ctrl)
 {
-    rc_ctrl->rc.ch0 = (sbus_buf[0] | (sbus_buf[1] << 8)) & 0x07ff;        ///< Channel 0
-    rc_ctrl->rc.ch1 = ((sbus_buf[1] >> 3) | (sbus_buf[2] << 5)) & 0x07ff; ///< Channel 1
-    rc_ctrl->rc.ch2 = ((sbus_buf[2] >> 6) | (sbus_buf[3] << 2) |          ///< Channel 2
-                       (sbus_buf[4] << 10)) &
-                      0x07ff;
-    rc_ctrl->rc.ch3 = ((sbus_buf[4] >> 1) | (sbus_buf[5] << 7)) & 0x07ff; ///< Channel 3
-    rc_ctrl->rc.s1 = ((sbus_buf[5] >> 4) & 0x0003);                       ///< Switch left
-    rc_ctrl->rc.s2 = ((sbus_buf[5] >> 4) & 0x000C) >> 2;                  ///< Switch right
-    rc_ctrl->mouse.x = sbus_buf[6] | (sbus_buf[7] << 8);                  ///< Mouse X axis
-    rc_ctrl->mouse.y = sbus_buf[8] | (sbus_buf[9] << 8);                  ///< Mouse Y axis
-    rc_ctrl->mouse.z = sbus_buf[10] | (sbus_buf[11] << 8);                ///< Mouse Z axis
-    rc_ctrl->mouse.press_l = sbus_buf[12];                                ///< Mouse Left Is Press ?
-    rc_ctrl->mouse.press_r = sbus_buf[13];                                ///< Mouse Right Is Press ?
-    rc_ctrl->key.value = sbus_buf[14] | (sbus_buf[15] << 8);              ///< KeyBoard value
-    rc_ctrl->rc.ch4 = sbus_buf[16] | (sbus_buf[17] << 8);                 ///< Channel 4
+	rc_ctrl->rc.ch0 = (sbus_buf[0] | (sbus_buf[1] << 8)) & 0x07ff;		  ///< Channel 0
+	rc_ctrl->rc.ch1 = ((sbus_buf[1] >> 3) | (sbus_buf[2] << 5)) & 0x07ff; ///< Channel 1
+	rc_ctrl->rc.ch2 = ((sbus_buf[2] >> 6) | (sbus_buf[3] << 2) |		  ///< Channel 2
+					   (sbus_buf[4] << 10)) &
+					  0x07ff;
+	rc_ctrl->rc.ch3 = ((sbus_buf[4] >> 1) | (sbus_buf[5] << 7)) & 0x07ff; ///< Channel 3
+	rc_ctrl->rc.s1 = ((sbus_buf[5] >> 4) & 0x0003);						  ///< Switch left
+	rc_ctrl->rc.s2 = ((sbus_buf[5] >> 4) & 0x000C) >> 2;				  ///< Switch right
+	rc_ctrl->mouse.x = sbus_buf[6] | (sbus_buf[7] << 8);				  ///< Mouse X axis
+	rc_ctrl->mouse.y = sbus_buf[8] | (sbus_buf[9] << 8);				  ///< Mouse Y axis
+	rc_ctrl->mouse.z = sbus_buf[10] | (sbus_buf[11] << 8);				  ///< Mouse Z axis
+	rc_ctrl->mouse.press_l = sbus_buf[12];								  ///< Mouse Left Is Press ?
+	rc_ctrl->mouse.press_r = sbus_buf[13];								  ///< Mouse Right Is Press ?
+	rc_ctrl->key.value = sbus_buf[14] | (sbus_buf[15] << 8);			  ///< KeyBoard value
+	rc_ctrl->rc.ch4 = sbus_buf[16] | (sbus_buf[17] << 8);				  ///< Channel 4
 
-    rc_ctrl->rc.ch0 -= RC_CH_VALUE_OFFSET;
-    rc_ctrl->rc.ch1 -= RC_CH_VALUE_OFFSET;
-    rc_ctrl->rc.ch2 -= RC_CH_VALUE_OFFSET;
-    rc_ctrl->rc.ch3 -= RC_CH_VALUE_OFFSET;
-    rc_ctrl->rc.ch4 -= RC_CH_VALUE_OFFSET;
+	rc_ctrl->rc.ch0 -= RC_CH_VALUE_OFFSET;
+	rc_ctrl->rc.ch1 -= RC_CH_VALUE_OFFSET;
+	rc_ctrl->rc.ch2 -= RC_CH_VALUE_OFFSET;
+	rc_ctrl->rc.ch3 -= RC_CH_VALUE_OFFSET;
+	rc_ctrl->rc.ch4 -= RC_CH_VALUE_OFFSET;
 
-    ///< å°†WASDæŒ‰é”®æ•°æ®è§£æžä¸ºè™šæ‹Ÿé¥æ„Ÿ
-    Parse_Wasd_Key_To_Virtual_Rocker(rc_ctrl);
+	///< ½«WASD°´¼üÊý¾Ý½âÎöÎªÐéÄâÒ£¸Ð
+	Parse_Wasd_Key_To_Virtual_Rocker(rc_ctrl);
 
-    ///< é¼ æ ‡xã€yè½´é™å¹…
-    rc_ctrl->mouse.x = Mouse_Coordnite_Value_Limit(rc_ctrl->mouse.x, -5000, 5000);
-    rc_ctrl->mouse.y = Mouse_Coordnite_Value_Limit(rc_ctrl->mouse.y, -5000, 5000);
+	///< Êó±êx¡¢yÖáÏÞ·ù
+	rc_ctrl->mouse.x = Mouse_Coordnite_Value_Limit(rc_ctrl->mouse.x, -5000, 5000);
+	rc_ctrl->mouse.y = Mouse_Coordnite_Value_Limit(rc_ctrl->mouse.y, -5000, 5000);
 }
 
 /**
- * @brief                   é™åˆ¶é¼ æ ‡çš„å–å€¼èŒƒå›´
- * @param[in]  {uint16_t}   data è¾“å…¥å€¼
- * @param[in]  {uint16_t}   min_value æœ€å°å€¼
- * @param[in]  {uint16_t}   max_value æœ€å¤§å€¼
- * @retval     {uint16_t}   åˆæ³•çš„æ•°æ®
+ * @brief                   ÏÞÖÆÊó±êµÄÈ¡Öµ·¶Î§
+ * @param[in]  {uint16_t}   data ÊäÈëÖµ
+ * @param[in]  {uint16_t}   min_value ×îÐ¡Öµ
+ * @param[in]  {uint16_t}   max_value ×î´óÖµ
+ * @retval     {uint16_t}   ºÏ·¨µÄÊý¾Ý
  */
 int16_t Mouse_Coordnite_Value_Limit(int16_t data, int16_t min_value, int16_t max_value)
 {
-    if (data > max_value)
-        return max_value;
-    else if (data < min_value)
-        return min_value;
-    return data;
+	if (data > max_value)
+		return max_value;
+	else if (data < min_value)
+		return min_value;
+	return data;
 }
 
 /**
- * @brief                   å°†æŒ‰é”®æ•°æ®æ¨¡æ‹Ÿè§£æžä¸ºé¥æŽ§å™¨æ•°æ®
- * @param[in]  {Rc_Ctrl_t}  é¥æŽ§å™¨æ•°æ®æŒ‡é’ˆ
+ * @brief                   ½«°´¼üÊý¾ÝÄ£Äâ½âÎöÎªÒ£¿ØÆ÷Êý¾Ý
+ * @param[in]  {Rc_Ctrl_t}  Ò£¿ØÆ÷Êý¾ÝÖ¸Õë
  * @retval                  void
  */
 void Parse_Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t *rc)
 {
-    #define RC_KEY rc->key.value
-    #define KEY_PRESSED(key) (RC_KEY & key)
+#define RC_KEY rc->key.value
+#define KEY_PRESSED(key) (RC_KEY & key)
 
-    ///< åªæŒ‰ä¸‹Wæ—¶ï¼Œä¸æŒ‰ä¸‹S
-    if (KEY_PRESSED(KEY_W) && !(KEY_PRESSED(KEY_S)))
-    {
-        if (rc->virtual_rocker.ch3 < 0)
-        {
-            rc->virtual_rocker.ch3 += VIRTUAL_ROCKER_STEP2;
-        }
-        if (rc->virtual_rocker.ch3 < 600)
-        {
-            rc->virtual_rocker.ch3 += VIRTUAL_ROCKER_STEP1;
-        }
-    }
-    ///< åªæŒ‰ä¸‹Sæ—¶ï¼Œä¸æŒ‰ä¸‹W
-    else if (KEY_PRESSED(KEY_S) && !(KEY_PRESSED(KEY_W)))
-    {
-        if (rc->virtual_rocker.ch3 > 0)
-        {
-            rc->virtual_rocker.ch3 -= VIRTUAL_ROCKER_STEP2;
-        }
-        if (rc->virtual_rocker.ch3 > -600)
-        {
-            rc->virtual_rocker.ch3 -= VIRTUAL_ROCKER_STEP1;
-        }
-    }
-    ///< Wã€Séƒ½æœªæŒ‰ä¸‹æ—¶
-    else
-    {
-        if (rc->virtual_rocker.ch3 < 0)
-        {
-            rc->virtual_rocker.ch3 += VIRTUAL_ROCKER_STEP2;
-            if (rc->virtual_rocker.ch3 > 0)
-                rc->virtual_rocker.ch3 = 0;
-        }
-        else if (rc->virtual_rocker.ch3 > 0)
-        {
-            rc->virtual_rocker.ch3 -= VIRTUAL_ROCKER_STEP2;
-            if (rc->virtual_rocker.ch3 < 0)
-                rc->virtual_rocker.ch3 = 0;
-        }
-    }
+	///< Ö»°´ÏÂWÊ±£¬²»°´ÏÂS
+	if (KEY_PRESSED(KEY_W) && !(KEY_PRESSED(KEY_S)))
+	{
+		if (rc->virtual_rocker.ch3 < 0)
+		{
+			rc->virtual_rocker.ch3 += VIRTUAL_ROCKER_STEP2;
+		}
+		if (rc->virtual_rocker.ch3 < 600)
+		{
+			rc->virtual_rocker.ch3 += VIRTUAL_ROCKER_STEP1;
+		}
+	}
+	///< Ö»°´ÏÂSÊ±£¬²»°´ÏÂW
+	else if (KEY_PRESSED(KEY_S) && !(KEY_PRESSED(KEY_W)))
+	{
+		if (rc->virtual_rocker.ch3 > 0)
+		{
+			rc->virtual_rocker.ch3 -= VIRTUAL_ROCKER_STEP2;
+		}
+		if (rc->virtual_rocker.ch3 > -600)
+		{
+			rc->virtual_rocker.ch3 -= VIRTUAL_ROCKER_STEP1;
+		}
+	}
+	///< W¡¢S¶¼Î´°´ÏÂÊ±
+	else
+	{
+		if (rc->virtual_rocker.ch3 < 0)
+		{
+			rc->virtual_rocker.ch3 += VIRTUAL_ROCKER_STEP2;
+			if (rc->virtual_rocker.ch3 > 0)
+				rc->virtual_rocker.ch3 = 0;
+		}
+		else if (rc->virtual_rocker.ch3 > 0)
+		{
+			rc->virtual_rocker.ch3 -= VIRTUAL_ROCKER_STEP2;
+			if (rc->virtual_rocker.ch3 < 0)
+				rc->virtual_rocker.ch3 = 0;
+		}
+	}
 
-    ///< åªæŒ‰ä¸‹Dæ—¶
-    if (KEY_PRESSED(KEY_D) && !(KEY_PRESSED(KEY_A)))
-    {
-        if (rc->virtual_rocker.ch2 < 0)
-        {
-            rc->virtual_rocker.ch2 += VIRTUAL_ROCKER_STEP2;
-        }
-        if (rc->virtual_rocker.ch2 < 600)
-        {
-            rc->virtual_rocker.ch2 += VIRTUAL_ROCKER_STEP1;
-        }
-    }
-    ///< åªæŒ‰ä¸‹Aæ—¶
-    else if (KEY_PRESSED(KEY_A) && !(KEY_PRESSED(KEY_D)))
-    {
-        if (rc->virtual_rocker.ch2 > 0)
-        {
-            rc->virtual_rocker.ch2 -= VIRTUAL_ROCKER_STEP2;
-        }
-        if (rc->virtual_rocker.ch2 > -600)
-        {
-            rc->virtual_rocker.ch2 -= VIRTUAL_ROCKER_STEP1;
-        }
-    }
-    ///< Aã€Déƒ½æœªæŒ‰ä¸‹æ—¶
-    else
-    {
-        if (rc->virtual_rocker.ch2 < 0)
-        {
-            rc->virtual_rocker.ch2 += VIRTUAL_ROCKER_STEP2;
-            if (rc->virtual_rocker.ch2 > 0)
-                rc->virtual_rocker.ch2 = 0;
-        }
-        else if (rc->virtual_rocker.ch2 > 0)
-        {
-            rc->virtual_rocker.ch2 -= VIRTUAL_ROCKER_STEP2;
-            if (rc->virtual_rocker.ch2 < 0)
-                rc->virtual_rocker.ch2 = 0;
-        }
-    }
-    #undef RC_KEY
-    #undef KEY_PRESSED
+	///< Ö»°´ÏÂDÊ±
+	if (KEY_PRESSED(KEY_D) && !(KEY_PRESSED(KEY_A)))
+	{
+		if (rc->virtual_rocker.ch2 < 0)
+		{
+			rc->virtual_rocker.ch2 += VIRTUAL_ROCKER_STEP2;
+		}
+		if (rc->virtual_rocker.ch2 < 600)
+		{
+			rc->virtual_rocker.ch2 += VIRTUAL_ROCKER_STEP1;
+		}
+	}
+	///< Ö»°´ÏÂAÊ±
+	else if (KEY_PRESSED(KEY_A) && !(KEY_PRESSED(KEY_D)))
+	{
+		if (rc->virtual_rocker.ch2 > 0)
+		{
+			rc->virtual_rocker.ch2 -= VIRTUAL_ROCKER_STEP2;
+		}
+		if (rc->virtual_rocker.ch2 > -600)
+		{
+			rc->virtual_rocker.ch2 -= VIRTUAL_ROCKER_STEP1;
+		}
+	}
+	///< A¡¢D¶¼Î´°´ÏÂÊ±
+	else
+	{
+		if (rc->virtual_rocker.ch2 < 0)
+		{
+			rc->virtual_rocker.ch2 += VIRTUAL_ROCKER_STEP2;
+			if (rc->virtual_rocker.ch2 > 0)
+				rc->virtual_rocker.ch2 = 0;
+		}
+		else if (rc->virtual_rocker.ch2 > 0)
+		{
+			rc->virtual_rocker.ch2 -= VIRTUAL_ROCKER_STEP2;
+			if (rc->virtual_rocker.ch2 < 0)
+				rc->virtual_rocker.ch2 = 0;
+		}
+	}
+#undef RC_KEY
+#undef KEY_PRESSED
 }
 
 /**
- * @brief                   æ£€éªŒé¥æŽ§å™¨æ•°æ®æ˜¯å¦åˆæ³•
- * @param[in]  {Rc_Ctrl_t}  é¥æŽ§å™¨æ•°æ®æŒ‡é’ˆ
- * @retval                  1: ä¸åˆæ³•
- *                          0: åˆæ³•
+ * @brief                   ¼ìÑéÒ£¿ØÆ÷Êý¾ÝÊÇ·ñºÏ·¨
+ * @param[in]  {Rc_Ctrl_t}  Ò£¿ØÆ÷Êý¾ÝÖ¸Õë
+ * @retval                  1: ²»ºÏ·¨
+ *                          0: ºÏ·¨
  */
 uint8_t Remoter_Data_Check(Rc_Ctrl_t *rc)
 {
@@ -184,23 +184,22 @@ uint8_t Remoter_Data_Check(Rc_Ctrl_t *rc)
 	return 0;
 }
 
-
 /**
- * @brief               å°† rc2 èµ‹å€¼ç»™ rc1 
- * @param {Rc_Ctrl_t}   é¥æŽ§å™¨æ•°æ® 1
- * @param {Rc_Ctrl_t}   é¥æŽ§å™¨æ•°æ® 2
+ * @brief               ½« rc2 ¸³Öµ¸ø rc1 
+ * @param {Rc_Ctrl_t}   Ò£¿ØÆ÷Êý¾Ý 1
+ * @param {Rc_Ctrl_t}   Ò£¿ØÆ÷Êý¾Ý 2
  * @retval              void
  */
-void Rc_Data_Copy(Rc_Ctrl_t* rc1, Rc_Ctrl_t* rc2)
+void Rc_Data_Copy(Rc_Ctrl_t *rc1, Rc_Ctrl_t *rc2)
 {
 	rc1->key.value = rc2->key.value;
-	
+
 	rc1->mouse.press_l = rc2->mouse.press_l;
 	rc1->mouse.press_r = rc2->mouse.press_r;
 	rc1->mouse.x = rc2->mouse.x;
 	rc1->mouse.y = rc2->mouse.y;
 	rc1->mouse.z = rc2->mouse.z;
-	
+
 	rc1->rc.ch0 = rc2->rc.ch0;
 	rc1->rc.ch1 = rc2->rc.ch1;
 	rc1->rc.ch2 = rc2->rc.ch2;
@@ -211,20 +210,20 @@ void Rc_Data_Copy(Rc_Ctrl_t* rc1, Rc_Ctrl_t* rc2)
 }
 
 /**
- * @brief               é‡ç½®é¥æŽ§å™¨æ•°æ® 
- * @param {Rc_Ctrl_t}   é¥æŽ§å™¨æ•°æ®
+ * @brief               ÖØÖÃÒ£¿ØÆ÷Êý¾Ý 
+ * @param {Rc_Ctrl_t}   Ò£¿ØÆ÷Êý¾Ý
  * @retval              void
  */
-void Rc_Data_Reset(Rc_Ctrl_t* rc)
+void Rc_Data_Reset(Rc_Ctrl_t *rc)
 {
 	rc->key.value = 0;
-	
+
 	rc->mouse.press_l = 0;
 	rc->mouse.press_r = 0;
 	rc->mouse.x = 0;
 	rc->mouse.y = 0;
 	rc->mouse.z = 0;
-	
+
 	rc->rc.ch0 = 0;
 	rc->rc.ch1 = 0;
 	rc->rc.ch2 = 0;

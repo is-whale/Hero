@@ -1,109 +1,109 @@
 #include "usart1.h"
 
-static const uint16_t usart1_dma_rx_max_len = 128;                   ///< USART1 DMA æœ€å¤§æŽ¥æ”¶é•¿åº¦
-volatile uint8_t usart1_dma_rx_buffer[usart1_dma_rx_max_len];        ///< USART1 DMA æŽ¥å—ç¼“å†²åŒº 1
-volatile uint8_t usart1_dma_rx_buffer_second[usart1_dma_rx_max_len]; ///< USART1 DMA æŽ¥å—ç¼“å†²åŒº 2
-static uint16_t usart1_dma_rxd_data_len;                             ///< USART1 DMA å·²ç»æŽ¥æ”¶åˆ°çš„æ•°æ®é•¿åº¦
+static const uint16_t usart1_dma_rx_max_len = 128;                   ///< USART1 DMA ×î´ó½ÓÊÕ³¤¶È
+volatile uint8_t usart1_dma_rx_buffer[usart1_dma_rx_max_len];        ///< USART1 DMA ½ÓÊÜ»º³åÇø 1
+volatile uint8_t usart1_dma_rx_buffer_second[usart1_dma_rx_max_len]; ///< USART1 DMA ½ÓÊÜ»º³åÇø 2
+static uint16_t usart1_dma_rxd_data_len;                             ///< USART1 DMA ÒÑ¾­½ÓÊÕµ½µÄÊý¾Ý³¤¶È
 
 /**
- * @brief       åˆå§‹åŒ–ä¸²å£ 1 çš„æŽ¥æ”¶ DMA 
+ * @brief       ³õÊ¼»¯´®¿Ú 1 µÄ½ÓÊÕ DMA 
  * @param[in]   none
  * @retval      void
  */
 void Usart1_RxDMA_Init(void)
 {
-    LL_DMA_SetPeriphAddress(DMA2, LL_DMA_STREAM_2, LL_USART_DMA_GetRegAddr(USART1));
-    LL_DMA_SetMemoryAddress(DMA2, LL_DMA_STREAM_2, (uint32_t)(usart1_dma_rx_buffer));
-    LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_2, usart1_dma_rx_max_len);
+	LL_DMA_SetPeriphAddress(DMA2, LL_DMA_STREAM_2, LL_USART_DMA_GetRegAddr(USART1));
+	LL_DMA_SetMemoryAddress(DMA2, LL_DMA_STREAM_2, (uint32_t)(usart1_dma_rx_buffer));
+	LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_2, usart1_dma_rx_max_len);
 
-    ///< å¼€å¯ DMA åŒç¼“å†²
-    LL_DMA_SetMemory1Address(DMA2, LL_DMA_STREAM_2, (uint32_t)(usart1_dma_rx_buffer_second));
-    LL_DMA_SetCurrentTargetMem(DMA2, LL_DMA_STREAM_2, LL_DMA_CURRENTTARGETMEM0);
-    LL_DMA_EnableDoubleBufferMode(DMA2, LL_DMA_STREAM_2);
+	///< ¿ªÆô DMA Ë«»º³å
+	LL_DMA_SetMemory1Address(DMA2, LL_DMA_STREAM_2, (uint32_t)(usart1_dma_rx_buffer_second));
+	LL_DMA_SetCurrentTargetMem(DMA2, LL_DMA_STREAM_2, LL_DMA_CURRENTTARGETMEM0);
+	LL_DMA_EnableDoubleBufferMode(DMA2, LL_DMA_STREAM_2);
 
-    LL_USART_ClearFlag_IDLE(USART1);
-    LL_USART_EnableIT_IDLE(USART1);
+	LL_USART_ClearFlag_IDLE(USART1);
+	LL_USART_EnableIT_IDLE(USART1);
 
-    LL_USART_EnableDMAReq_RX(USART1);
+	LL_USART_EnableDMAReq_RX(USART1);
 
-    LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_2);
+	LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_2);
 }
 
 /**
- * @brief           ä¸²å£ 1 çš„æŽ¥æ”¶ä¸­æ–­å‡½æ•° 
+ * @brief           ´®¿Ú 1 µÄ½ÓÊÕÖÐ¶Ïº¯Êý 
  * @param[in]       none
  * @retval          void
  */
 void Usart1_DMA_RxCp_Callback(void)
 {
-    if (LL_USART_IsActiveFlag_IDLE(USART1))
-    {
-        ///< å…³é—­ DMA
-        LL_DMA_DisableStream(DMA2, LL_DMA_STREAM_2);
+	if (LL_USART_IsActiveFlag_IDLE(USART1))
+	{
+		///< ¹Ø±Õ DMA
+		LL_DMA_DisableStream(DMA2, LL_DMA_STREAM_2);
 
-        ///< æ¸…æ¥š IDLE ä¸­æ–­ã€DMA TC2 æ ‡å¿—ä½
-        LL_USART_ClearFlag_IDLE(USART1);
-        LL_DMA_ClearFlag_TC2(DMA2);
+		///< Çå³þ IDLE ÖÐ¶Ï¡¢DMA TC2 ±êÖ¾Î»
+		LL_USART_ClearFlag_IDLE(USART1);
+		LL_DMA_ClearFlag_TC2(DMA2);
 
-        ///< èŽ·å–è¯¥å¸§çš„æ•°æ®é•¿åº¦
-        usart1_dma_rxd_data_len = usart1_dma_rx_max_len - LL_DMA_GetDataLength(DMA2, LL_DMA_STREAM_2);
+		///< »ñÈ¡¸ÃÖ¡µÄÊý¾Ý³¤¶È
+		usart1_dma_rxd_data_len = usart1_dma_rx_max_len - LL_DMA_GetDataLength(DMA2, LL_DMA_STREAM_2);
 
-        ///< é‡æ–°è®¾ç½®æ•°æ®ä¼ è¾“é•¿åº¦
-        LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_2, usart1_dma_rx_max_len);
+		///< ÖØÐÂÉèÖÃÊý¾Ý´«Êä³¤¶È
+		LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_2, usart1_dma_rx_max_len);
 
-        ///< é€šçŸ¥ä»»åŠ¡è¿›è¡Œè§£æž
-        Info_RemoteTask_Parse_Data();
+		///< Í¨ÖªÈÎÎñ½øÐÐ½âÎö
+		Info_RemoteTask_Parse_Data();
 
-        ///< é‡æ–°å¼€å¯ DMA
-        LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_2);
-    }
+		///< ÖØÐÂ¿ªÆô DMA
+		LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_2);
+	}
 }
 /**
- * @brief           è¿”å›ž USART1 DMA çš„ç¬¬ä¸€ä¸ªæŽ¥å—ç¼“å†²åŒºæŒ‡é’ˆ
+ * @brief           ·µ»Ø USART1 DMA µÄµÚÒ»¸ö½ÓÊÜ»º³åÇøÖ¸Õë
  * @param[in]       none
- * @retval          USART1 DMA çš„æŽ¥å—ç¼“å†²åŒºåœ°å€
+ * @retval          USART1 DMA µÄ½ÓÊÜ»º³åÇøµØÖ·
  */
 uint8_t *Get_Usart1_DMA_RxBuffer_One(void)
 {
-    return (uint8_t *)usart1_dma_rx_buffer;
+	return (uint8_t *)usart1_dma_rx_buffer;
 }
 /**
- * @brief           è¿”å›ž USART1 DMA çš„æŽ¥å—ç¼“å†²åŒºæœ€å¤§æŽ¥å—é•¿åº¦
+ * @brief           ·µ»Ø USART1 DMA µÄ½ÓÊÜ»º³åÇø×î´ó½ÓÊÜ³¤¶È
  * @param[in]       none
- * @retval          USART1 DMA çš„æœ€å¤§æŽ¥æ”¶é•¿åº¦
+ * @retval          USART1 DMA µÄ×î´ó½ÓÊÕ³¤¶È
  */
 const uint16_t *Get_Usart1_DMA_RxMaxLen(void)
 {
-    return &usart1_dma_rx_max_len;
+	return &usart1_dma_rx_max_len;
 }
 /**
- * @brief           è¿”å›ž USART1 DMA çš„æŽ¥å—ç¼“å†²åŒºå·²ç»æŽ¥å—åˆ°çš„æ•°æ®é•¿åº¦
+ * @brief           ·µ»Ø USART1 DMA µÄ½ÓÊÜ»º³åÇøÒÑ¾­½ÓÊÜµ½µÄÊý¾Ý³¤¶È
  * @param[in]       none
- * @retval          USART1 DMA å·²ç»æŽ¥å—åˆ°äº†å¤šé•¿çš„æ•°æ®
+ * @retval          USART1 DMA ÒÑ¾­½ÓÊÜµ½ÁË¶à³¤µÄÊý¾Ý
  */
 uint16_t *Get_Usart1_DMA_Rxd_DataLen(void)
 {
-    return &usart1_dma_rxd_data_len;
+	return &usart1_dma_rxd_data_len;
 }
 /**
- * @brief           è¿”å›ž USART1 DMA ç¬¬äºŒä¸ªæŽ¥æ”¶ç¼“å†²åŒº
+ * @brief           ·µ»Ø USART1 DMA µÚ¶þ¸ö½ÓÊÕ»º³åÇø
  * @param[in]       none
- * @retval          USART1 DMA çš„æŽ¥å—ç¼“å†²åŒºåœ°å€
+ * @retval          USART1 DMA µÄ½ÓÊÜ»º³åÇøµØÖ·
  */
 uint8_t *Get_Usart1_DMA_RxBuffer_Two(void)
 {
-    return (uint8_t *)(usart1_dma_rx_buffer_second);
+	return (uint8_t *)(usart1_dma_rx_buffer_second);
 }
 /**
- * @brief           è¿”å›ž USART1 DMA çš„å½“å‰å¯ç”¨çš„æŽ¥å—ç¼“å†²åŒº
+ * @brief           ·µ»Ø USART1 DMA µÄµ±Ç°¿ÉÓÃµÄ½ÓÊÜ»º³åÇø
  * @param[in]       none
- * @retval          USART1 DMA çš„å½“å‰å¯ç”¨çš„æŽ¥å—ç¼“å†²åŒº
+ * @retval          USART1 DMA µÄµ±Ç°¿ÉÓÃµÄ½ÓÊÜ»º³åÇø
  */
 uint8_t Get_Rc_Available_Bufferx(void)
 {
-    if (LL_DMA_GetCurrentTargetMem(DMA2, LL_DMA_STREAM_2))
-    {
-        return 1;
-    }
-    return 0;
+	if (LL_DMA_GetCurrentTargetMem(DMA2, LL_DMA_STREAM_2))
+	{
+		return 1;
+	}
+	return 0;
 }
