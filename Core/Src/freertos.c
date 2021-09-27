@@ -57,6 +57,9 @@ osStaticThreadDef_t shellTaskControlBlock;
 osThreadId remoteTaskHandle;
 uint32_t remoteTaskBuffer[ 512 ];
 osStaticThreadDef_t remoteTaskControlBlock;
+osThreadId monitorTaskHandle;
+uint32_t monitorTaskBuffer[ 512 ];
+osStaticThreadDef_t monitorTaskControlBlock;
 osSemaphoreId shellGetDataBinarySemHandle;
 osStaticSemaphoreDef_t myBinarySem01ControlBlock;
 osSemaphoreId remoteGetDataBinarySemHandle;
@@ -70,6 +73,7 @@ osStaticSemaphoreDef_t remoteGetDataBinarySemControlBlock;
 void StartDefaultTask(void const * argument);
 void StartShellTask(void const * argument);
 void StartRemoteTask(void const * argument);
+void StartMonitorTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -137,6 +141,10 @@ void MX_FREERTOS_Init(void) {
   osThreadStaticDef(remoteTask, StartRemoteTask, osPriorityHigh, 0, 512, remoteTaskBuffer, &remoteTaskControlBlock);
   remoteTaskHandle = osThreadCreate(osThread(remoteTask), NULL);
 
+  /* definition and creation of monitorTask */
+  osThreadStaticDef(monitorTask, StartMonitorTask, osPriorityLow, 0, 512, monitorTaskBuffer, &monitorTaskControlBlock);
+  monitorTaskHandle = osThreadCreate(osThread(monitorTask), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -195,6 +203,24 @@ __weak void StartRemoteTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartRemoteTask */
+}
+
+/* USER CODE BEGIN Header_StartMonitorTask */
+/**
+* @brief Function implementing the monitorTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartMonitorTask */
+__weak void StartMonitorTask(void const * argument)
+{
+  /* USER CODE BEGIN StartMonitorTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartMonitorTask */
 }
 
 /* Private application code --------------------------------------------------*/
