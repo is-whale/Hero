@@ -5,14 +5,14 @@
 union cmd_id
 {
     struct
-    { // å‘½ä»¤å·åˆ†ä¸ºä»¥ä¸‹äº”ä¸ªéƒ¨åˆ†
-        unsigned int num : 8;        ///< å‘½ä»¤åºå·
-        unsigned int sum : 8;        ///< å‘½ä»¤å­—ç¬¦çš„æ€»å’Œ
-        unsigned int len : 8;        ///< å‘½ä»¤å­—ç¬¦çš„é•¿åº¦ï¼Œ8 bit ï¼Œå³å‘½ä»¤é•¿åº¦ä¸èƒ½è¶…è¿‡31ä¸ªå­—ç¬¦
-        unsigned int first_char : 8; ///< å‘½ä»¤å­—ç¬¦çš„ç¬¬ä¸€ä¸ªå­—ç¬¦
+    { // ÃüÁîºÅ·ÖÎªÒÔÏÂÎå¸ö²¿·Ö
+        unsigned int num : 8;        ///< ÃüÁîĞòºÅ
+        unsigned int sum : 8;        ///< ÃüÁî×Ö·ûµÄ×ÜºÍ
+        unsigned int len : 8;        ///< ÃüÁî×Ö·ûµÄ³¤¶È£¬8 bit £¬¼´ÃüÁî³¤¶È²»ÄÜ³¬¹ı31¸ö×Ö·û
+        unsigned int first_char : 8; ///< ÃüÁî×Ö·ûµÄµÚÒ»¸ö×Ö·û
     } part;
 
-    unsigned int id; ///< ç”±æ­¤åˆå¹¶ä¸º 32 ä½çš„å‘½ä»¤ç 
+    unsigned int id; ///< ÓÉ´ËºÏ²¢Îª 32 Î»µÄÃüÁîÂë
 };
 
 Shell_command_t shell_cmd_root;
@@ -20,11 +20,11 @@ Shell_command_t shell_cmd_root;
 
 /**
   * @author   Bashpow
-  * @brief    æ–°å‘½ä»¤æ’å…¥è®°å½•
+  * @brief    ĞÂÃüÁî²åÈë¼ÇÂ¼
   * @author   Bashpow
-  * @param    root     : æ£€ç´¢æ ¹ï¼Œé“¾è¡¨å¤´èŠ‚ç‚¹
-  * @param    newcmd   : æ–°å‘½ä»¤æ§åˆ¶å—
-  * @return   æˆåŠŸè¿”å› 0
+  * @param    root     : ¼ìË÷¸ù£¬Á´±íÍ·½Úµã
+  * @param    newcmd   : ĞÂÃüÁî¿ØÖÆ¿é
+  * @return   ³É¹¦·µ»Ø 0
 */
 static int Shell_Insert_Cmd(Shell_command_t * root , Shell_command_t * newcmd)
 {
@@ -50,13 +50,13 @@ static int Shell_Insert_Cmd(Shell_command_t * root , Shell_command_t * newcmd)
 
 /**
   * @author   Bashpow
-  * @brief    æ³¨å†Œä¸€ä¸ªå‘½ä»¤å·å’Œå¯¹åº”çš„å‘½ä»¤å‡½æ•° 
-  * @note     å‰ç¼€ä¸º '_' è¡¨ç¤ºä¸å»ºè®®ç›´æ¥è°ƒç”¨æ­¤å‡½æ•°ï¼Œé€šè¿‡ç›¸å¯¹äºçš„å®å®šä¹‰æ¥è°ƒç”¨
-  * @param    root     : å‘½ä»¤é“¾è¡¨å¤´
-  * @param    new_cmd   : å‘½ä»¤æ§åˆ¶å—å¯¹åº”çš„æŒ‡é’ˆ
-  * @param    cmd_name : å‘½ä»¤å
-  * @param    cmd_func : å‘½ä»¤åå¯¹åº”çš„æ‰§è¡Œå‡½æ•°
-  * @return   æ— 
+  * @brief    ×¢²áÒ»¸öÃüÁîºÅºÍ¶ÔÓ¦µÄÃüÁîº¯Êı 
+  * @note     Ç°×ºÎª '_' ±íÊ¾²»½¨ÒéÖ±½Óµ÷ÓÃ´Ëº¯Êı£¬Í¨¹ıÏà¶ÔÓÚµÄºê¶¨ÒåÀ´µ÷ÓÃ
+  * @param    root     : ÃüÁîÁ´±íÍ·
+  * @param    new_cmd   : ÃüÁî¿ØÖÆ¿é¶ÔÓ¦µÄÖ¸Õë
+  * @param    cmd_name : ÃüÁîÃû
+  * @param    cmd_func : ÃüÁîÃû¶ÔÓ¦µÄÖ´ĞĞº¯Êı
+  * @return   ÎŞ
 */
 void _Shell_Register(Shell_command_t * root, Shell_command_t * new_cmd, char * cmd_name, cmd_callback_func cmd_func)
 {
@@ -79,14 +79,14 @@ void _Shell_Register(Shell_command_t * root, Shell_command_t * new_cmd, char * c
 	new_cmd->func = cmd_func;
 	new_cmd->next = NULL;
 
-	Shell_Insert_Cmd(root, new_cmd); //æ’å…¥è‡³å‘½ä»¤é“¾è¡¨
+	Shell_Insert_Cmd(root, new_cmd); //²åÈëÖÁÃüÁîÁ´±í
 }
 
 /**
   * @author   Bashpow
-  * @brief    è§£æå‘½ä»¤
-  * @param    arg  : å‘½ä»¤è¡Œå†…å­˜
-  * @return   æ— 
+  * @brief    ½âÎöÃüÁî
+  * @param    arg  : ÃüÁîĞĞÄÚ´æ
+  * @return   ÎŞ
 */
 void Shell_Command_Parse(char * arg)
 {
@@ -103,7 +103,7 @@ void Shell_Command_Parse(char * arg)
 			if ((arg[node_id.part.len] == '\0') || (arg[node_id.part.len] == ' '))
 			{
 				shell_print("rov> %s\r\n", arg);
-				node->func(arg); //æ‰§è¡Œå›è°ƒå‡½æ•°
+				node->func(arg); //Ö´ĞĞ»Øµ÷º¯Êı
 				shell_print("\r\n");
 				return;
 			}
@@ -114,28 +114,28 @@ void Shell_Command_Parse(char * arg)
 
 /**
   * @author   Bashpow
-  * @brief    eg.æŠŠ "abc bc cdef xyz" æ‹†åˆ†ä¸º char*argv[] = {"abc","bc","cdef","xyz"};
-  * @note     è¿è¡Œè¿‡åå­—ç¬¦ä¸²ç¼“å†²åŒºå†…å®¹å°†è¢«ä¿®æ”¹
-  * @param    str    : å‘½ä»¤å­—ç¬¦ä¸²åé¢æ‰€è·Ÿå‚æ•°ç¼“å†²åŒºæŒ‡é’ˆ
-  * @param    argv   : æ•°æ®è½¬æ¢åç¼“å­˜åœ°å€
-  * @param    maxread: æœ€å¤§è¯»å–æ•°ï¼ˆä¸€èˆ¬ä¸ºargvçš„ä¸ªæ•°ï¼‰
-  * @return   æœ€ç»ˆè¯»å–å‚æ•°ä¸ªæ•°è¾“å‡º
+  * @brief    eg.°Ñ "abc bc cdef xyz" ²ğ·ÖÎª char*argv[] = {"abc","bc","cdef","xyz"};
+  * @note     ÔËĞĞ¹ıºó×Ö·û´®»º³åÇøÄÚÈİ½«±»ĞŞ¸Ä
+  * @param    str    : ÃüÁî×Ö·û´®ºóÃæËù¸ú²ÎÊı»º³åÇøÖ¸Õë
+  * @param    argv   : Êı¾İ×ª»»ºó»º´æµØÖ·
+  * @param    maxread: ×î´ó¶ÁÈ¡Êı£¨Ò»°ãÎªargvµÄ¸öÊı£©
+  * @return   ×îÖÕ¶ÁÈ¡²ÎÊı¸öÊıÊä³ö
 */
 int Shell_Split_String(char * str ,char ** argv ,int maxread)
 {
 	int argc = 0;
 
 	for (; ' ' == *str; ++str)
-		; //è·³è¿‡ç©ºæ ¼
+		; //Ìø¹ı¿Õ¸ñ
 
-	for (; *str && argc < maxread; ++argc, ++argv) //å­—ç¬¦ä¸ä¸º â€˜\0' çš„æ—¶å€™
+	for (; *str && argc < maxread; ++argc, ++argv) //×Ö·û²»Îª ¡®\0' µÄÊ±ºò
 	{
 
 		for (*argv = str; ' ' != *str && *str; ++str)
-			; //è®°å½•è¿™ä¸ªå‚æ•°ï¼Œç„¶åè·³è¿‡éç©ºå­—ç¬¦
+			; //¼ÇÂ¼Õâ¸ö²ÎÊı£¬È»ºóÌø¹ı·Ç¿Õ×Ö·û
 
 		for (; ' ' == *str; *str++ = '\0')
-			; //æ¯ä¸ªå‚æ•°åŠ å­—ç¬¦ä¸²ç»“æŸç¬¦ï¼Œè·³è¿‡ç©ºæ ¼
+			; //Ã¿¸ö²ÎÊı¼Ó×Ö·û´®½áÊø·û£¬Ìø¹ı¿Õ¸ñ
 	}
 
 	return argc;
@@ -144,24 +144,33 @@ int Shell_Split_String(char * str ,char ** argv ,int maxread)
 
 /**
   * @author   Bashpow
-  * @brief    æ˜¾ç¤ºæ‰€æœ‰æ³¨å†Œäº†çš„å‘½ä»¤
-  * @param    arg  : å‘½ä»¤è¡Œå†…å­˜
-  * @return   æ— 
+  * @brief    ÏÔÊ¾ËùÓĞ×¢²áÁËµÄÃüÁî
+  * @param    arg  : ÃüÁîĞĞÄÚ´æ
+  * @return   ÎŞ
 */
 #ifndef VERSION
 	#define VERSION "-"
 #endif
 static void Infantry_Version(char * arg)
 {
+	shell_print("\r\n");
+	shell_print("    __  ____    __       _____                          __  __              \r\n");
+	shell_print("   / / / / /   / /      / ___/__  ______  ___  _____   / / / /__  _________ \r\n");
+	shell_print("  / /_/ / /   / /       \\__ \\/ / / / __ \\/ _ \\/ ___/  / /_/ / _ \\/ ___/ __ \r\n");
+	shell_print(" / __  / /___/ /___    ___/ / /_/ / /_/ /  __/ /     / __  /  __/ /  / /_/ /\r\n");
+	shell_print("/_/ /_/_____/_____/   /____/\\__,_/ .___/\\___/_/     /_/ /_/\\___/_/   \\____/ \r\n");
+	shell_print("                                /_/                                         \r\n");
+	shell_print("\r\n");
+	shell_print("\r\n");
 	shell_print("version:\t%s\r\n", VERSION);
 }
 
 
 /**
   * @author   Bashpow
-  * @brief    æ˜¾ç¤ºæ‰€æœ‰æ³¨å†Œäº†çš„å‘½ä»¤
-  * @param    arg  : å‘½ä»¤è¡Œå†…å­˜
-  * @return   æ— 
+  * @brief    ÏÔÊ¾ËùÓĞ×¢²áÁËµÄÃüÁî
+  * @param    arg  : ÃüÁîĞĞÄÚ´æ
+  * @return   ÎŞ
 */
 static void Shell_List_Cmd(char * arg)
 {
@@ -177,8 +186,8 @@ static void Shell_List_Cmd(char * arg)
 
 /**
   * @author   Bashpow
-  * @brief    shell åˆå§‹åŒ–,æ³¨å†Œå‡ æ¡åŸºæœ¬çš„å‘½ä»¤ï¼Œæ³¨å†Œç”¨æˆ·å‘½ä»¤ã€‚ä¸å»ºè®®ä¸åˆå§‹åŒ–ã€‚
-  * @return   æ— 
+  * @brief    shell ³õÊ¼»¯,×¢²á¼¸Ìõ»ù±¾µÄÃüÁî£¬×¢²áÓÃ»§ÃüÁî¡£²»½¨Òé²»³õÊ¼»¯¡£
+  * @return   ÎŞ
 */
 void Shell_Init(void)
 {
@@ -188,11 +197,11 @@ void Shell_Init(void)
 		shell_cmd_root.next = NULL;
 	}
 	
-	/* æ³¨å†Œä¸€äº›åŸºæœ¬å‘½ä»¤ */
+	/* ×¢²áÒ»Ğ©»ù±¾ÃüÁî */
 	Shell_Register_Command("version",       Infantry_Version);
 	Shell_Register_Command("command-list" , Shell_List_Cmd);
 	Shell_Register_Command("?" ,            Shell_List_Cmd);
 
-	/* æ³¨å†Œç”¨æˆ·å‘½ä»¤ */
+	/* ×¢²áÓÃ»§ÃüÁî */
 	User_Commands_Init();
 }

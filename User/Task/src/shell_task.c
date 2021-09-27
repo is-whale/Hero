@@ -77,6 +77,16 @@ void Print_Dragon(void)
 	__printf(" (__(__)___(__)__) \r\n");
 }
 
+void Print_Logo(void)
+{
+	__printf("    __  ____    __       _____                          __  __              \r\n");
+	__printf("   / / / / /   / /      / ___/__  ______  ___  _____   / / / /__  _________ \r\n");
+	__printf("  / /_/ / /   / /       \\__ \\/ / / / __ \\/ _ \\/ ___/  / /_/ / _ \\/ ___/ __ \r\n");
+	__printf(" / __  / /___/ /___    ___/ / /_/ / /_/ /  __/ /     / __  /  __/ /  / /_/ /\r\n");
+	__printf("/_/ /_/_____/_____/   /____/\\__,_/ .___/\\___/_/     /_/ /_/\\___/_/   \\____/ \r\n");
+	__printf("                                /_/                                         \r\n");
+}
+
 static void Shell_Str_Process(void)
 {
 	if (shell_rx_buffer[shell_rxd_data_len - 2] == '\r' && shell_rx_buffer[shell_rxd_data_len - 1] == '\n')
@@ -94,6 +104,9 @@ static void Print_At_First(void)
 	__printf("\r\n");
 	Print_Dragon();
 	__printf("\r\n");
+	Print_Logo();
+	__printf("\r\n");
 	__printf("Hll super hero 2022.\r\n");
+	__printf("\r\n");
 	__printf("\r\n");
 }
