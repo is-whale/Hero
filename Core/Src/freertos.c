@@ -54,8 +54,13 @@ osStaticThreadDef_t defaultTaskControlBlock;
 osThreadId shellTaskHandle;
 uint32_t shellTaskBuffer[ 1024 ];
 osStaticThreadDef_t shellTaskControlBlock;
+osThreadId remoteTaskHandle;
+uint32_t remoteTaskBuffer[ 512 ];
+osStaticThreadDef_t remoteTaskControlBlock;
 osSemaphoreId shellGetDataBinarySemHandle;
 osStaticSemaphoreDef_t myBinarySem01ControlBlock;
+osSemaphoreId remoteGetDataBinarySemHandle;
+osStaticSemaphoreDef_t remoteGetDataBinarySemControlBlock;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -64,6 +69,7 @@ osStaticSemaphoreDef_t myBinarySem01ControlBlock;
 
 void StartDefaultTask(void const * argument);
 void StartShellTask(void const * argument);
+void StartRemoteTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -102,6 +108,10 @@ void MX_FREERTOS_Init(void) {
   osSemaphoreStaticDef(shellGetDataBinarySem, &myBinarySem01ControlBlock);
   shellGetDataBinarySemHandle = osSemaphoreCreate(osSemaphore(shellGetDataBinarySem), 1);
 
+  /* definition and creation of remoteGetDataBinarySem */
+  osSemaphoreStaticDef(remoteGetDataBinarySem, &remoteGetDataBinarySemControlBlock);
+  remoteGetDataBinarySemHandle = osSemaphoreCreate(osSemaphore(remoteGetDataBinarySem), 1);
+
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
@@ -122,6 +132,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of shellTask */
   osThreadStaticDef(shellTask, StartShellTask, osPriorityBelowNormal, 0, 1024, shellTaskBuffer, &shellTaskControlBlock);
   shellTaskHandle = osThreadCreate(osThread(shellTask), NULL);
+
+  /* definition and creation of remoteTask */
+  osThreadStaticDef(remoteTask, StartRemoteTask, osPriorityHigh, 0, 512, remoteTaskBuffer, &remoteTaskControlBlock);
+  remoteTaskHandle = osThreadCreate(osThread(remoteTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -163,6 +177,24 @@ __weak void StartShellTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartShellTask */
+}
+
+/* USER CODE BEGIN Header_StartRemoteTask */
+/**
+* @brief Function implementing the remoteTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartRemoteTask */
+__weak void StartRemoteTask(void const * argument)
+{
+  /* USER CODE BEGIN StartRemoteTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartRemoteTask */
 }
 
 /* Private application code --------------------------------------------------*/
