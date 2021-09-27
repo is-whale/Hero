@@ -17,12 +17,14 @@ void Usart1_RxDMA_Init(void)
     LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_2, usart1_dma_rx_max_len);
 
     ///< 开启 DMA 双缓冲
-    LL_DMA_SetMemory1Address(DMA2, LL_DMA_STREAM_2, (uint32_t)(usart1_dma_rx_buffer_second));
-    LL_DMA_SetCurrentTargetMem(DMA2, LL_DMA_STREAM_2, LL_DMA_CURRENTTARGETMEM0);
-    LL_DMA_EnableDoubleBufferMode(DMA2, LL_DMA_STREAM_2);
+    // LL_DMA_SetMemory1Address(DMA2, LL_DMA_STREAM_2, (uint32_t)(usart1_dma_rx_buffer_second));
+    // LL_DMA_SetCurrentTargetMem(DMA2, LL_DMA_STREAM_2, LL_DMA_CURRENTTARGETMEM0);
+    // LL_DMA_EnableDoubleBufferMode(DMA2, LL_DMA_STREAM_2);
 
     LL_USART_ClearFlag_IDLE(USART1);
     LL_USART_EnableIT_IDLE(USART1);
+
+    LL_USART_EnableDMAReq_RX(USART1);
 
     LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_2);
 }
@@ -45,11 +47,13 @@ void Usart1_DMA_RxCp_Callback(void)
 
         ///< 获取该帧的数据长度
         usart1_dma_rxd_data_len = usart1_dma_rx_max_len - LL_DMA_GetDataLength(DMA2, LL_DMA_STREAM_2);
-
+    
+        // debug_print("rx len:%d\r\n",usart1_dma_rxd_data_len);
         ///< 重新设置数据传输长度
         LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_2, usart1_dma_rx_max_len);
 
         ///< 通知任务进行解析
+        Info_RemoteTask_Parse_Data();
 
         ///< 重新开启 DMA
         LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_2);

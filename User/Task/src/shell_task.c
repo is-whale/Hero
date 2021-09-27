@@ -4,12 +4,15 @@ static uint8_t *shell_rx_buffer;
 const uint16_t *shell_rx_max_buffer_len;
 static uint16_t shell_rxd_data_len;
 extern osSemaphoreId shellGetDataBinarySemHandle;
+extern osThreadId shellTaskHandle;
+static const uint32_t shell_get_data_signal = 0x0001;
 
 static void Shell_Str_Process(void);
 static void Print_At_First(void);
 
 void StartShellTask(void const *argument)
 {
+	osEvent shell_get_data_event;
 	shell_rx_buffer = Get_Usart3_DMA_RxBuffer();
 	shell_rx_max_buffer_len = Get_Usart3_DMA_Rx_MaxLen();
 	PRINT_USART_INIT();
@@ -20,18 +23,22 @@ void StartShellTask(void const *argument)
 
 	for (;;)
 	{
-		if (osOK == osSemaphoreWait(shellGetDataBinarySemHandle, osWaitForever))
+		shell_get_data_event = osSignalWait(shell_get_data_signal,osWaitForever);
+		if (shell_get_data_event.status == osEventSignal)
 		{
-			///< 字符串预处理
-			Shell_Str_Process();
-			Shell_Command_Parse((char *)shell_rx_buffer);
+			if (shell_get_data_event.value.signals == shell_get_data_signal)
+			{
+				///< 字符串预处理
+				Shell_Str_Process();
+				Shell_Command_Parse((char *)shell_rx_buffer);
+			}
 		}
 	}
 }
 
 static void Inform_ShellTask_Get_Data(void)
 {
-	osSemaphoreRelease(shellGetDataBinarySemHandle);
+	osSignalSet(shellTaskHandle,shell_get_data_signal);
 }
 
 void Usart3_Idle_ITCallback(void)

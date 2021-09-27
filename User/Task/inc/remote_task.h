@@ -5,4 +5,6 @@
 #include "usart1.h"
 #include "remote.h"
 
+void Info_RemoteTask_Parse_Data(void);
+
 #endif //__REMOTE_TASK_H_

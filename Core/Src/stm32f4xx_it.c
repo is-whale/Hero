@@ -24,6 +24,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "usart3.h"
+#include "usart1.h"
 #include "shell_task.h"
 /* USER CODE END Includes */
 
@@ -196,7 +197,7 @@ void DMA1_Stream3_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
-
+  Usart1_DMA_RxCp_Callback();
   /* USER CODE END USART1_IRQn 0 */
   /* USER CODE BEGIN USART1_IRQn 1 */
 
