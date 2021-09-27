@@ -3,6 +3,7 @@
 static uint8_t *shell_rx_buffer;
 const uint16_t *shell_rx_max_buffer_len;
 static uint16_t shell_rxd_data_len;
+extern osSemaphoreId shellGetDataBinarySemHandle;
 
 void StartShellTask(void const *argument)
 {
@@ -15,8 +16,16 @@ void StartShellTask(void const *argument)
 
     for (;;)
     {
+        if (osOK == osSemaphoreWait(shellGetDataBinarySemHandle,osWaitForever))
+        {
+            // TODO
+        }
         osDelay(10);
     }
+}
+static void Inform_ShellTask_Get_Data(void)
+{
+    osSemaphoreRelease(shellGetDataBinarySemHandle);
 }
 
 void Usart3_Idle_ITCallback(void)
@@ -40,7 +49,7 @@ void Usart3_Idle_ITCallback(void)
         LL_DMA_SetDataLength(DMA1, LL_DMA_STREAM_1, *shell_rx_max_buffer_len);
 
         ///< 通知任务进行解析
-
+        Inform_ShellTask_Get_Data();
         
         ///< 重新开启 DMA
         LL_DMA_EnableStream(DMA1, LL_DMA_STREAM_1);
