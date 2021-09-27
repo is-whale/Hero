@@ -34,4 +34,5 @@ void StartRemoteTask(void const *argument)
 
 void Info_RemoteTask_Parse_Data(void)
 {
+	
 }
