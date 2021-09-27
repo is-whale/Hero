@@ -1,6 +1,11 @@
-
 #include "remote.h"
 
+/**
+ * @brief                                   解析串口接收的遥控器数据
+ * @param[in]  {volatile_const_uint8_t_*}   sbus_buf 存储串口接收的数据缓冲区
+ * @param[in]  {Rc_Ctrl_t_*}                rc_ctrl 指向遥控器的结构体指针
+ * @retval                                  void
+ */
 void Parse_Remoter_Data(volatile const uint8_t *sbus_buf, Rc_Ctrl_t *rc_ctrl)
 {
     rc_ctrl->rc.ch0 = (sbus_buf[0] | (sbus_buf[1] << 8)) & 0x07ff;        ///< Channel 0
@@ -33,6 +38,13 @@ void Parse_Remoter_Data(volatile const uint8_t *sbus_buf, Rc_Ctrl_t *rc_ctrl)
     rc_ctrl->mouse.y = Mouse_Coordnite_Value_Limit(rc_ctrl->mouse.y, -5000, 5000);
 }
 
+/**
+ * @brief                   限制鼠标的取值范围
+ * @param[in]  {uint16_t}   data 输入值
+ * @param[in]  {uint16_t}   min_value 最小值
+ * @param[in]  {uint16_t}   max_value 最大值
+ * @retval     {uint16_t}   合法的数据
+ */
 int16_t Mouse_Coordnite_Value_Limit(int16_t data, int16_t min_value, int16_t max_value)
 {
     if (data > max_value)
@@ -42,6 +54,11 @@ int16_t Mouse_Coordnite_Value_Limit(int16_t data, int16_t min_value, int16_t max
     return data;
 }
 
+/**
+ * @brief                   将按键数据模拟解析为遥控器数据
+ * @param[in]  {Rc_Ctrl_t}  遥控器数据指针
+ * @retval                  void
+ */
 void Parse_Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t *rc)
 {
     #define RC_KEY rc->key.value
@@ -132,6 +149,12 @@ void Parse_Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t *rc)
     #undef KEY_PRESSED
 }
 
+/**
+ * @brief                   检验遥控器数据是否合法
+ * @param[in]  {Rc_Ctrl_t}  遥控器数据指针
+ * @retval                  1: 不合法
+ *                          0: 合法
+ */
 uint8_t Remoter_Data_Check(Rc_Ctrl_t *rc)
 {
 	if (ROCKER_DATA_CHECK(rc->rc.ch0))

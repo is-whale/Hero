@@ -1,9 +1,9 @@
 #include "usart1.h"
 
-static const uint16_t usart1_dma_rx_max_len = 128;
-volatile uint8_t usart1_dma_rx_buffer[usart1_dma_rx_max_len];
-volatile uint8_t usart1_dma_rx_buffer_second[usart1_dma_rx_max_len];
-static uint16_t usart1_dma_rxd_data_len;
+static const uint16_t usart1_dma_rx_max_len = 128;                   ///< USART1 DMA 最大接收长度
+volatile uint8_t usart1_dma_rx_buffer[usart1_dma_rx_max_len];        ///< USART1 DMA 接受缓冲区 1
+volatile uint8_t usart1_dma_rx_buffer_second[usart1_dma_rx_max_len]; ///< USART1 DMA 接受缓冲区 2
+static uint16_t usart1_dma_rxd_data_len;                             ///< USART1 DMA 已经接收到的数据长度
 
 /**
  * @brief       初始化串口 1 的接收 DMA 
@@ -47,8 +47,7 @@ void Usart1_DMA_RxCp_Callback(void)
 
         ///< 获取该帧的数据长度
         usart1_dma_rxd_data_len = usart1_dma_rx_max_len - LL_DMA_GetDataLength(DMA2, LL_DMA_STREAM_2);
-    
-        // debug_print("rx len:%d\r\n",usart1_dma_rxd_data_len);
+
         ///< 重新设置数据传输长度
         LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_2, usart1_dma_rx_max_len);
 
@@ -59,26 +58,47 @@ void Usart1_DMA_RxCp_Callback(void)
         LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_2);
     }
 }
-
+/**
+ * @brief           返回 USART1 DMA 的第一个接受缓冲区指针
+ * @param[in]       none
+ * @retval          USART1 DMA 的接受缓冲区地址
+ */
 uint8_t *Get_Usart1_DMA_RxBuffer_One(void)
 {
     return (uint8_t *)usart1_dma_rx_buffer;
 }
-
+/**
+ * @brief           返回 USART1 DMA 的接受缓冲区最大接受长度
+ * @param[in]       none
+ * @retval          USART1 DMA 的最大接收长度
+ */
 const uint16_t *Get_Usart1_DMA_RxMaxLen(void)
 {
     return &usart1_dma_rx_max_len;
 }
-
+/**
+ * @brief           返回 USART1 DMA 的接受缓冲区已经接受到的数据长度
+ * @param[in]       none
+ * @retval          USART1 DMA 已经接受到了多长的数据
+ */
 uint16_t *Get_Usart1_DMA_Rxd_DataLen(void)
 {
     return &usart1_dma_rxd_data_len;
 }
+/**
+ * @brief           返回 USART1 DMA 第二个接收缓冲区
+ * @param[in]       none
+ * @retval          USART1 DMA 的接受缓冲区地址
+ */
 uint8_t *Get_Usart1_DMA_RxBuffer_Two(void)
 {
     return (uint8_t *)(usart1_dma_rx_buffer_second);
 }
-
+/**
+ * @brief           返回 USART1 DMA 的当前可用的接受缓冲区
+ * @param[in]       none
+ * @retval          USART1 DMA 的当前可用的接受缓冲区
+ */
 uint8_t Get_Rc_Available_Bufferx(void)
 {
     if (LL_DMA_GetCurrentTargetMem(DMA2, LL_DMA_STREAM_2))
