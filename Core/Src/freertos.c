@@ -54,6 +54,8 @@ osStaticThreadDef_t defaultTaskControlBlock;
 osThreadId shellTaskHandle;
 uint32_t shellTaskBuffer[ 1024 ];
 osStaticThreadDef_t shellTaskControlBlock;
+osSemaphoreId shellGetDataBinarySemHandle;
+osStaticSemaphoreDef_t myBinarySem01ControlBlock;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -94,6 +96,11 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
+
+  /* Create the semaphores(s) */
+  /* definition and creation of shellGetDataBinarySem */
+  osSemaphoreStaticDef(shellGetDataBinarySem, &myBinarySem01ControlBlock);
+  shellGetDataBinarySemHandle = osSemaphoreCreate(osSemaphore(shellGetDataBinarySem), 1);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
