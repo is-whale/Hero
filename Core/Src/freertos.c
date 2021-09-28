@@ -66,9 +66,12 @@ osStaticThreadDef_t canSendTaskControlBlock;
 osThreadId chassisTaskHandle;
 uint32_t chassisTaskBuffer[ 512 ];
 osStaticThreadDef_t chassisTaskControlBlock;
-osThreadId parseCanRxDataTHandle;
+osThreadId parseCan1RxDataHandle;
 uint32_t parseCanRxDataTBuffer[ 512 ];
 osStaticThreadDef_t parseCanRxDataTControlBlock;
+osThreadId parseCan2RxDataHandle;
+uint32_t parseCan2RxDataBuffer[ 512 ];
+osStaticThreadDef_t parseCan2RxDataControlBlock;
 osSemaphoreId shellGetDataBinarySemHandle;
 osStaticSemaphoreDef_t myBinarySem01ControlBlock;
 osSemaphoreId remoteGetDataBinarySemHandle;
@@ -85,7 +88,8 @@ void StartRemoteTask(void const * argument);
 void StartMonitorTask(void const * argument);
 void StartCanSendTask(void const * argument);
 void StartChassisTask(void const * argument);
-void StartParseCanRxDataTask(void const * argument);
+void StartParseCan1RxDataTask(void const * argument);
+void StartParseCan2RxDataTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -165,9 +169,13 @@ void MX_FREERTOS_Init(void) {
   osThreadStaticDef(chassisTask, StartChassisTask, osPriorityAboveNormal, 0, 512, chassisTaskBuffer, &chassisTaskControlBlock);
   chassisTaskHandle = osThreadCreate(osThread(chassisTask), NULL);
 
-  /* definition and creation of parseCanRxDataT */
-  osThreadStaticDef(parseCanRxDataT, StartParseCanRxDataTask, osPriorityAboveNormal, 0, 512, parseCanRxDataTBuffer, &parseCanRxDataTControlBlock);
-  parseCanRxDataTHandle = osThreadCreate(osThread(parseCanRxDataT), NULL);
+  /* definition and creation of parseCan1RxData */
+  osThreadStaticDef(parseCan1RxData, StartParseCan1RxDataTask, osPriorityAboveNormal, 0, 512, parseCanRxDataTBuffer, &parseCanRxDataTControlBlock);
+  parseCan1RxDataHandle = osThreadCreate(osThread(parseCan1RxData), NULL);
+
+  /* definition and creation of parseCan2RxData */
+  osThreadStaticDef(parseCan2RxData, StartParseCan2RxDataTask, osPriorityIdle, 0, 512, parseCan2RxDataBuffer, &parseCan2RxDataControlBlock);
+  parseCan2RxDataHandle = osThreadCreate(osThread(parseCan2RxData), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -283,22 +291,40 @@ __weak void StartChassisTask(void const * argument)
   /* USER CODE END StartChassisTask */
 }
 
-/* USER CODE BEGIN Header_StartParseCanRxDataTask */
+/* USER CODE BEGIN Header_StartParseCan1RxDataTask */
 /**
-* @brief Function implementing the parseCanRxDataT thread.
+* @brief Function implementing the parseCan1RxData thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartParseCanRxDataTask */
-__weak void StartParseCanRxDataTask(void const * argument)
+/* USER CODE END Header_StartParseCan1RxDataTask */
+__weak void StartParseCan1RxDataTask(void const * argument)
 {
-  /* USER CODE BEGIN StartParseCanRxDataTask */
+  /* USER CODE BEGIN StartParseCan1RxDataTask */
   /* Infinite loop */
   for(;;)
   {
     osDelay(1);
   }
-  /* USER CODE END StartParseCanRxDataTask */
+  /* USER CODE END StartParseCan1RxDataTask */
+}
+
+/* USER CODE BEGIN Header_StartParseCan2RxDataTask */
+/**
+* @brief Function implementing the parseCan2RxData thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartParseCan2RxDataTask */
+__weak void StartParseCan2RxDataTask(void const * argument)
+{
+  /* USER CODE BEGIN StartParseCan2RxDataTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartParseCan2RxDataTask */
 }
 
 /* Private application code --------------------------------------------------*/
