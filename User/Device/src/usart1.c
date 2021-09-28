@@ -1,6 +1,6 @@
 #include "usart1.h"
 
-static const uint16_t usart1_dma_rx_max_len = 128;                   ///< USART1 DMA 最大接收长度
+static const uint16_t usart1_dma_rx_max_len = 36;                   ///< USART1 DMA 最大接收长度
 volatile uint8_t usart1_dma_rx_buffer[usart1_dma_rx_max_len];        ///< USART1 DMA 接受缓冲区 1
 volatile uint8_t usart1_dma_rx_buffer_second[usart1_dma_rx_max_len]; ///< USART1 DMA 接受缓冲区 2
 static uint16_t usart1_dma_rxd_data_len;                             ///< USART1 DMA 已经接收到的数据长度

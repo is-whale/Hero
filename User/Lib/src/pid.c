@@ -1,6 +1,11 @@
 #include "pid.h"
 #include "math.h"
 
+/**
+ * @brief			pid value limit
+ * @param[in]		pid Pid_Position_t struct
+ * @retval			none
+ */
 static float Pid_Limit(float value, float min, float max)
 {
 	if (value < min)
@@ -10,6 +15,7 @@ static float Pid_Limit(float value, float min, float max)
 
 	return value;
 }
+
 /**
  * @brief			calculate position pid,statice method,call in Pid_Position_Calc()
  * @param[in]		pid Pid_Position_t struct

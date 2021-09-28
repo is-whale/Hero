@@ -21,7 +21,7 @@ void Can1_Filter_Init(void)
 
 void Can1_Rx_FIFO0_IT_Callback()
 {
-
+    
 }
 
 void Can1_Send_4Msg(uint32_t id, int16_t data1, int16_t data2, int16_t data3, int16_t data4)
@@ -42,6 +42,6 @@ void Can1_Send_4Msg(uint32_t id, int16_t data1, int16_t data2, int16_t data3, in
     can_tx_msg[6] = data4 >> 8;
     can_tx_msg[7] = data4;
 
-    /* use HAL function send */
+    ///< use HAL function send 
     HAL_CAN_AddTxMessage(&hcan2, &can_tx_msg_format, can_tx_msg, &send_mail_box);
 }

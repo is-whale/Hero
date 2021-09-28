@@ -4,6 +4,7 @@
 #include "cmsis_os.h"
 #include "usart1.h"
 #include "remote.h"
+#include "monitor_task.h"
 
 void Info_RemoteTask_Parse_Data(void);
 
