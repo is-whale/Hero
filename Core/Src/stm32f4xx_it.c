@@ -26,6 +26,7 @@
 #include "usart3.h"
 #include "usart1.h"
 #include "shell_task.h"
+#include "parse_can1_rx_data_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -199,7 +200,7 @@ void DMA1_Stream3_IRQHandler(void)
 void CAN1_RX0_IRQHandler(void)
 {
   /* USER CODE BEGIN CAN1_RX0_IRQn 0 */
-
+  Info_Can1_ParseData_Task();
   /* USER CODE END CAN1_RX0_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan1);
   /* USER CODE BEGIN CAN1_RX0_IRQn 1 */
