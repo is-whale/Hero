@@ -60,6 +60,12 @@ osStaticThreadDef_t remoteTaskControlBlock;
 osThreadId monitorTaskHandle;
 uint32_t monitorTaskBuffer[ 512 ];
 osStaticThreadDef_t monitorTaskControlBlock;
+osThreadId canSendTaskHandle;
+uint32_t canSendTaskBuffer[ 512 ];
+osStaticThreadDef_t canSendTaskControlBlock;
+osThreadId chassisTaskHandle;
+uint32_t chassisTaskBuffer[ 512 ];
+osStaticThreadDef_t chassisTaskControlBlock;
 osSemaphoreId shellGetDataBinarySemHandle;
 osStaticSemaphoreDef_t myBinarySem01ControlBlock;
 osSemaphoreId remoteGetDataBinarySemHandle;
@@ -74,6 +80,8 @@ void StartDefaultTask(void const * argument);
 void StartShellTask(void const * argument);
 void StartRemoteTask(void const * argument);
 void StartMonitorTask(void const * argument);
+void StartCanSendTask(void const * argument);
+void StartChassisTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -144,6 +152,14 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of monitorTask */
   osThreadStaticDef(monitorTask, StartMonitorTask, osPriorityLow, 0, 512, monitorTaskBuffer, &monitorTaskControlBlock);
   monitorTaskHandle = osThreadCreate(osThread(monitorTask), NULL);
+
+  /* definition and creation of canSendTask */
+  osThreadStaticDef(canSendTask, StartCanSendTask, osPriorityAboveNormal, 0, 512, canSendTaskBuffer, &canSendTaskControlBlock);
+  canSendTaskHandle = osThreadCreate(osThread(canSendTask), NULL);
+
+  /* definition and creation of chassisTask */
+  osThreadStaticDef(chassisTask, StartChassisTask, osPriorityAboveNormal, 0, 512, chassisTaskBuffer, &chassisTaskControlBlock);
+  chassisTaskHandle = osThreadCreate(osThread(chassisTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -221,6 +237,42 @@ __weak void StartMonitorTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartMonitorTask */
+}
+
+/* USER CODE BEGIN Header_StartCanSendTask */
+/**
+* @brief Function implementing the canSendTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartCanSendTask */
+__weak void StartCanSendTask(void const * argument)
+{
+  /* USER CODE BEGIN StartCanSendTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartCanSendTask */
+}
+
+/* USER CODE BEGIN Header_StartChassisTask */
+/**
+* @brief Function implementing the chassisTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartChassisTask */
+__weak void StartChassisTask(void const * argument)
+{
+  /* USER CODE BEGIN StartChassisTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartChassisTask */
 }
 
 /* Private application code --------------------------------------------------*/
