@@ -66,6 +66,9 @@ osStaticThreadDef_t canSendTaskControlBlock;
 osThreadId chassisTaskHandle;
 uint32_t chassisTaskBuffer[ 512 ];
 osStaticThreadDef_t chassisTaskControlBlock;
+osThreadId parseCanRxDataTHandle;
+uint32_t parseCanRxDataTBuffer[ 512 ];
+osStaticThreadDef_t parseCanRxDataTControlBlock;
 osSemaphoreId shellGetDataBinarySemHandle;
 osStaticSemaphoreDef_t myBinarySem01ControlBlock;
 osSemaphoreId remoteGetDataBinarySemHandle;
@@ -82,6 +85,7 @@ void StartRemoteTask(void const * argument);
 void StartMonitorTask(void const * argument);
 void StartCanSendTask(void const * argument);
 void StartChassisTask(void const * argument);
+void StartParseCanRxDataTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -160,6 +164,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of chassisTask */
   osThreadStaticDef(chassisTask, StartChassisTask, osPriorityAboveNormal, 0, 512, chassisTaskBuffer, &chassisTaskControlBlock);
   chassisTaskHandle = osThreadCreate(osThread(chassisTask), NULL);
+
+  /* definition and creation of parseCanRxDataT */
+  osThreadStaticDef(parseCanRxDataT, StartParseCanRxDataTask, osPriorityAboveNormal, 0, 512, parseCanRxDataTBuffer, &parseCanRxDataTControlBlock);
+  parseCanRxDataTHandle = osThreadCreate(osThread(parseCanRxDataT), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -273,6 +281,24 @@ __weak void StartChassisTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartChassisTask */
+}
+
+/* USER CODE BEGIN Header_StartParseCanRxDataTask */
+/**
+* @brief Function implementing the parseCanRxDataT thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartParseCanRxDataTask */
+__weak void StartParseCanRxDataTask(void const * argument)
+{
+  /* USER CODE BEGIN StartParseCanRxDataTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartParseCanRxDataTask */
 }
 
 /* Private application code --------------------------------------------------*/
