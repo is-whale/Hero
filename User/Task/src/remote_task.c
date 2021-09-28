@@ -6,7 +6,7 @@ extern osThreadId remoteTaskHandle;                    ///< 遥控器任务句柄
 static uint16_t *sbus_rxd_len;                         ///< 本次遥控器接收到的数据长度
 static uint8_t *rc_rx_buffer[2];                       ///< 遥控器两次接收数据缓冲
 static const uint32_t remote_get_data_signal = 0x0001; ///< 遥控器接收数据信号
-static const uint32_t remote_heartbeat_time = 50;      ///< 遥控器数据包心跳时间
+static const uint32_t remote_data_overtime = 50;      ///< 遥控器数据包心跳时间
 
 void StartRemoteTask(void const *argument)
 {
@@ -26,7 +26,7 @@ void StartRemoteTask(void const *argument)
 
     for (;;)
     {
-        remote_get_data_event = osSignalWait(remote_get_data_signal, remote_heartbeat_time);
+        remote_get_data_event = osSignalWait(remote_get_data_signal, remote_data_overtime);
         if (remote_get_data_event.status == osEventSignal)
         {
             if (remote_get_data_event.value.signals == remote_get_data_signal)
