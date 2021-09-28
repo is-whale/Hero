@@ -19,9 +19,10 @@ void Can1_Filter_Init(void)
 	HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 }
 
-void Can1_Rx_FIFO0_IT_Callback()
+void Can1_Rx_FIFO0_IT_Callback(void)
 {
-    
+    // TODO 添加标志位判断
+    Info_Can1_ParseData_Task();
 }
 
 void Can1_Send_4Msg(uint32_t id, int16_t data1, int16_t data2, int16_t data3, int16_t data4)
