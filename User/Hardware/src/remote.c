@@ -6,7 +6,7 @@
  * @param[in]  {Rc_Ctrl_t_*}                rc_ctrl 指向遥控器的结构体指针
  * @retval                                  void
  */
-void Parse_Remoter_Data(volatile const uint8_t *sbus_buf, Rc_Ctrl_t *rc_ctrl)
+static void Parse_Remoter_Data(volatile const uint8_t *sbus_buf, Rc_Ctrl_t *rc_ctrl)
 {
 	rc_ctrl->rc.ch0 = (sbus_buf[0] | (sbus_buf[1] << 8)) & 0x07ff;		  ///< Channel 0
 	rc_ctrl->rc.ch1 = ((sbus_buf[1] >> 3) | (sbus_buf[2] << 5)) & 0x07ff; ///< Channel 1
@@ -29,124 +29,26 @@ void Parse_Remoter_Data(volatile const uint8_t *sbus_buf, Rc_Ctrl_t *rc_ctrl)
 	rc_ctrl->rc.ch2 -= RC_CH_VALUE_OFFSET;
 	rc_ctrl->rc.ch3 -= RC_CH_VALUE_OFFSET;
 	rc_ctrl->rc.ch4 -= RC_CH_VALUE_OFFSET;
-
-	///< 将WASD按键数据解析为虚拟遥感
-	Parse_Wasd_Key_To_Virtual_Rocker(rc_ctrl);
-
-	///< 鼠标x、y轴限幅
-	rc_ctrl->mouse.x = Mouse_Coordnite_Value_Limit(rc_ctrl->mouse.x, -5000, 5000);
-	rc_ctrl->mouse.y = Mouse_Coordnite_Value_Limit(rc_ctrl->mouse.y, -5000, 5000);
 }
 
 /**
- * @brief                   限制鼠标的取值范围
- * @param[in]  {uint16_t}   data 输入值
- * @param[in]  {uint16_t}   min_value 最小值
- * @param[in]  {uint16_t}   max_value 最大值
- * @retval     {uint16_t}   合法的数据
+ * @brief                   检验接收到的数据长度
+ * @param[in]  {uint16_t}  本次接收到的数据长度
+ * @retval                  1: 不合法
+ *                          0: 合法
  */
-int16_t Mouse_Coordnite_Value_Limit(int16_t data, int16_t min_value, int16_t max_value)
+static uint8_t Rc_Data_Len_Check(uint16_t len)
 {
-	if (data > max_value)
-		return max_value;
-	else if (data < min_value)
-		return min_value;
-	return data;
-}
-
-/**
- * @brief                   将按键数据模拟解析为遥控器数据
- * @param[in]  {Rc_Ctrl_t}  遥控器数据指针
- * @retval                  void
- */
-void Parse_Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t *rc)
-{
-#define RC_KEY rc->key.value
-#define KEY_PRESSED(key) (RC_KEY & key)
-
-	///< 只按下W时，不按下S
-	if (KEY_PRESSED(KEY_W) && !(KEY_PRESSED(KEY_S)))
+#define RC_EFFICTIVE_DATA_LEN 18
+	if (len == RC_EFFICTIVE_DATA_LEN)
 	{
-		if (rc->virtual_rocker.ch3 < 0)
-		{
-			rc->virtual_rocker.ch3 += VIRTUAL_ROCKER_STEP2;
-		}
-		if (rc->virtual_rocker.ch3 < 600)
-		{
-			rc->virtual_rocker.ch3 += VIRTUAL_ROCKER_STEP1;
-		}
+		return 1;
 	}
-	///< 只按下S时，不按下W
-	else if (KEY_PRESSED(KEY_S) && !(KEY_PRESSED(KEY_W)))
-	{
-		if (rc->virtual_rocker.ch3 > 0)
-		{
-			rc->virtual_rocker.ch3 -= VIRTUAL_ROCKER_STEP2;
-		}
-		if (rc->virtual_rocker.ch3 > -600)
-		{
-			rc->virtual_rocker.ch3 -= VIRTUAL_ROCKER_STEP1;
-		}
-	}
-	///< W、S都未按下时
 	else
 	{
-		if (rc->virtual_rocker.ch3 < 0)
-		{
-			rc->virtual_rocker.ch3 += VIRTUAL_ROCKER_STEP2;
-			if (rc->virtual_rocker.ch3 > 0)
-				rc->virtual_rocker.ch3 = 0;
-		}
-		else if (rc->virtual_rocker.ch3 > 0)
-		{
-			rc->virtual_rocker.ch3 -= VIRTUAL_ROCKER_STEP2;
-			if (rc->virtual_rocker.ch3 < 0)
-				rc->virtual_rocker.ch3 = 0;
-		}
+		return 0;
 	}
-
-	///< 只按下D时
-	if (KEY_PRESSED(KEY_D) && !(KEY_PRESSED(KEY_A)))
-	{
-		if (rc->virtual_rocker.ch2 < 0)
-		{
-			rc->virtual_rocker.ch2 += VIRTUAL_ROCKER_STEP2;
-		}
-		if (rc->virtual_rocker.ch2 < 600)
-		{
-			rc->virtual_rocker.ch2 += VIRTUAL_ROCKER_STEP1;
-		}
-	}
-	///< 只按下A时
-	else if (KEY_PRESSED(KEY_A) && !(KEY_PRESSED(KEY_D)))
-	{
-		if (rc->virtual_rocker.ch2 > 0)
-		{
-			rc->virtual_rocker.ch2 -= VIRTUAL_ROCKER_STEP2;
-		}
-		if (rc->virtual_rocker.ch2 > -600)
-		{
-			rc->virtual_rocker.ch2 -= VIRTUAL_ROCKER_STEP1;
-		}
-	}
-	///< A、D都未按下时
-	else
-	{
-		if (rc->virtual_rocker.ch2 < 0)
-		{
-			rc->virtual_rocker.ch2 += VIRTUAL_ROCKER_STEP2;
-			if (rc->virtual_rocker.ch2 > 0)
-				rc->virtual_rocker.ch2 = 0;
-		}
-		else if (rc->virtual_rocker.ch2 > 0)
-		{
-			rc->virtual_rocker.ch2 -= VIRTUAL_ROCKER_STEP2;
-			if (rc->virtual_rocker.ch2 < 0)
-				rc->virtual_rocker.ch2 = 0;
-		}
-	}
-#undef RC_KEY
-#undef KEY_PRESSED
+#undef RC_EFFICTIVE_DATA_LEN
 }
 
 /**
@@ -155,33 +57,51 @@ void Parse_Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t *rc)
  * @retval                  1: 不合法
  *                          0: 合法
  */
-uint8_t Remoter_Data_Check(Rc_Ctrl_t *rc)
+static uint8_t Remoter_Data_Value_Check(Rc_Ctrl_t *rc)
 {
 	if (ROCKER_DATA_CHECK(rc->rc.ch0))
 	{
-		return 1;
+		return 0;
 	}
 	if (ROCKER_DATA_CHECK(rc->rc.ch1))
 	{
-		return 1;
+		return 0;
 	}
 	if (ROCKER_DATA_CHECK(rc->rc.ch2))
 	{
-		return 1;
+		return 0;
 	}
 	if (ROCKER_DATA_CHECK(rc->rc.ch3))
 	{
-		return 1;
+		return 0;
 	}
 	if (SWITCH_DATA_CHECK(rc->rc.s1))
 	{
-		return 1;
+		return 0;
 	}
 	if (SWITCH_DATA_CHECK(rc->rc.s2))
 	{
-		return 1;
+		return 0;
 	}
-	return 0;
+	return 1;
+}
+
+/**
+ * @brief               					解析遥控器数据并检验
+ * @param[in] {volatile_const_uint8_t}   	遥控器数据缓冲区
+ * @param[in] {Rc_Ctrl_t}   				遥控器数据指针结构体
+ * @param[in] {uint16_t}					本次接收到的数据长度
+ * @retval    {uint8_t}						1 : 数据解析并校验成功
+ * 											0 : 数据解析校验失败	            					
+ */
+uint8_t Rc_Data_Check_Parse(volatile const uint8_t *sbus_buf, Rc_Ctrl_t *rc_ctrl, uint16_t rc_data_len)
+{
+	if (!Rc_Data_Len_Check(rc_data_len))
+	{
+		return 0;
+	}
+	Parse_Remoter_Data(sbus_buf, rc_ctrl);
+	return Remoter_Data_Value_Check(rc_ctrl);
 }
 
 /**
