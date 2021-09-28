@@ -26,7 +26,7 @@ void StartParseCan1RxDataTask(void const *argument)
     }
 }
 
-void Info_Can1_ParseData_Task()
+void Info_Can2_ParseData_Task()
 {
     osSignalSet(parseCan2RxDataHandle,can2_get_data_signal);
 }
