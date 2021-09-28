@@ -1,9 +1,9 @@
 #include "remote_task.h"
 
-static Rc_Ctrl_t remote_controller; ///< 本次解析的遥控器数据
-static Rc_Ctrl_t last_time_rc;      ///< 上次解析的遥控器数据
-extern osThreadId remoteTaskHandle; ///< 遥控器任务句柄
-static uint16_t *sbus_rxd_len;
+static Rc_Ctrl_t remote_controller;                    ///< 本次解析的遥控器数据
+static Rc_Ctrl_t last_time_rc;                         ///< 上次解析的遥控器数据
+extern osThreadId remoteTaskHandle;                    ///< 遥控器任务句柄
+static uint16_t *sbus_rxd_len;                         ///< 本次遥控器接收到的数据长度
 static uint8_t *rc_rx_buffer[2];                       ///< 遥控器两次接收数据缓冲
 static const uint32_t remote_get_data_signal = 0x0001; ///< 遥控器接收数据信号
 static const uint32_t remote_heartbeat_time = 50;      ///< 遥控器数据包心跳时间
