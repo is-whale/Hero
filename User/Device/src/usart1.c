@@ -1,9 +1,9 @@
 #include "usart1.h"
 
-static const uint16_t usart1_dma_rx_max_len = 36;                   ///< USART1 DMA 最大接收长度
-volatile uint8_t usart1_dma_rx_buffer[usart1_dma_rx_max_len];        ///< USART1 DMA 接受缓冲区 1
+static const uint16_t usart1_dma_rx_max_len = 36;					 ///< USART1 DMA 最大接收长度
+volatile uint8_t usart1_dma_rx_buffer[usart1_dma_rx_max_len];		 ///< USART1 DMA 接受缓冲区 1
 volatile uint8_t usart1_dma_rx_buffer_second[usart1_dma_rx_max_len]; ///< USART1 DMA 接受缓冲区 2
-static uint16_t usart1_dma_rxd_data_len;                             ///< USART1 DMA 已经接收到的数据长度
+static uint16_t usart1_dma_rxd_data_len;							 ///< USART1 DMA 已经接收到的数据长度
 
 /**
  * @brief       初始化串口 1 的接收 DMA 
@@ -106,4 +106,20 @@ uint8_t Get_Rc_Available_Bufferx(void)
 		return 1;
 	}
 	return 0;
+}
+
+/**
+ * @brief           重置 USART1 Rx DMA
+ * @param[in]       none
+ * @retval          void
+ */
+void Usart1_Rx_DMA_Reset(void)
+{
+	LL_USART_Disable(USART1);
+	LL_DMA_DisableStream(DMA2, LL_DMA_STREAM_2);
+	LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_2, usart1_dma_rx_max_len);
+
+	LL_USART_ClearFlag_IDLE(USART1);
+	LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_2);
+	LL_USART_Enable(USART1);
 }

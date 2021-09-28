@@ -40,7 +40,7 @@ void StartRemoteTask(void const *argument)
                 }
                 else
                 {
-                    // TODO
+                    Usart1_Rx_DMA_Reset();
                 }
             }
         }
