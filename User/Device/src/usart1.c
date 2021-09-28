@@ -1,9 +1,9 @@
 #include "usart1.h"
 
-static const uint16_t usart1_dma_rx_max_len = 36;					 ///< USART1 DMA 最大接收长度
-volatile uint8_t usart1_dma_rx_buffer[usart1_dma_rx_max_len];		 ///< USART1 DMA 接受缓冲区 1
-volatile uint8_t usart1_dma_rx_buffer_second[usart1_dma_rx_max_len]; ///< USART1 DMA 接受缓冲区 2
-static uint16_t usart1_dma_rxd_data_len;							 ///< USART1 DMA 已经接收到的数据长度
+static const uint16_t usart1_dma_rx_max_len = 36;					  ///< USART1 DMA 最大接收长度
+static volatile uint8_t usart1_dma_rx_buffer0[usart1_dma_rx_max_len]; ///< USART1 DMA 接受缓冲区 1
+static volatile uint8_t usart1_dma_rx_buffer1[usart1_dma_rx_max_len]; ///< USART1 DMA 接受缓冲区 2
+static volatile uint16_t usart1_dma_rxd_data_len;				      ///< USART1 DMA 已经接收到的数据长度
 
 /**
  * @brief       初始化串口 1 的接收 DMA 
@@ -13,11 +13,11 @@ static uint16_t usart1_dma_rxd_data_len;							 ///< USART1 DMA 已经接收到的数据
 void Usart1_RxDMA_Init(void)
 {
 	LL_DMA_SetPeriphAddress(DMA2, LL_DMA_STREAM_2, LL_USART_DMA_GetRegAddr(USART1));
-	LL_DMA_SetMemoryAddress(DMA2, LL_DMA_STREAM_2, (uint32_t)(usart1_dma_rx_buffer));
+	LL_DMA_SetMemoryAddress(DMA2, LL_DMA_STREAM_2, (uint32_t)(usart1_dma_rx_buffer0));
 	LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_2, usart1_dma_rx_max_len);
 
 	///< 开启 DMA 双缓冲
-	LL_DMA_SetMemory1Address(DMA2, LL_DMA_STREAM_2, (uint32_t)(usart1_dma_rx_buffer_second));
+	LL_DMA_SetMemory1Address(DMA2, LL_DMA_STREAM_2, (uint32_t)(usart1_dma_rx_buffer1));
 	LL_DMA_SetCurrentTargetMem(DMA2, LL_DMA_STREAM_2, LL_DMA_CURRENTTARGETMEM0);
 	LL_DMA_EnableDoubleBufferMode(DMA2, LL_DMA_STREAM_2);
 
@@ -67,6 +67,7 @@ void Usart1_DMA_RxCp_Callback(void)
 		LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_2);
 	}
 }
+
 /**
  * @brief           返回 USART1 DMA 的第一个接受缓冲区指针
  * @param[in]       none
@@ -74,8 +75,9 @@ void Usart1_DMA_RxCp_Callback(void)
  */
 uint8_t *Get_Usart1_DMA_RxBuffer_One(void)
 {
-	return (uint8_t *)usart1_dma_rx_buffer;
+	return (uint8_t *)usart1_dma_rx_buffer0;
 }
+
 /**
  * @brief           返回 USART1 DMA 的接受缓冲区最大接受长度
  * @param[in]       none
@@ -85,6 +87,7 @@ const uint16_t *Get_Usart1_DMA_RxMaxLen(void)
 {
 	return &usart1_dma_rx_max_len;
 }
+
 /**
  * @brief           返回 USART1 DMA 的接受缓冲区已经接受到的数据长度
  * @param[in]       none
@@ -92,8 +95,9 @@ const uint16_t *Get_Usart1_DMA_RxMaxLen(void)
  */
 uint16_t *Get_Usart1_DMA_Rxd_DataLen(void)
 {
-	return &usart1_dma_rxd_data_len;
+	return (uint16_t*)&usart1_dma_rxd_data_len;
 }
+
 /**
  * @brief           返回 USART1 DMA 第二个接收缓冲区
  * @param[in]       none
@@ -101,8 +105,9 @@ uint16_t *Get_Usart1_DMA_Rxd_DataLen(void)
  */
 uint8_t *Get_Usart1_DMA_RxBuffer_Two(void)
 {
-	return (uint8_t *)(usart1_dma_rx_buffer_second);
+	return (uint8_t *)(usart1_dma_rx_buffer1);
 }
+
 /**
  * @brief           返回 USART1 DMA 的当前可用的接受缓冲区
  * @param[in]       none
