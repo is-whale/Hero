@@ -72,7 +72,7 @@ void Info_RemoteTask_Parse_Data(void)
  * @param[in]                   void
  * @retval {Rc_Ctrl_t*}        解析后的遥控器数据结构体指针
  */
-Rc_Ctrl_t *Get_Rc_Parsed_RemoteData(void)
+Rc_Ctrl_t *Get_Rc_Parsed_RemoteData_Pointer(void)
 {
     return &remote_controller;
 }
