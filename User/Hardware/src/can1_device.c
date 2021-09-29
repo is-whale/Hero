@@ -1,9 +1,9 @@
 #include "can1_device.h"
 
-static Pid_Position_t motor_fl_speed_pid = NEW_POSITION_PID(10, 0, 5, 2000, 16000, 0, 1000, 500);
-static Pid_Position_t motor_fr_speed_pid = NEW_POSITION_PID(10, 0, 5, 2000, 16000, 0, 1000, 500);
-static Pid_Position_t motor_bl_speed_pid = NEW_POSITION_PID(10, 0, 5, 2000, 16000, 0, 1000, 500);
-static Pid_Position_t motor_br_speed_pid = NEW_POSITION_PID(10, 0, 5, 2000, 16000, 0, 1000, 500);
+static Pid_Position_t motor_fl_speed_pid = NEW_POSITION_PID(1, 0, 0.1, 2000, 16000, 0, 1000, 500);
+static Pid_Position_t motor_fr_speed_pid = NEW_POSITION_PID(1, 0, 0.1, 2000, 16000, 0, 1000, 500);
+static Pid_Position_t motor_bl_speed_pid = NEW_POSITION_PID(1, 0, 0.1, 2000, 16000, 0, 1000, 500);
+static Pid_Position_t motor_br_speed_pid = NEW_POSITION_PID(1, 0, 0.1, 2000, 16000, 0, 1000, 500);
 
 void Set_ChassisMotor_Speed(float speed_fl, float speed_fr, float speed_bl, float speed_br, Motor_Measure_t *chassis_motor_feedback_data)
 {
