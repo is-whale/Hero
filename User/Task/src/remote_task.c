@@ -2,7 +2,7 @@
 
 static Rc_Ctrl_t remote_controller;                    ///< 本次解析的遥控器数据
 static Rc_Ctrl_t last_time_remote_controller;          ///< 上次解析的遥控器数据
-static Robot_contral_data_t robot_contral_data;
+static Robot_control_data_t robot_control_data;
 static uint16_t *sbus_rxd_len;                         ///< 本次遥控器接收到的数据长度
 static uint8_t *rc_rx_buffer[2];                       ///< 遥控器两次接收数据缓冲
 static const uint32_t remote_get_data_signal = 0x0001; ///< 遥控器接收数据信号
@@ -36,7 +36,7 @@ void StartRemoteTask(void const *argument)
 
                 if (Rc_Data_Check_Parse(rc_rx_buffer[rx_available_buffer_index], &remote_controller, *sbus_rxd_len))
                 {
-                    // Parse_Robot_Contral_Data(&remote_controller, &last_time_remote_controller, &robot_contral_data); ///< 解析出遥控器模式
+                    Parse_Robot_Control_Data(&remote_controller, &last_time_remote_controller, &robot_control_data); ///< 解析出遥控器模式
                     
                     Rc_Data_Copy(&last_time_remote_controller, &remote_controller); ///< 保存本次遥控器状态
 

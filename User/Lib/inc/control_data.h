@@ -49,8 +49,8 @@ typedef struct
 	//ËÙ¶È±¶ÂÊ 1+x
 	
 	
-}Robot_contral_data_t;
+}Robot_control_data_t;
 
-// void Parse_Robot_Contral_Data(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data, Robot_contral_data_t* robot_contral_data);
+void Parse_Robot_Control_Data(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data, Robot_control_data_t* robot_control_data);
 
 #endif // __CONTROL_DATA_H_
