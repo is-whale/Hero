@@ -12,9 +12,13 @@ typedef struct
 		uint8_t rc_motion_mode;				 //底盘云台模式 1底盘跟随 2小陀螺 3自瞄跟随 4自瞄小陀螺 5特殊
 		uint8_t mouse_keyboard_chassis_mode; //1跟随 2小陀螺 3特殊
 		uint8_t mouse_keyboard_gimbal_mode;	 //1手动 2自瞄 3特殊
-		uint8_t shoot_mode;					 //射击模式 1单发 2连发（慢速） 3连发（最大速度）
 		uint8_t fric_cover_mode;			 //摩擦轮模式 0关闭 1自适应 2最高速 3开舱盖
+		uint8_t shoot_mode;					 //射击模式 1单发 2连发（慢速） 3连发（最大速度）
+		uint8_t shoot_key;                   //射击开关 0关闭
+	} mode;
 
+	struct
+	{
 		//const鼠标最大速度
 		int16_t mouse_x_max_value;
 		int16_t mouse_y_max_value;
@@ -27,8 +31,7 @@ typedef struct
 		int16_t chassis_acceleration;
 		//底盘最大速度
 		int16_t chassis_max_speed; 
-
-	} mode;
+	}parameter;
 
 	struct
 	{
