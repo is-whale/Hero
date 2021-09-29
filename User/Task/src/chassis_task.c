@@ -25,19 +25,15 @@ void StartChassisTask(void const *argument)
             {
             case 1: ///< 改用枚举类型
             {
-                chassis_motor_speed[0] = rc_data_pt->rc.ch0;
-                chassis_motor_speed[1] = rc_data_pt->rc.ch0;
-                chassis_motor_speed[2] = rc_data_pt->rc.ch0;
-                chassis_motor_speed[3] = rc_data_pt->rc.ch0;
+                chassis_motor_speed[0] = -rc_data_pt->rc.ch3 - rc_data_pt->rc.ch2 + rc_data_pt->rc.ch0;
+                chassis_motor_speed[1] = rc_data_pt->rc.ch3  - rc_data_pt->rc.ch2 + rc_data_pt->rc.ch0;
+                chassis_motor_speed[2] = -rc_data_pt->rc.ch3 + rc_data_pt->rc.ch2 + rc_data_pt->rc.ch0;
+                chassis_motor_speed[3] = rc_data_pt->rc.ch3  + rc_data_pt->rc.ch2 + rc_data_pt->rc.ch0;
 
                 chassis_motor_speed[0] *= motor_speed_multiple;
                 chassis_motor_speed[1] *= motor_speed_multiple;
                 chassis_motor_speed[2] *= motor_speed_multiple;
                 chassis_motor_speed[3] *= motor_speed_multiple;
-                // debug_print("speed 1 %d\r\n",chassis_motor_feedback_parsed_data[0].speed_rpm);
-                // debug_print("speed 2 %d\r\n",chassis_motor_feedback_parsed_data[1].speed_rpm);
-                // debug_print("speed 3 %d\r\n",chassis_motor_feedback_parsed_data[2].speed_rpm);
-                // debug_print("speed 4 %d\r\n",chassis_motor_feedback_parsed_data[3].speed_rpm);
 
                 break;
             }
@@ -67,7 +63,7 @@ void StartChassisTask(void const *argument)
         }
 
         ///< 设置底盘电机速度
-        Set_ChassisMotor_Speed(chassis_motor_speed[0],chassis_motor_speed[1],chassis_motor_speed[2],chassis_motor_speed[3],chassis_motor_feedback_parsed_data);
+        Set_ChassisMotor_Speed(chassis_motor_speed[0], chassis_motor_speed[1], chassis_motor_speed[2], chassis_motor_speed[3], chassis_motor_feedback_parsed_data);
 
         osDelay(10);
     }
