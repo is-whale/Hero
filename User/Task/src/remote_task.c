@@ -1,12 +1,13 @@
 #include "remote_task.h"
 
 static Rc_Ctrl_t remote_controller;                    ///< 本次解析的遥控器数据
-static Rc_Ctrl_t last_time_rc;                         ///< 上次解析的遥控器数据
-extern osThreadId remoteTaskHandle;                    ///< 遥控器任务句柄
+static Rc_Ctrl_t last_time_remote_controller;          ///< 上次解析的遥控器数据
+static Robot_contral_data_t robot_contral_data;
 static uint16_t *sbus_rxd_len;                         ///< 本次遥控器接收到的数据长度
 static uint8_t *rc_rx_buffer[2];                       ///< 遥控器两次接收数据缓冲
 static const uint32_t remote_get_data_signal = 0x0001; ///< 遥控器接收数据信号
-static const uint32_t remote_data_overtime = 50;      ///< 遥控器数据包心跳时间
+static const uint32_t remote_data_overtime = 50;      ///< 遥控器接收数据包超时时间
+extern osThreadId remoteTaskHandle;                    ///< 遥控器任务句柄
 
 void StartRemoteTask(void const *argument)
 {
@@ -20,7 +21,7 @@ void StartRemoteTask(void const *argument)
     Usart1_RxDMA_Init();
 
     Rc_Data_Reset(&remote_controller);
-    Rc_Data_Reset(&last_time_rc);
+    Rc_Data_Reset(&last_time_remote_controller);
 
     osDelay(100);
 
@@ -35,19 +36,23 @@ void StartRemoteTask(void const *argument)
 
                 if (Rc_Data_Check_Parse(rc_rx_buffer[rx_available_buffer_index], &remote_controller, *sbus_rxd_len))
                 {
-                    Module_Reload(remote_control);
-                    // TODO
+                    // Parse_Robot_Contral_Data(&remote_controller, &last_time_remote_controller, &robot_contral_data); ///< 解析出遥控器模式
+                    
+                    Rc_Data_Copy(&last_time_remote_controller, &remote_controller); ///< 保存本次遥控器状态
+
+                    Module_Reload(remote_control); ///< 更新遥控器状态
                 }
                 else
                 {
                     Usart1_Rx_DMA_Reset();
+                    Rc_Data_Copy(&remote_controller, &last_time_remote_controller); ///< 校验出错保持遥控器数据不变
                 }
             }
         }
         else if (remote_get_data_event.status == osEventTimeout)
         {
             Rc_Data_Reset(&remote_controller);
-            Rc_Data_Reset(&last_time_rc);
+            Rc_Data_Reset(&last_time_remote_controller);
         }
     }
 }
