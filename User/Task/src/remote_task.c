@@ -70,9 +70,19 @@ void Info_RemoteTask_Parse_Data(void)
 /**
  * @brief                       获取解析后的遥控器数据
  * @param[in]                   void
- * @retval {Rc_Ctrl_t*}        解析后的遥控器数据结构体指针
+ * @retval {Rc_Ctrl_t*}         解析后的遥控器数据结构体指针
  */
 Rc_Ctrl_t *Get_Rc_Parsed_RemoteData_Pointer(void)
 {
     return &remote_controller;
+}
+
+/**
+ * @brief                       获取解析后的机器人模式结构体指针
+ * @param[in]                   void
+ * @retval {Rc_Ctrl_t*}         解析后的解析后的机器人模式结构体指针
+ */
+Robot_control_data_t *Get_Parsed_RobotMode_Pointer(void)
+{
+    return &robot_control_data;
 }
