@@ -22,6 +22,8 @@ typedef struct
         (ptr)->mechanical_angle = (data)[6];                                   \
     }
 
+void Calculate_Motor_Data(Motor_Measure_t* motor, uint8_t* can_message);
+
 #endif // __MOTOR_H_
 		
 		
