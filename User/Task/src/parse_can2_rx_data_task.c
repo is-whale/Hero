@@ -3,7 +3,7 @@
 extern osThreadId parseCan2RxDataHandle;
 static const uint16_t can2_get_data_signal = 0x0001;
 
-void StartParseCan1RxDataTask(void const *argument)
+void StartParseCan2RxDataTask(void const *argument)
 {
     osEvent can2_get_data_event;
 
@@ -26,7 +26,7 @@ void StartParseCan1RxDataTask(void const *argument)
     }
 }
 
-void Info_Can2_ParseData_Task()
+void Info_Can2_ParseData_Task(void)
 {
     osSignalSet(parseCan2RxDataHandle,can2_get_data_signal);
 }

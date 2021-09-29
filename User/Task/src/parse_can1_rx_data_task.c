@@ -2,7 +2,8 @@
 
 extern osThreadId parseCan1RxDataHandle;
 static const uint16_t can1_get_data_signal = 0x0001;
-Motor_Measure_t m3508_feddback_data[4];
+static const uint8_t can1_motor_device_number = 4;
+static Motor_Measure_t m3508_feddback_data[can1_motor_device_number];
 
 void StartParseCan1RxDataTask(void const *argument)
 {
@@ -20,6 +21,9 @@ void StartParseCan1RxDataTask(void const *argument)
             if (can1_get_data_event.value.signals == can1_get_data_signal)
             {
                 Parse_Can1_Rxd_Data();
+                debug_showdata1("mechine angle",m3508_feddback_data[0].mechanical_angle);
+                debug_showdata1("speed",m3508_feddback_data[0].speed_rpm);
+                debug_showdata1("temperate",m3508_feddback_data[0].temperate);
             }
         }
         else if (can1_get_data_event.status == osEventTimeout)
@@ -42,4 +46,14 @@ void Parse_Can1_Rxd_Data(void)
 void Info_Can1_ParseData_Task(void)
 {
     osSignalSet(parseCan1RxDataHandle, can1_get_data_signal);
+}
+
+Motor_Measure_t *Get_Can1_Feedback_Data(void)
+{
+    return m3508_feddback_data;
+}
+
+const uint8_t *Get_Can1_Motor_DeviceNumber(void)
+{
+    return (&can1_motor_device_number);
 }

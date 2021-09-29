@@ -10,5 +10,7 @@
 
 void Info_Can1_ParseData_Task(void);
 void Parse_Can1_Rxd_Data(void);
+Motor_Measure_t *Get_Can1_Feedback_Data(void);
+const uint8_t *Get_Can1_Motor_DeviceNumber(void);
 
 #endif //__PARSE_CAN1_RX_DATA_TASK_H_
