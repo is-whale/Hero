@@ -2,8 +2,6 @@
 #define __REMOTE_H_
 
 #include "stm32f4xx.h"
-#include "stdio.h"
-#include "usart1.h"
 
 #define RC_CH_VALUE_MIN                 ((uint16_t)364)
 #define RC_CH_VALUE_OFFSET              ((uint16_t)1024)

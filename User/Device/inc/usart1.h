@@ -3,7 +3,6 @@
 
 #include "stm32f4xx_ll_usart.h"
 #include "usart.h"
-#include "usart3.h"
 #include "remote_task.h"
 
 void Usart1_DMA_RxCp_Callback(void);
