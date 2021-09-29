@@ -8,5 +8,6 @@
 #include "monitor_task.h"
 
 void Info_RemoteTask_Parse_Data(void);
+Rc_Ctrl_t *Get_Rc_Parsed_RemoteData(void);
 
 #endif //__REMOTE_TASK_H_

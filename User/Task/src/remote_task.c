@@ -66,3 +66,13 @@ void Info_RemoteTask_Parse_Data(void)
 {
     osSignalSet(remoteTaskHandle, remote_get_data_signal);
 }
+
+/**
+ * @brief                       获取解析后的遥控器数据
+ * @param[in]                   void
+ * @retval {Rc_Ctrl_t*}        解析后的遥控器数据结构体指针
+ */
+Rc_Ctrl_t *Get_Rc_Parsed_RemoteData(void)
+{
+    return &remote_controller;
+}
