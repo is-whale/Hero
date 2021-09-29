@@ -22,7 +22,6 @@ void StartParseCan1RxDataTask(void const *argument)
 
     for (;;)
     {
-        osDelay(10);
         can1_get_data_event = osSignalWait(can1_get_data_signal, can1_rx_data_overtime);
         if (can1_get_data_event.status == osEventSignal)
         {
