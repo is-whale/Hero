@@ -8,5 +8,7 @@
 #include "monitor_task.h"
 
 void Info_RemoteTask_Parse_Data(void);
+Rc_Ctrl_t *Get_Rc_Parsed_RemoteData_Pointer(void);
+Robot_control_data_t *Get_Parsed_RobotMode_Pointer(void);
 
 #endif //__REMOTE_TASK_H_

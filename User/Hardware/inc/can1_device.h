@@ -2,6 +2,8 @@
 #define __CAN1_DEVICE_H_
 
 #include "stm32f4xx.h"
+#include "can1.h"
+#include "pid.h"
 
 typedef enum
 {
@@ -14,5 +16,7 @@ typedef enum
     SUPER_CAPACITOR_ID = 0x211,
     SUPER_CAPACITOR_SEND_ID = 0x210,
 } Can1_RxMsg_ID;
+
+void Set_ChassisMotor_Speed(float speed_fl, float speed_fr, float speed_bl, float speed_br, Motor_Measure_t *chassis_motor_feedback_data);
 
 #endif // __CAN1_DEVICE_H_
