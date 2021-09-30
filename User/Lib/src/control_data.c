@@ -6,6 +6,40 @@ static void Mouse_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t* ro
 static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data, Robot_control_data_t* robot_control_data);
 static void Shoot_Key_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data, Robot_control_data_t* robot_control_data);
 
+void Control_Data_Init(Robot_control_data_t* robot_control_data)
+{
+	robot_control_data->mode.control_device = mouse_keyboard_device_ENUM;
+	robot_control_data->mode.rc_motion_mode = rc_special_mode_ENUM;
+	robot_control_data->mode.mouse_keyboard_chassis_mode = mk_chassis_follow_mode_ENUM;
+	robot_control_data->mode.mouse_keyboard_gimbal_mode = mk_manual_aim_mode_ENUM;
+	robot_control_data->mode.gyro_direction = gyro_positive_ENUM;
+	robot_control_data->mode.fric_cover_mode = fric_cover_off_mode_ENUM;
+	robot_control_data->mode.shoot_mode = on_shoot_mode_ENUM;
+	robot_control_data->mode.shoot_key = 0;
+
+#define MOUSE_X_MAX_VALUE 5000
+#define MOUSE_Y_MAX_VALUE 5000
+#define MOUSE_X_SENSITIVITY 0.2f
+#define MOUSE_Y_SENSITIVITY 0.2f
+
+	robot_control_data->parameter.mouse_x_max_value = MOUSE_X_MAX_VALUE;
+	robot_control_data->parameter.mouse_y_max_value = MOUSE_Y_MAX_VALUE;
+	robot_control_data->parameter.mouse_x_sensitivity = MOUSE_X_SENSITIVITY;
+	robot_control_data->parameter.mouse_y_sensitivity = MOUSE_Y_SENSITIVITY;
+	robot_control_data->parameter.chassis_acceleration = 10;
+	robot_control_data->parameter.chassis_max_speed = 660;
+
+#undef MOUSE_X_MAX_VALUE
+#undef MOUSE_Y_MAX_VALUE
+#undef MOUSE_X_SENSITIVITY
+#undef MOUSE_Y_SENSITIVITY
+
+	robot_control_data->virtual_rocker.ch0 = 0;
+	robot_control_data->virtual_rocker.ch1 = 0;
+	robot_control_data->virtual_rocker.ch2 = 0;
+	robot_control_data->virtual_rocker.ch3 = 0;
+}
+
 void Parse_Robot_Control_Data(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data, Robot_control_data_t* robot_control_data)
 {
 	Robot_Rc_Mode_Change_Control(rc_data, last_rc_data, robot_control_data); ///< 机器人模式变换响应
@@ -58,7 +92,7 @@ static void Robot_Rc_Mode_Change_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_
 	if(S1_CHANGED_TO(3,1))
 	{
 		ROBOT_MODE.shoot_mode++;
-		if(ROBOT_MODE.shoot_mode==5) ROBOT_MODE.shoot_mode=1;
+		if(ROBOT_MODE.shoot_mode==3) ROBOT_MODE.shoot_mode=1;
 		// Set_Beep_Time(ROBOT_MODE.shoot_mode, 600, 65);
 	}
 
@@ -79,8 +113,21 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 #define KEY_D            0x08
 #define RC_KEY           rc_data->key.value
 #define KEY_PRESSED(key) (RC_KEY & key)
-#define VIRTUAL_ROCKER_STEP 10
+#define VIRTUAL_ROCKER_STEP robot_control_data->parameter.chassis_acceleration
+#define VIRTUAL_ROCKER_MIN  (-robot_control_data->parameter.chassis_max_speed)
+#define VIRTUAL_ROCKER_MAX  robot_control_data->parameter.chassis_max_speed
 #define VIRTUAL_ROCKER    robot_control_data->virtual_rocker
+
+	/* ch3 min max限制 */
+	if(VIRTUAL_ROCKER.ch3 > VIRTUAL_ROCKER_MAX)
+	{
+		Int16_Minus_Limit(&VIRTUAL_ROCKER.ch3, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MAX);
+	}
+	else if(VIRTUAL_ROCKER.ch3 < VIRTUAL_ROCKER_MIN)
+	{
+		Int16_Add_Limit(&VIRTUAL_ROCKER.ch3, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MIN);
+	}
+
 	/*只按下W时，不按下S*/
 	if(KEY_PRESSED(KEY_W) && !(KEY_PRESSED(KEY_S)))
 	{
@@ -88,9 +135,9 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 		{
 			VIRTUAL_ROCKER.ch3 += VIRTUAL_ROCKER_STEP;
 		}
-		if(VIRTUAL_ROCKER.ch3 < 600)
+		if(VIRTUAL_ROCKER.ch3 < VIRTUAL_ROCKER_MAX)
 		{
-			VIRTUAL_ROCKER.ch3 += VIRTUAL_ROCKER_STEP;
+			Int16_Add_Limit(&VIRTUAL_ROCKER.ch3, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MAX);
 		}
 	}
 	/*只按下S时，不按下W*/
@@ -100,9 +147,9 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 		{
 			VIRTUAL_ROCKER.ch3 -= VIRTUAL_ROCKER_STEP;
 		}
-		if(VIRTUAL_ROCKER.ch3 > -600)
+		if(VIRTUAL_ROCKER.ch3 > VIRTUAL_ROCKER_MIN)
 		{
-			VIRTUAL_ROCKER.ch3 -= VIRTUAL_ROCKER_STEP;
+			Int16_Minus_Limit(&VIRTUAL_ROCKER.ch3, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MIN);
 		}
 	}
 	/*W、S都未按下时*/
@@ -110,16 +157,22 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 	{
 		if(VIRTUAL_ROCKER.ch3 < 0)
 		{
-			VIRTUAL_ROCKER.ch3 += VIRTUAL_ROCKER_STEP;
-			if(VIRTUAL_ROCKER.ch3 > 0)
-				VIRTUAL_ROCKER.ch3 = 0;
+			Int16_Add_Limit(&VIRTUAL_ROCKER.ch3, VIRTUAL_ROCKER_STEP, 0);
 		}
 		else if(VIRTUAL_ROCKER.ch3 > 0)
 		{
-			VIRTUAL_ROCKER.ch3 -= VIRTUAL_ROCKER_STEP;
-			if(VIRTUAL_ROCKER.ch3 < 0)
-				VIRTUAL_ROCKER.ch3 = 0;
+			Int16_Minus_Limit(&VIRTUAL_ROCKER.ch3, VIRTUAL_ROCKER_STEP, 0);
 		}
+	}
+
+	/* ch2 min max限制 */
+	if(VIRTUAL_ROCKER.ch2 > VIRTUAL_ROCKER_MAX)
+	{
+		Int16_Minus_Limit(&VIRTUAL_ROCKER.ch2, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MAX);
+	}
+	else if(VIRTUAL_ROCKER.ch2 < VIRTUAL_ROCKER_MIN)
+	{
+		Int16_Add_Limit(&VIRTUAL_ROCKER.ch2, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MIN);
 	}
 
 	/*只按下D时*/
@@ -129,9 +182,9 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 		{
 			VIRTUAL_ROCKER.ch2 += VIRTUAL_ROCKER_STEP;
 		}
-		if(VIRTUAL_ROCKER.ch2 < 600)
+		if(VIRTUAL_ROCKER.ch2 < VIRTUAL_ROCKER_MAX)
 		{
-			VIRTUAL_ROCKER.ch2 += VIRTUAL_ROCKER_STEP;
+			Int16_Add_Limit(&VIRTUAL_ROCKER.ch2, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MAX);
 		}
 	}
 	/*只按下A时*/
@@ -141,133 +194,180 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 		{
 			VIRTUAL_ROCKER.ch2 -= VIRTUAL_ROCKER_STEP;
 		}
-		if(VIRTUAL_ROCKER.ch2 > -600)
+		if(VIRTUAL_ROCKER.ch2 > VIRTUAL_ROCKER_MIN)
 		{
-			VIRTUAL_ROCKER.ch2 -= VIRTUAL_ROCKER_STEP;
+			Int16_Minus_Limit(&VIRTUAL_ROCKER.ch2, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MIN);
 		}
-
 	}
 	/*A、D都未按下时*/
 	else
 	{
 		if(VIRTUAL_ROCKER.ch2 < 0)
 		{
-			VIRTUAL_ROCKER.ch2 += VIRTUAL_ROCKER_STEP;
-			if(VIRTUAL_ROCKER.ch2 > 0)
-				VIRTUAL_ROCKER.ch2 = 0;
+			Int16_Add_Limit(&VIRTUAL_ROCKER.ch2, VIRTUAL_ROCKER_STEP, 0);
 		}
 		else if(VIRTUAL_ROCKER.ch2 > 0)
 		{
-			VIRTUAL_ROCKER.ch2 -= VIRTUAL_ROCKER_STEP;
-			if(VIRTUAL_ROCKER.ch2 < 0)
-				VIRTUAL_ROCKER.ch2 = 0;
+			Int16_Minus_Limit(&VIRTUAL_ROCKER.ch2, VIRTUAL_ROCKER_STEP, 0);
 		}
 	}
 
+#undef KEY_W
+#undef KEY_A
+#undef KEY_S
+#undef KEY_D
+#undef RC_KEY
+#undef KEY_PRESSED
+#undef VIRTUAL_ROCKER_STEP
+#undef VIRTUAL_ROCKER_MIN
+#undef VIRTUAL_ROCKER_MAX
+#undef VIRTUAL_ROCKER
 }
 
 static void Mouse_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t* robot_control_data)
 {
-	//TODO 鼠标上下限限制
-	//TODO 鼠标数值*灵敏度
+	//鼠标上下限限制
+	robot_control_data->virtual_rocker.ch0 = Int16_Limit(rc_data->mouse.x, -robot_control_data->parameter.mouse_x_max_value, robot_control_data->parameter.mouse_x_max_value);
+	robot_control_data->virtual_rocker.ch1 = Int16_Limit(rc_data->mouse.y, -robot_control_data->parameter.mouse_y_max_value, robot_control_data->parameter.mouse_y_max_value);
+
+	//鼠标数值*灵敏度
+	robot_control_data->virtual_rocker.ch0 *= robot_control_data->parameter.mouse_x_sensitivity;
+	robot_control_data->virtual_rocker.ch1 *= robot_control_data->parameter.mouse_y_sensitivity;
 }
 
 /* 响应键盘切换模式 */
 static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data, Robot_control_data_t* robot_control_data)
 {
+#define KEY_CTRL         0x20
+#define KEY_SHIFT        0x10
+#define KEY_Z            0x800
+#define KEY_X            0x1000
+#define KEY_C            0x2000
+#define KEY_V            0x4000
+#define KEY_B            0x8000
+#define KEY_F            0x200
+#define KEY_G            0x400
+#define KEY_Q            0x40
+#define KEY_E            0x80
+#define KEY_R            0x100
+#define KEY_VALUE        rc_data->key.value
+#define OLD_KEY_VALUE    last_rc_data->key.value
+#define KEY_PRESSED(key) (KEY_VALUE & key)
+#define KEY_CLICKED(key) ((KEY_VALUE & key) && (!(OLD_KEY_VALUE & key)))
+
+
 	//判断是不是键鼠模式
 	if(robot_control_data->mode.control_device != 1)
 	{
 		return;
 	}
 
-	// //按住shift底盘加速
-	// if( RC_KEY_PRESSED(KEY_VALUE, KEY_SHIFT) )
-	// {
-	// 	Change_Chassis_Motor_Boost_Rate(1, 2.7); //加速
-	// }
-	// else
-	// {
-	// 	Change_Chassis_Motor_Boost_Rate(-1, 2.7); //减速
-	// }
+	//按住shift底盘加速
+	if( KEY_PRESSED(KEY_SHIFT) )
+	{
+		robot_control_data->parameter.chassis_acceleration = 15;
+		robot_control_data->parameter.chassis_max_speed = 660;
+	}
+	else
+	{
+		robot_control_data->parameter.chassis_acceleration = 5;
+		robot_control_data->parameter.chassis_max_speed = 500;
+	}
 
-	// //底盘模式(按下ctrl更改底盘模式1跟随模式2小陀螺模式)
-	// if(KEY_CLICKED(KEY_CTRL))
-	// {
-	// 	if(robot_mode->mouse_key_chassis_mode == 1)
-	// 	{
-	// 		robot_mode->mouse_key_chassis_mode = 2;
-	// 		Set_Beep_Time(2, 1200, 50);
-	// 	}
-	// 	else
-	// 	{
-	// 		robot_mode->mouse_key_chassis_mode = 1;
-	// 		Set_Beep_Time(1, 1200, 50);
-	// 	}
-	// }
+	//底盘模式(按下ctrl更改底盘模式1跟随模式2小陀螺模式)
+	if(KEY_CLICKED(KEY_CTRL))
+	{
+		if(robot_control_data->mode.mouse_keyboard_chassis_mode == mk_chassis_follow_mode_ENUM)
+		{
+			robot_control_data->mode.mouse_keyboard_chassis_mode = mk_chassis_gyro_mode_ENUM;
+			// Set_Beep_Time(2, 1200, 50);
+		}
+		else
+		{
+			robot_control_data->mode.mouse_keyboard_chassis_mode = mk_chassis_follow_mode_ENUM;
+			// Set_Beep_Time(1, 1200, 50);
+		}
+	}
 
-	// //云台模式 G (手动控制 自瞄模式)
-	// if(KEY_CLICKED(KEY_G))
-	// {
-	// 	if(robot_mode->mouse_key_gimbal_mode == 1)
-	// 	{
-	// 		robot_mode->mouse_key_gimbal_mode = 2;
-	// 		Set_Beep_Time(4, 1200, 50);
-	// 	}
-	// 	else
-	// 	{
-	// 		robot_mode->mouse_key_gimbal_mode = 1;
-	// 		Set_Beep_Time(3, 1200, 50);
-	// 	}
-	// }
+	//云台模式 G (手动控制 自瞄模式)
+	if(KEY_CLICKED(KEY_G))
+	{
+		if(robot_control_data->mode.mouse_keyboard_gimbal_mode == mk_manual_aim_mode_ENUM)
+		{
+			robot_control_data->mode.mouse_keyboard_gimbal_mode = mk_auto_aim_mode_ENUM;
+			// Set_Beep_Time(4, 1200, 50);
+		}
+		else
+		{
+			robot_control_data->mode.mouse_keyboard_gimbal_mode = mk_manual_aim_mode_ENUM;
+			// Set_Beep_Time(3, 1200, 50);
+		}
+	}
 
-	// //特殊模式
-	// if( KEY_CLICKED(KEY_Z) )
-	// {
-	// 	robot_mode->mouse_key_chassis_mode = 3;
-	// 	robot_mode->mouse_key_gimbal_mode = 3;
-	// 	Set_Beep_Time(5, 1200, 50);
-	// }
+	//特殊模式
+	if( KEY_CLICKED(KEY_V) )
+	{
+		robot_control_data->mode.mouse_keyboard_chassis_mode = mk_chassis_special_mode_ENUM;
+		robot_control_data->mode.mouse_keyboard_gimbal_mode = mk_special_aim_mode_ENUM;
+		// Set_Beep_Time(5, 1200, 50);
+	}
 
-	// //非特殊模式检查
-	// if(robot_mode->mouse_key_chassis_mode == 3 && robot_mode->mouse_key_gimbal_mode != 3)
-	// {
-	// 	robot_mode->mouse_key_chassis_mode = 1;
-	// }
-	// if(robot_mode->mouse_key_chassis_mode != 3 && robot_mode->mouse_key_gimbal_mode == 3)
-	// {
-	// 	robot_mode->mouse_key_gimbal_mode = 1;
-	// }
+	//非特殊模式检查
+	if(robot_control_data->mode.mouse_keyboard_chassis_mode == 3 && robot_control_data->mode.mouse_keyboard_gimbal_mode != 3)
+	{
+		robot_control_data->mode.mouse_keyboard_chassis_mode = 1;
+	}
+	if(robot_control_data->mode.mouse_keyboard_chassis_mode != 3 && robot_control_data->mode.mouse_keyboard_gimbal_mode == 3)
+	{
+		robot_control_data->mode.mouse_keyboard_gimbal_mode = 1;
+	}
 
-	// //弹舱模式 R （开关弹舱盖）
-	// if(KEY_CLICKED(KEY_R))
-	// {
-	// 	if(robot_mode->fric_cover_mode == 3)
-	// 	{
-	// 		robot_mode->fric_cover_mode = 0;
-	// 		Set_Beep_Time(1, 800, 60);
-	// 	}
-	// 	else
-	// 	{
-	// 		robot_mode->fric_cover_mode = 3;
-	// 		Set_Beep_Time(4, 800, 60);
-	// 	}
-	// }
+	//弹舱模式 R （开关弹舱盖）
+	if(KEY_CLICKED(KEY_R))
+	{
+		if(robot_control_data->mode.fric_cover_mode == cover_on_ENUM)
+		{
+			robot_control_data->mode.fric_cover_mode = fric_cover_off_mode_ENUM;
+			// Set_Beep_Time(1, 800, 60);
+		}
+		else
+		{
+			robot_control_data->mode.fric_cover_mode = cover_on_ENUM;
+			// Set_Beep_Time(4, 800, 60);
+		}
+	}
 
-	// //摩擦轮模式 E
-	// if(KEY_CLICKED(KEY_E))
-	// {
-	// 	if(robot_mode->fric_cover_mode == 1)
-	// 	{
-	// 		robot_mode->fric_cover_mode = 0;
-	// 		Set_Beep_Time(1, 800, 60);
-	// 	}
-	// 	else
-	// 	{
-	// 		robot_mode->fric_cover_mode = 1;
-	// 		Set_Beep_Time(2, 800, 60);
-	// 	}
-	// }
+	//摩擦轮模式 E
+	if(KEY_CLICKED(KEY_E))
+	{
+		if(robot_control_data->mode.fric_cover_mode == fric_adaptive_speed_mode_ENUM)
+		{
+			robot_control_data->mode.fric_cover_mode = fric_cover_off_mode_ENUM;
+			// Set_Beep_Time(1, 800, 60);
+		}
+		else
+		{
+			robot_control_data->mode.fric_cover_mode = fric_adaptive_speed_mode_ENUM;
+			// Set_Beep_Time(2, 800, 60);
+		}
+	}
+
+#undef KEY_CTRL
+#undef KEY_SHIFT
+#undef KEY_Z
+#undef KEY_X
+#undef KEY_C
+#undef KEY_V
+#undef KEY_B
+#undef KEY_F
+#undef KEY_G
+#undef KEY_Q
+#undef KEY_E
+#undef KEY_R
+#undef KEY_VALUE
+#undef OLD_KEY_VALUE
+#undef KEY_PRESSED
+#undef KEY_CLICKED
 }
 
 /* 响应射击模式 */
@@ -297,32 +397,12 @@ static void Shoot_Key_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data, Robot
 		}
 	}
 	
-	// //键盘模式
-	// else if(robot_mode.control_device == 1)
-	// {
-	// 	if( Is_Id1_17mm_Excess_Heat(judge_data) == 0 )  //判断是否超热量
-	// 	{
-	// 		if(remote_controller.mouse.press_l)
-	// 		{
-	// 			Set_Shoot_key(3);
-	// 		}
-	// 		else
-	// 		{
-	// 			Set_Shoot_key(0);
-	// 		}
-
-	// 		if( remote_controller.mouse.press_r && (!last_time_rc.mouse.press_r) )
-	// 		{
-	// 			Set_Shoot_key(2);
-	// 		}
-	// 	}
-	// 	else
-	// 	{
-	// 		Set_Shoot_key(0);
-	// 	}
-
-	// }
-
+	//键盘模式
+	else if (robot_control_data->mode.control_device == 1)
+	{
+		if (rc_data->mouse.press_l && (!last_rc_data->mouse.press_l))
+		{
+			robot_control_data->mode.shoot_key = 1;
+		}
+	}
 }
-
-
