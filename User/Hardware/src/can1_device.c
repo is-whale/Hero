@@ -17,8 +17,8 @@ void Set_ChassisMotor_Speed(float speed_fl, float speed_fr, float speed_bl, floa
         b,
         c,
         d);
-    debug_log("%d %d %d %d\r\n", chassis_motor_feedback_data[0].speed_rpm,
-              chassis_motor_feedback_data[0].speed_rpm,
-              chassis_motor_feedback_data[0].speed_rpm,
-              chassis_motor_feedback_data[0].speed_rpm);
+    // debug_log("%d %d %d %d\r\n", chassis_motor_feedback_data[0].speed_rpm,
+    //           chassis_motor_feedback_data[0].speed_rpm,
+    //           chassis_motor_feedback_data[0].speed_rpm,
+    //           chassis_motor_feedback_data[0].speed_rpm);
 }
