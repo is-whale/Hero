@@ -19,8 +19,8 @@ void Control_Data_Init(Robot_control_data_t* robot_control_data)
 
 #define MOUSE_X_MAX_VALUE 5000
 #define MOUSE_Y_MAX_VALUE 5000
-#define MOUSE_X_SENSITIVITY 0.2f
-#define MOUSE_Y_SENSITIVITY 0.2f
+#define MOUSE_X_SENSITIVITY 0.8f
+#define MOUSE_Y_SENSITIVITY 0.8f
 
 	robot_control_data->parameter.mouse_x_max_value = MOUSE_X_MAX_VALUE;
 	robot_control_data->parameter.mouse_y_max_value = MOUSE_Y_MAX_VALUE;
@@ -265,13 +265,13 @@ static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data,
 	//按住shift底盘加速
 	if( KEY_PRESSED(KEY_SHIFT) )
 	{
-		robot_control_data->parameter.chassis_acceleration = 15;
+		robot_control_data->parameter.chassis_acceleration = 50;
 		robot_control_data->parameter.chassis_max_speed = 660;
 	}
 	else
 	{
-		robot_control_data->parameter.chassis_acceleration = 5;
-		robot_control_data->parameter.chassis_max_speed = 500;
+		robot_control_data->parameter.chassis_acceleration = 16;
+		robot_control_data->parameter.chassis_max_speed = 360;
 	}
 
 	//底盘模式(按下ctrl更改底盘模式1跟随模式2小陀螺模式)
