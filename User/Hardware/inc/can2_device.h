@@ -4,6 +4,7 @@
 #include "can2.h"
 #include "motor.h"
 #include "pid.h"
+#include "motor.h"
 
 typedef enum
 {
@@ -24,5 +25,6 @@ Motor_Measure_t *Get_Gimbal_Motor_Feedback_Data(void);
 CAN_RxHeaderTypeDef *Get_CAN2_Rx_Header(void);
 CAN_RxHeaderTypeDef *Get_CAN2_Rx_Header(void);
 uint8_t *Get_CAN2_Rxd_Buffer(void);
+void Set_Gimbal_Motors_Speed(float yaw_speed, float pitch_speed, Motor_Measure_t *yaw_motor_parsed_feedback_data, Motor_Measure_t *pitch_motor_parsed_feedback_data);
 
 #endif //__CAN2_DEVICE_H_
