@@ -26,6 +26,7 @@
 #include "usart3.h"
 #include "usart1.h"
 #include "shell_task.h"
+#include "can2_device.h"
 #include "parse_can1_rx_data_task.h"
 /* USER CODE END Includes */
 
@@ -273,7 +274,7 @@ void DMA2_Stream2_IRQHandler(void)
 void CAN2_RX0_IRQHandler(void)
 {
   /* USER CODE BEGIN CAN2_RX0_IRQn 0 */
-
+  Can2_Rx_FIFO0_IT_Callback();
   /* USER CODE END CAN2_RX0_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan2);
   /* USER CODE BEGIN CAN2_RX0_IRQn 1 */
