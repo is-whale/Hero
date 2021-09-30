@@ -72,6 +72,9 @@ osStaticThreadDef_t parseCanRxDataTControlBlock;
 osThreadId parseCan2RxDataHandle;
 uint32_t parseCan2RxDataBuffer[ 512 ];
 osStaticThreadDef_t parseCan2RxDataControlBlock;
+osThreadId gimbalTaskHandle;
+uint32_t gimbalTaskBuffer[ 512 ];
+osStaticThreadDef_t gimbalTaskControlBlock;
 osSemaphoreId shellGetDataBinarySemHandle;
 osStaticSemaphoreDef_t myBinarySem01ControlBlock;
 osSemaphoreId remoteGetDataBinarySemHandle;
@@ -90,6 +93,7 @@ void StartCanSendTask(void const * argument);
 void StartChassisTask(void const * argument);
 void StartParseCan1RxDataTask(void const * argument);
 void StartParseCan2RxDataTask(void const * argument);
+void StartGimbalTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -176,6 +180,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of parseCan2RxData */
   osThreadStaticDef(parseCan2RxData, StartParseCan2RxDataTask, osPriorityIdle, 0, 512, parseCan2RxDataBuffer, &parseCan2RxDataControlBlock);
   parseCan2RxDataHandle = osThreadCreate(osThread(parseCan2RxData), NULL);
+
+  /* definition and creation of gimbalTask */
+  osThreadStaticDef(gimbalTask, StartGimbalTask, osPriorityAboveNormal, 0, 512, gimbalTaskBuffer, &gimbalTaskControlBlock);
+  gimbalTaskHandle = osThreadCreate(osThread(gimbalTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -325,6 +333,24 @@ __weak void StartParseCan2RxDataTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartParseCan2RxDataTask */
+}
+
+/* USER CODE BEGIN Header_StartGimbalTask */
+/**
+* @brief Function implementing the gimbalTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartGimbalTask */
+__weak void StartGimbalTask(void const * argument)
+{
+  /* USER CODE BEGIN StartGimbalTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartGimbalTask */
 }
 
 /* Private application code --------------------------------------------------*/
