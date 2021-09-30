@@ -11,12 +11,18 @@ typedef enum
 	CAN_3508_WAVE_ID = 0x201,
 
 	CAN_GIMBAL_ALL_ID = 0x2FF,
-	CAN_YAW_MOTOR_ID = 0x209,       ///< x
-	CAN_PITCH_MOTOR_ID = 0x20A,     ///< y
+	CAN_YAW_MOTOR_ID = 0x209,	///< x
+	CAN_PITCH_MOTOR_ID = 0x20A, ///< y
 } Can2_RxMsg_ID;
 
 void Can2_Rx_FIFO0_IT_Callback(void);
 Motor_Measure_t *Get_Pitch_Motor_Feedback_Data(void);
-Motor_Measure_t *Get_Pitch_Motor_Feedback_Data(void);
+Motor_Measure_t *Get_Yaw_Motor_Feedback_Data(void);
+const uint8_t *Get_Pitch_Motor_Index(void);
+const uint8_t *Get_Yaw_Motor_Index(void);
+Motor_Measure_t *Get_Gimbal_Motor_Feedback_Data(void);
+CAN_RxHeaderTypeDef *Get_CAN2_Rx_Header(void);
+CAN_RxHeaderTypeDef *Get_CAN2_Rx_Header(void);
+uint8_t *Get_CAN2_Rxd_Buffer(void);
 
 #endif //__CAN2_DEVICE_H_
