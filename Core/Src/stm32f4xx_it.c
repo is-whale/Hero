@@ -228,7 +228,7 @@ void USART1_IRQHandler(void)
 void USART3_IRQHandler(void)
 {
   /* USER CODE BEGIN USART3_IRQn 0 */
-  if(LL_USART_IsActiveFlag_TC(USART3))
+  if (LL_USART_IsActiveFlag_TC(USART3))
   {
     Usart3_It_Tc_Callback();
   }
@@ -246,7 +246,7 @@ void USART3_IRQHandler(void)
 void TIM8_BRK_TIM12_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM8_BRK_TIM12_IRQn 0 */
-	
+
   /* USER CODE END TIM8_BRK_TIM12_IRQn 0 */
   HAL_TIM_IRQHandler(&htim12);
   /* USER CODE BEGIN TIM8_BRK_TIM12_IRQn 1 */
@@ -274,11 +274,11 @@ void DMA2_Stream2_IRQHandler(void)
 void CAN2_RX0_IRQHandler(void)
 {
   /* USER CODE BEGIN CAN2_RX0_IRQn 0 */
-  Can2_Rx_FIFO0_IT_Callback();
+
   /* USER CODE END CAN2_RX0_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan2);
   /* USER CODE BEGIN CAN2_RX0_IRQn 1 */
-
+  Can2_Rx_FIFO0_IT_Callback();
   /* USER CODE END CAN2_RX0_IRQn 1 */
 }
 
