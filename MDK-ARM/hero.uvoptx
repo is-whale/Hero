@@ -1075,8 +1075,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Task\src\parse_can2_rx_data_task.c</PathWithFileName>
-      <FilenameWithoutPath>parse_can2_rx_data_task.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Task\src\gimbal_task.c</PathWithFileName>
+      <FilenameWithoutPath>gimbal_task.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

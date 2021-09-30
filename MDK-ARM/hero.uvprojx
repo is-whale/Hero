@@ -1070,9 +1070,9 @@
               <FilePath>..\User\Task\src\parse_can1_rx_data_task.c</FilePath>
             </File>
             <File>
-              <FileName>parse_can2_rx_data_task.c</FileName>
+              <FileName>gimbal_task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\Task\src\parse_can2_rx_data_task.c</FilePath>
+              <FilePath>..\User\Task\src\gimbal_task.c</FilePath>
             </File>
           </Files>
         </Group>
