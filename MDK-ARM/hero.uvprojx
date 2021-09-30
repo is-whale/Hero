@@ -974,11 +974,6 @@
               <FileType>1</FileType>
               <FilePath>..\User\Hardware\src\can2_device.c</FilePath>
             </File>
-            <File>
-              <FileName>can1_motor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Hardware\src\can1_motor.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
