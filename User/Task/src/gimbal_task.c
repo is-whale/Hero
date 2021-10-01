@@ -1,17 +1,15 @@
 #include "gimbal_task.h"
 
-static const uint8_t gimbal_motor_num = 2;
-static const uint8_t yaw_motor_index = 0;
-static const uint8_t pitch_motor_index = 1;
+static const uint8_t gimbal_motor_num = 2;  ///< 云台电机的数量
+static const uint8_t yaw_motor_index = 0;   ///< yaw 轴电机在电机数据结构体中的下标
+static const uint8_t pitch_motor_index = 1; ///< pitch 轴电机在电机数据结构体中的下标
 
-static CAN_RxHeaderTypeDef *can2_rx_header_pt;
-static uint8_t *can2_rxd_data_buffer;
+static CAN_RxHeaderTypeDef *can2_rx_header_pt;   ///< can2 接收的头数据结构体指针
+static uint8_t *can2_rxd_data_buffer;            ///< can2 接收的数据存放的数组首地址
+static Rc_Ctrl_t *rc_data_pt;                    ///< 指向遥控器数据的结构体指针
+static Robot_control_data_t *robot_mode_data_pt; ///< 指向机器人模式的结构体指针
 
-static Rc_Ctrl_t *rc_data_pt;
-static Robot_control_data_t *robot_mode_data_pt;
-
-static Motor_Measure_t gimbal_motor_parsed_feedback_data[gimbal_motor_num];
-
+static Motor_Measure_t gimbal_motor_parsed_feedback_data[gimbal_motor_num]; ///< 解析后的云台电机数据数组
 
 void StartGimbalTask(void const *argument)
 {
@@ -56,6 +54,13 @@ void StartGimbalTask(void const *argument)
     }
 }
 
+/**
+ * @brief                       解析 CAN2 解析云台接收到的两个云台的数据并进行解析
+ * @param p_can_rx_header       指向接收 CAN2 数据头的结构体指针
+ * @param data                  接收到的 8 Byte 数据
+ * @param motor                 传进来的电机结构体数组首地址
+ * @retval                      void
+ */
 void Parse_Can2_Gimbal_Rxd_Data(CAN_RxHeaderTypeDef *p_can_rx_header, uint8_t *data, Motor_Measure_t *motor)
 {
 
