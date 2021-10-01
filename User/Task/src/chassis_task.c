@@ -16,9 +16,9 @@ void StartChassisTask(void const *argument)
 
     for (;;)
     {
-        debug_print("control device %d rc_motion_mode %d\r\n",
-                    robot_mode_data_pt->mode.control_device,
-                    robot_mode_data_pt->mode.rc_motion_mode);
+        // debug_print("control device %d rc_motion_mode %d\r\n",
+        //             robot_mode_data_pt->mode.control_device,
+        //             robot_mode_data_pt->mode.rc_motion_mode);
 
         if (robot_mode_data_pt->mode.control_device == remote_controller_device_ENUM) ///< 最好是使用枚举定义
         {
