@@ -67,14 +67,12 @@ void Parse_Can2_Gimbal_Rxd_Data(CAN_RxHeaderTypeDef *p_can_rx_header, uint8_t *d
     case CAN_YAW_MOTOR_ID:
     {
         Calculate_Motor_Data(motor, data);
-        // osDelay(1);
         break;
     }
 
     case CAN_PITCH_MOTOR_ID:
     {
         Calculate_Motor_Data(motor, data);
-        // osDelay(1);
         break;
     }
 
