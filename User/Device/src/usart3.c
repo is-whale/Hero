@@ -77,10 +77,10 @@ const uint16_t *Get_Usart3_DMA_Rx_MaxLen(void)
  */
 int __printf(const char *format, ...)
 {
-	// while (usart3_tx_lock)
-	// {
-	// 	LED_RED_ON();
-	// }
+	while (usart3_tx_lock)
+	{
+		LED_RED_ON();
+	}
 	if (usart3_tx_lock == 0)
 	{
 		usart3_tx_lock = 1;
@@ -93,9 +93,9 @@ int __printf(const char *format, ...)
 		LED_RED_OFF();
 		return len;
 	}
-	else
-	{
-		LED_RED_ON();
-	}
+	// else
+	// {
+	// 	LED_RED_ON();
+	// }
 	return -1;
 }
