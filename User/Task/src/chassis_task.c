@@ -12,33 +12,21 @@ void StartChassisTask(void const *argument)
     robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();
     chassis_motor_feedback_parsed_data = Get_Can1_Feedback_Data();
 
-    ///< 仅测试阶段使用
-    robot_mode_data_pt->mode.control_device = 0;
-    robot_mode_data_pt->mode.rc_motion_mode = 1;
-    osDelay(100);
+    osDelay(1000); ///< 等待遥控器任务初始化完成
 
     for (;;)
     {
-        // debug_print("%d, %d, %d, %d\r\n", robot_mode_data_pt->virtual_rocker.ch0,
-        //             robot_mode_data_pt->virtual_rocker.ch1,
-        //             robot_mode_data_pt->virtual_rocker.ch2,
-        //             robot_mode_data_pt->virtual_rocker.ch3);
+        debug_print("control device %d rc_motion_mode %d\r\n",
+                    robot_mode_data_pt->mode.control_device,
+                    robot_mode_data_pt->mode.rc_motion_mode);
 
-        chassis_motor_speed[0] = -robot_mode_data_pt->virtual_rocker.ch3 - robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch0;
-        chassis_motor_speed[1] = robot_mode_data_pt->virtual_rocker.ch3- robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch0;
-        chassis_motor_speed[2] = -robot_mode_data_pt->virtual_rocker.ch3 + robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch0;
-        chassis_motor_speed[3] = robot_mode_data_pt->virtual_rocker.ch3 + robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch0;
-
-        chassis_motor_speed[0] *=1.0f;
-        chassis_motor_speed[1] *=1.0f;
-        chassis_motor_speed[2] *=1.0f;
-        chassis_motor_speed[3] *=1.0f;
-
-        if (robot_mode_data_pt->mode.control_device == 2) ///< 最好是使用枚举定义
+        if (robot_mode_data_pt->mode.control_device == remote_controller_device_ENUM) ///< 最好是使用枚举定义
         {
+
             switch (robot_mode_data_pt->mode.rc_motion_mode)
             {
-            case 1: ///< 改用枚举类型
+            case rc_special_mode_ENUM:
+
             {
                 chassis_motor_speed[0] = -rc_data_pt->rc.ch3 - rc_data_pt->rc.ch2 + rc_data_pt->rc.ch0;
                 chassis_motor_speed[1] = rc_data_pt->rc.ch3 - rc_data_pt->rc.ch2 + rc_data_pt->rc.ch0;
@@ -59,13 +47,23 @@ void StartChassisTask(void const *argument)
             }
             }
         }
-        else if (robot_mode_data_pt->mode.control_device == 2)
+        else if (robot_mode_data_pt->mode.control_device == mouse_keyboard_device_ENUM)
         {
             switch (robot_mode_data_pt->mode.mouse_keyboard_chassis_mode)
             {
-            case 1:
+            case mk_chassis_special_mode_ENUM:
 
             {
+                chassis_motor_speed[0] = -robot_mode_data_pt->virtual_rocker.ch3 - robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch0;
+                chassis_motor_speed[1] = robot_mode_data_pt->virtual_rocker.ch3 - robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch0;
+                chassis_motor_speed[2] = -robot_mode_data_pt->virtual_rocker.ch3 + robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch0;
+                chassis_motor_speed[3] = robot_mode_data_pt->virtual_rocker.ch3 + robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch0;
+
+                chassis_motor_speed[0] *= 10.0f;
+                chassis_motor_speed[1] *= 10.0f;
+                chassis_motor_speed[2] *= 10.0f;
+                chassis_motor_speed[3] *= 10.0f;
+
                 break;
             }
 
