@@ -76,7 +76,11 @@ void StartChassisTask(void const *argument)
         }
 
         ///< 设置底盘电机速度
-        Set_ChassisMotor_Speed(chassis_motor_speed[0], chassis_motor_speed[1], chassis_motor_speed[2], chassis_motor_speed[3], chassis_motor_feedback_parsed_data);
+        Set_ChassisMotor_Speed(chassis_motor_speed[0],
+                               chassis_motor_speed[1],
+                               chassis_motor_speed[2],
+                               chassis_motor_speed[3],
+                               chassis_motor_feedback_parsed_data);
 
         osDelay(10);
     }
