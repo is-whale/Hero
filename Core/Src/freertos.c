@@ -78,6 +78,9 @@ osStaticThreadDef_t gimbalTaskControlBlock;
 osThreadId buzzerTaskHandle;
 uint32_t buzzerTaskBuffer[ 128 ];
 osStaticThreadDef_t buzzerTaskControlBlock;
+osThreadId shootTaskHandle;
+uint32_t shootTaskBuffer[ 512 ];
+osStaticThreadDef_t shootTaskControlBlock;
 osMessageQId buzzerQueueHandle;
 uint8_t buzzerQueueBuffer[ 5 * 5 ];
 osStaticMessageQDef_t buzzerQueueControlBlock;
@@ -101,6 +104,7 @@ void StartParseCan1RxDataTask(void const * argument);
 void StartParseCan2RxDataTask(void const * argument);
 void StartGimbalTask(void const * argument);
 void StartBuzzerTask(void const * argument);
+void StartShootTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -200,6 +204,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of buzzerTask */
   osThreadStaticDef(buzzerTask, StartBuzzerTask, osPriorityNormal, 0, 128, buzzerTaskBuffer, &buzzerTaskControlBlock);
   buzzerTaskHandle = osThreadCreate(osThread(buzzerTask), NULL);
+
+  /* definition and creation of shootTask */
+  osThreadStaticDef(shootTask, StartShootTask, osPriorityNormal, 0, 512, shootTaskBuffer, &shootTaskControlBlock);
+  shootTaskHandle = osThreadCreate(osThread(shootTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -385,6 +393,24 @@ __weak void StartBuzzerTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartBuzzerTask */
+}
+
+/* USER CODE BEGIN Header_StartShootTask */
+/**
+* @brief Function implementing the shootTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartShootTask */
+__weak void StartShootTask(void const * argument)
+{
+  /* USER CODE BEGIN StartShootTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartShootTask */
 }
 
 /* Private application code --------------------------------------------------*/
