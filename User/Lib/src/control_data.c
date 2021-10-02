@@ -64,7 +64,7 @@ static void Robot_Rc_Mode_Change_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_
 	{
 		ROBOT_MODE.control_device++;
 		if(ROBOT_MODE.control_device==3) ROBOT_MODE.control_device=1;
-		// Set_Beep_Time(ROBOT_MODE.control_device, 1000, 55);
+		Set_Beep_Time(ROBOT_MODE.control_device, 1000, 55);
 	}
 	
 	/* 底盘云台模式 */
@@ -72,7 +72,7 @@ static void Robot_Rc_Mode_Change_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_
 	{
 		ROBOT_MODE.rc_motion_mode++;
 		if(ROBOT_MODE.rc_motion_mode==6) ROBOT_MODE.rc_motion_mode=1;
-		// Set_Beep_Time(ROBOT_MODE.rc_motion_mode, 1200, 50);
+		Set_Beep_Time(ROBOT_MODE.rc_motion_mode, 1200, 50);
 	}
 
 	if(ROBOT_MODE.control_device != 2)
@@ -85,7 +85,7 @@ static void Robot_Rc_Mode_Change_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_
 	{
 		ROBOT_MODE.fric_cover_mode++;
 		if(ROBOT_MODE.fric_cover_mode==4) ROBOT_MODE.fric_cover_mode=0;
-		// Set_Beep_Time(ROBOT_MODE.fric_cover_mode+1, 800, 60);
+		Set_Beep_Time(ROBOT_MODE.fric_cover_mode+1, 800, 60);
 	}
 
 	/* 射击模式选择器 */
@@ -93,7 +93,7 @@ static void Robot_Rc_Mode_Change_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_
 	{
 		ROBOT_MODE.shoot_mode++;
 		if(ROBOT_MODE.shoot_mode==3) ROBOT_MODE.shoot_mode=1;
-		// Set_Beep_Time(ROBOT_MODE.shoot_mode, 600, 65);
+		Set_Beep_Time(ROBOT_MODE.shoot_mode, 600, 65);
 	}
 
 #undef ROBOT_MODE
@@ -280,12 +280,12 @@ static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data,
 		if(robot_control_data->mode.mouse_keyboard_chassis_mode == mk_chassis_follow_mode_ENUM)
 		{
 			robot_control_data->mode.mouse_keyboard_chassis_mode = mk_chassis_gyro_mode_ENUM;
-			// Set_Beep_Time(2, 1200, 50);
+			Set_Beep_Time(2, 1200, 50);
 		}
 		else
 		{
 			robot_control_data->mode.mouse_keyboard_chassis_mode = mk_chassis_follow_mode_ENUM;
-			// Set_Beep_Time(1, 1200, 50);
+			Set_Beep_Time(1, 1200, 50);
 		}
 	}
 
@@ -295,12 +295,12 @@ static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data,
 		if(robot_control_data->mode.mouse_keyboard_gimbal_mode == mk_manual_aim_mode_ENUM)
 		{
 			robot_control_data->mode.mouse_keyboard_gimbal_mode = mk_auto_aim_mode_ENUM;
-			// Set_Beep_Time(4, 1200, 50);
+			Set_Beep_Time(4, 1200, 50);
 		}
 		else
 		{
 			robot_control_data->mode.mouse_keyboard_gimbal_mode = mk_manual_aim_mode_ENUM;
-			// Set_Beep_Time(3, 1200, 50);
+			Set_Beep_Time(3, 1200, 50);
 		}
 	}
 
@@ -309,7 +309,7 @@ static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data,
 	{
 		robot_control_data->mode.mouse_keyboard_chassis_mode = mk_chassis_special_mode_ENUM;
 		robot_control_data->mode.mouse_keyboard_gimbal_mode = mk_special_aim_mode_ENUM;
-		// Set_Beep_Time(5, 1200, 50);
+		Set_Beep_Time(5, 1200, 50);
 	}
 
 	//非特殊模式检查
@@ -328,12 +328,12 @@ static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data,
 		if(robot_control_data->mode.fric_cover_mode == cover_on_ENUM)
 		{
 			robot_control_data->mode.fric_cover_mode = fric_cover_off_mode_ENUM;
-			// Set_Beep_Time(1, 800, 60);
+			Set_Beep_Time(1, 800, 60);
 		}
 		else
 		{
 			robot_control_data->mode.fric_cover_mode = cover_on_ENUM;
-			// Set_Beep_Time(4, 800, 60);
+			Set_Beep_Time(4, 800, 60);
 		}
 	}
 
@@ -343,12 +343,12 @@ static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data,
 		if(robot_control_data->mode.fric_cover_mode == fric_adaptive_speed_mode_ENUM)
 		{
 			robot_control_data->mode.fric_cover_mode = fric_cover_off_mode_ENUM;
-			// Set_Beep_Time(1, 800, 60);
+			Set_Beep_Time(1, 800, 60);
 		}
 		else
 		{
 			robot_control_data->mode.fric_cover_mode = fric_adaptive_speed_mode_ENUM;
-			// Set_Beep_Time(2, 800, 60);
+			Set_Beep_Time(2, 800, 60);
 		}
 	}
 

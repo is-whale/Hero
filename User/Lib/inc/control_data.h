@@ -4,6 +4,7 @@
 #include "stm32f4xx.h"
 #include "remote.h"
 #include "math2.h"
+#include "buzzer_task.h"
 
 enum controlDevice
 {
