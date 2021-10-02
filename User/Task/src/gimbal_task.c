@@ -3,6 +3,12 @@
 static const uint8_t gimbal_motor_num = 2;  ///< 云台电机的数量
 static const uint8_t yaw_motor_index = 0;   ///< yaw 轴电机在电机数据结构体中的下标
 static const uint8_t pitch_motor_index = 1; ///< pitch 轴电机在电机数据结构体中的下标
+static const uint16_t pitch_up_angle_limit = 6960;
+static const uint16_t pitch_middle_angle = 7490;
+static const uint16_t pitch_down_angle_limit = 8010;
+
+static float yaw_angle_set = 0;
+static float pitch_angle_set = pitch_middle_angle;
 
 static CAN_RxHeaderTypeDef *can2_rx_header_pt;   ///< can2 接收的头数据结构体指针
 static uint8_t *can2_rxd_data_buffer;            ///< can2 接收的数据存放的数组首地址
@@ -37,8 +43,16 @@ void StartGimbalTask(void const *argument)
             case 1:
 
             {
-                yaw_speed = (-rc_data_pt->rc.ch0) * 0.5f;
-                pitch_speed = (rc_data_pt->rc.ch1) * 0.5f;
+                pitch_angle_set = (rc_data_pt->rc.ch0) * 10.0 ;
+                yaw_angle_set = (rc_data_pt->rc.ch1) / 12.0f;
+
+                (void)yaw_angle_set; ///< avoid warning
+
+                // Float_Constraion(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit); ///< pitch 角度限幅
+                // Pitch_Angle_Limit(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit);
+                pitch_speed = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
+                // pitch_speed = (rc_data_pt->rc.ch0);
+                debug_print("   speed %.2f \r\n",pitch_speed);
                 break;
             }
 
@@ -49,7 +63,7 @@ void StartGimbalTask(void const *argument)
             }
         }
 
-        Set_Gimbal_Motors_Speed(yaw_speed, pitch_speed, &gimbal_motor_parsed_feedback_data[yaw_motor_index], &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
+        Set_Gimbal_Motors_Speed(pitch_speed, pitch_speed, &gimbal_motor_parsed_feedback_data[yaw_motor_index], &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
         osDelay(10);
     }
 }
@@ -63,7 +77,7 @@ void StartGimbalTask(void const *argument)
  */
 void Parse_Can2_Gimbal_Rxd_Data(CAN_RxHeaderTypeDef *p_can_rx_header, uint8_t *data, Motor_Measure_t *motor)
 {
-
+    
     switch (p_can_rx_header->StdId)
     {
     case CAN_YAW_MOTOR_ID:

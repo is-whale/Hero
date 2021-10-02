@@ -1,10 +1,10 @@
 #include "can2_device.h"
 
-static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(12, 0, 2, 2000, 16000, 0, 1000, 500);	//yaw电机速度PID
+static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(12, 0, 2, 2000, 16000, 0, 1000, 500); //yaw电机速度PID
 // static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); //yaw电机角度PID
 
 static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(12, 0, 2, 2000, 16000, 0, 1000, 500);		//pitch电机速度PID
-// static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 300, 0, 3000, 500); //pitch电机角度PID
+static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 300, 0, 3000, 500); //pitch电机角度PID
 
 static Motor_Measure_t gm6020_feedback_data[2]; ///< 存储解析后的两个云台电机的数据，一般是两个
 static uint8_t can2_rxd_data_buffer[8];			///< 辅助变量，接受电机反馈的原始数据
@@ -87,7 +87,34 @@ void Set_Gimbal_Motors_Speed(float yaw_speed, float pitch_speed, Motor_Measure_t
 	Can2_Send_4Msg(
 		CAN_GIMBAL_ALL_ID,
 		Pid_Position_Calc(&motor_yaw_speed_pid, yaw_speed, yaw_motor_parsed_feedback_data->speed_rpm),
-		Pid_Position_Calc(&motor_pitch_speed_pid, pitch_speed, pitch_motor_parsed_feedback_data->speed_rpm),
 		0,
+		Pid_Position_Calc(&motor_pitch_speed_pid, pitch_speed, pitch_motor_parsed_feedback_data->speed_rpm),
 		0);
+}
+
+void Pitch_Angle_Limit(float *angle, float down_angle, float up_angle)
+{
+	if (down_angle > up_angle)
+	{
+		if (*angle > down_angle)
+			*angle = down_angle;
+		else if (*angle < up_angle)
+			*angle = up_angle;
+	}
+	else if (down_angle <= up_angle)
+	{
+		if (*angle < down_angle)
+			*angle = down_angle;
+		else if (*angle > up_angle)
+			*angle = up_angle;
+	}
+}
+float Calc_Pitch_Angle8191_Pid(float tar_angle, Motor_Measure_t *pitch_motor_parsed_feedback_data)
+{
+	float pitch_tar_angle = tar_angle;
+	float pitch_cur_angle = pitch_motor_parsed_feedback_data->mechanical_angle;
+	Handle_Angle8191_PID_Over_Zero(&pitch_tar_angle, &pitch_cur_angle);
+	debug_print("setangle: %.2f, cur_angle: %.2f ",pitch_tar_angle,pitch_cur_angle);
+	///< 这是第一层 PID，计算设定角度与实际角度之间的误差，得到下一步要设定的速度值，如果已经达到目标值，则输出为 0
+	return Pid_Position_Calc(&motor_pitch_angle_pid, pitch_tar_angle, pitch_cur_angle);
 }
