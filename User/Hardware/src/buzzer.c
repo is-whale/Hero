@@ -1,6 +1,10 @@
 #include "buzzer.h"
 
-
+/**
+ * @brief           ·äÃùÆ÷³õÊ¼»¯
+ * @param[in]       void
+ * @retval          void
+ */
 void Buzzer_Init(void)
 {
     LL_TIM_CC_EnableChannel(TIM12,LL_TIM_CHANNEL_CH1);
