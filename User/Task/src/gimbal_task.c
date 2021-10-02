@@ -26,6 +26,10 @@ void StartGimbalTask(void const *argument)
     rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();
     robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();
 
+    (void)pitch_down_angle_limit;
+    (void)pitch_up_angle_limit;
+    (void)yaw_speed;
+
     ///< ½ö²âÊÔ½×¶ÎÊ¹ÓÃ
     robot_mode_data_pt->mode.control_device = 0;
     robot_mode_data_pt->mode.rc_motion_mode = 1;
@@ -103,4 +107,19 @@ void Parse_Can2_Gimbal_Rxd_Data(CAN_RxHeaderTypeDef *p_can_rx_header, uint8_t *d
         break;
     }
     }
+}
+
+Motor_Measure_t *Get_Gimbal_Parsed_FeedBack_Data(void)
+{
+    return gimbal_motor_parsed_feedback_data;
+}
+
+const uint8_t* Get_Pitch_Motor_Index(void)
+{
+    return &pitch_motor_index;
+}
+
+const uint8_t* Get_Yaw_Motor_Index(void)
+{
+    return &yaw_motor_index;
 }
