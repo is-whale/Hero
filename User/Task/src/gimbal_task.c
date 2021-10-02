@@ -123,3 +123,16 @@ const uint8_t* Get_Yaw_Motor_Index(void)
 {
     return &yaw_motor_index;
 }
+
+
+float GM6020_YAW_Angle_To_360(uint16_t gm6020_angle)
+{
+#define ROBOT_HEAD_ANGLE YAW_GM6020_HEAD_ANGLE
+    int16_t yaw_angle = gm6020_angle - ROBOT_HEAD_ANGLE;
+    if (yaw_angle < 0)
+    {
+        yaw_angle += 8191;
+    }
+    return (float)(yaw_angle * 360 / 8191);
+#undef ROBOT_HEAD_ANGLE
+}
