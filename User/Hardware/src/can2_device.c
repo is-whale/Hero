@@ -114,7 +114,7 @@ float Calc_Pitch_Angle8191_Pid(float tar_angle, Motor_Measure_t *pitch_motor_par
 	float pitch_tar_angle = tar_angle;
 	float pitch_cur_angle = pitch_motor_parsed_feedback_data->mechanical_angle;
 	Handle_Angle8191_PID_Over_Zero(&pitch_tar_angle, &pitch_cur_angle);
-	debug_print("setangle: %.2f, cur_angle: %.2f ",pitch_tar_angle,pitch_cur_angle);
+	// debug_print("setangle: %.2f, cur_angle: %.2f ",pitch_tar_angle,pitch_cur_angle);
 	///< 这是第一层 PID，计算设定角度与实际角度之间的误差，得到下一步要设定的速度值，如果已经达到目标值，则输出为 0
 	return Pid_Position_Calc(&motor_pitch_angle_pid, pitch_tar_angle, pitch_cur_angle);
 }

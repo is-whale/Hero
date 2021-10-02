@@ -52,7 +52,7 @@ void StartGimbalTask(void const *argument)
                 // Pitch_Angle_Limit(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit);
                 pitch_speed = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
                 // pitch_speed = (rc_data_pt->rc.ch0);
-                debug_print("   speed %.2f \r\n",pitch_speed);
+                // debug_print("   speed %.2f \r\n",pitch_speed);
                 break;
             }
 
