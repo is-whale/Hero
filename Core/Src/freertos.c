@@ -75,6 +75,9 @@ osStaticThreadDef_t parseCan2RxDataControlBlock;
 osThreadId gimbalTaskHandle;
 uint32_t gimbalTaskBuffer[ 512 ];
 osStaticThreadDef_t gimbalTaskControlBlock;
+osThreadId buzzerTaskHandle;
+uint32_t buzzerTaskBuffer[ 128 ];
+osStaticThreadDef_t buzzerTaskControlBlock;
 osMessageQId buzzerQueueHandle;
 uint8_t buzzerQueueBuffer[ 5 * 5 ];
 osStaticMessageQDef_t buzzerQueueControlBlock;
@@ -97,6 +100,7 @@ void StartChassisTask(void const * argument);
 void StartParseCan1RxDataTask(void const * argument);
 void StartParseCan2RxDataTask(void const * argument);
 void StartGimbalTask(void const * argument);
+void StartBuzzerTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -192,6 +196,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of gimbalTask */
   osThreadStaticDef(gimbalTask, StartGimbalTask, osPriorityAboveNormal, 0, 512, gimbalTaskBuffer, &gimbalTaskControlBlock);
   gimbalTaskHandle = osThreadCreate(osThread(gimbalTask), NULL);
+
+  /* definition and creation of buzzerTask */
+  osThreadStaticDef(buzzerTask, StartBuzzerTask, osPriorityNormal, 0, 128, buzzerTaskBuffer, &buzzerTaskControlBlock);
+  buzzerTaskHandle = osThreadCreate(osThread(buzzerTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -359,6 +367,24 @@ __weak void StartGimbalTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartGimbalTask */
+}
+
+/* USER CODE BEGIN Header_StartBuzzerTask */
+/**
+* @brief Function implementing the buzzerTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartBuzzerTask */
+__weak void StartBuzzerTask(void const * argument)
+{
+  /* USER CODE BEGIN StartBuzzerTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartBuzzerTask */
 }
 
 /* Private application code --------------------------------------------------*/
