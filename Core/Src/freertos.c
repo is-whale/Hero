@@ -75,6 +75,9 @@ osStaticThreadDef_t parseCan2RxDataControlBlock;
 osThreadId gimbalTaskHandle;
 uint32_t gimbalTaskBuffer[ 512 ];
 osStaticThreadDef_t gimbalTaskControlBlock;
+osMessageQId buzzerQueueHandle;
+uint8_t buzzerQueueBuffer[ 5 * 5 ];
+osStaticMessageQDef_t buzzerQueueControlBlock;
 osSemaphoreId shellGetDataBinarySemHandle;
 osStaticSemaphoreDef_t myBinarySem01ControlBlock;
 osSemaphoreId remoteGetDataBinarySemHandle;
@@ -143,6 +146,11 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
+
+  /* Create the queue(s) */
+  /* definition and creation of buzzerQueue */
+  osMessageQStaticDef(buzzerQueue, 5, 5, buzzerQueueBuffer, &buzzerQueueControlBlock);
+  buzzerQueueHandle = osMessageCreate(osMessageQ(buzzerQueue), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
