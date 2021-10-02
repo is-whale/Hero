@@ -60,3 +60,16 @@ void Float_Constraion(float *data, float min_value, float max_value)
 		*data = min_value;
 	}
 }
+
+/* 角度Pid时，在获取tar和cur之后紧接着调用  0~8191 */
+void Handle_Angle8191_PID_Over_Zero(float *tar, float *cur)
+{
+	if(*tar - *cur > 4096)   //4096 ：半圈机械角度, 如果设定值和目标值之间的角度差已经超过了半圈
+	{
+		*cur += 8192;
+	}
+	else if(*tar - *cur < -4096)
+	{
+		*cur = *cur - 8192;
+	}
+}
