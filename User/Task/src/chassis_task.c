@@ -21,6 +21,8 @@ void StartChassisTask(void const *argument)
     yaw_motor_index = Get_Yaw_Motor_Index();
     pitch_motor_index = Get_Pitch_Motor_Index();
 
+    (void)pitch_motor_index;
+
     osDelay(1000); ///< 等待遥控器任务初始化完成
 
     for (;;)
@@ -169,6 +171,11 @@ void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed, float move_
     motors_speed[3] += ((-x_x_speed + x_y_speed) + (-y_x_speed - y_y_speed));
 }
 
+/**
+ * @brief           计算底盘跟随 pid
+ * @param[in]       void
+ * @return          float 计算出的速度值
+ */
 float Calc_Chassis_Follow(void)
 {
 #define YAW_INIT_ANGLE YAW_GM6020_HEAD_ANGLE
