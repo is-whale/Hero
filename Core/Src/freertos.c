@@ -81,6 +81,9 @@ osStaticThreadDef_t buzzerTaskControlBlock;
 osThreadId shootTaskHandle;
 uint32_t shootTaskBuffer[ 512 ];
 osStaticThreadDef_t shootTaskControlBlock;
+osThreadId gyroscopeTaskHandle;
+uint32_t gyroscopeTaskBuffer[ 512 ];
+osStaticThreadDef_t gyroscopeTaskControlBlock;
 osMessageQId buzzerQueueHandle;
 uint8_t buzzerQueueBuffer[ 5 * 5 ];
 osStaticMessageQDef_t buzzerQueueControlBlock;
@@ -105,6 +108,7 @@ void StartParseCan2RxDataTask(void const * argument);
 void StartGimbalTask(void const * argument);
 void StartBuzzerTask(void const * argument);
 void StartShootTask(void const * argument);
+void StartGyroscopeTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -208,6 +212,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of shootTask */
   osThreadStaticDef(shootTask, StartShootTask, osPriorityNormal, 0, 512, shootTaskBuffer, &shootTaskControlBlock);
   shootTaskHandle = osThreadCreate(osThread(shootTask), NULL);
+
+  /* definition and creation of gyroscopeTask */
+  osThreadStaticDef(gyroscopeTask, StartGyroscopeTask, osPriorityNormal, 0, 512, gyroscopeTaskBuffer, &gyroscopeTaskControlBlock);
+  gyroscopeTaskHandle = osThreadCreate(osThread(gyroscopeTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -411,6 +419,24 @@ __weak void StartShootTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartShootTask */
+}
+
+/* USER CODE BEGIN Header_StartGyroscopeTask */
+/**
+* @brief Function implementing the gyroscopeTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartGyroscopeTask */
+__weak void StartGyroscopeTask(void const * argument)
+{
+  /* USER CODE BEGIN StartGyroscopeTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartGyroscopeTask */
 }
 
 /* Private application code --------------------------------------------------*/
