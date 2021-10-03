@@ -4,6 +4,8 @@ static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(12, 0, 2, 2000, 160
 // static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); //yaw电机角度PID
 static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(12, 0, 2, 2000, 16000, 0, 1000, 500);		//pitch电机速度PID
 static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 300, 0, 3000, 500); //pitch电机角度PID
+static Pid_Position_t wave_motor_left_speed_pid = NEW_POSITION_PID(11, 0, 5, 2000, 16000, 0, 1000, 500);
+static Pid_Position_t wave_motor_right_speed_pid = NEW_POSITION_PID(11, 0, 5, 2000, 16000, 0, 1000, 500);
 
 static uint8_t can2_rxd_data_buffer[8];	   ///< 辅助变量，接受电机反馈的原始数据
 static CAN_RxHeaderTypeDef can2_rx_header; ///< 辅助变量，用于 HAL 库函数接受数据，存放关于 CAN 反馈数据的 ID 号等信息
@@ -89,7 +91,23 @@ float Calc_Pitch_Angle8191_Pid(float tar_angle, Motor_Measure_t *pitch_motor_par
 	float pitch_tar_angle = tar_angle;
 	float pitch_cur_angle = pitch_motor_parsed_feedback_data->mechanical_angle;
 	Handle_Angle8191_PID_Over_Zero(&pitch_tar_angle, &pitch_cur_angle);
-	// debug_print("setangle: %.2f, cur_angle: %.2f ",pitch_tar_angle,pitch_cur_angle);
-	///< 这是第一层 PID，计算设定角度与实际角度之间的误差，得到下一步要设定的速度值，如果已经达到目标值，则输出为 0
-	return Pid_Position_Calc(&motor_pitch_angle_pid, pitch_tar_angle, pitch_cur_angle);
+	return Pid_Position_Calc(&motor_pitch_angle_pid, pitch_tar_angle, pitch_cur_angle); ///< 这是第一层 PID，计算设定角度与实际角度之间的误差，得到下一步要设定的速度值，如果已经达到目标值，则输出为 0
+}
+
+/**
+ * @brief 								设置波轮电机的速度
+ * @param speed_left 					左边波轮电机的速度
+ * @param speed_right 					右边波轮电机的速度
+ * @param wave_motor_feedback_data 		两个波轮电机解析后的反馈数据
+ */
+void Set_Wave_Motor_Speed(float speed_left, float speed_right, Motor_Measure_t *wave_motor_feedback_data)
+{
+	int16_t left = Pid_Position_Calc(&wave_motor_left_speed_pid, speed_left, wave_motor_feedback_data[0].speed_rpm);
+	int16_t right = Pid_Position_Calc(&wave_motor_right_speed_pid, speed_right, wave_motor_feedback_data[1].speed_rpm);
+	Can2_Send_4Msg(
+		CAN_SHOOTER_ALL_ID,
+		left,
+		right,
+		0,
+		0);
 }
