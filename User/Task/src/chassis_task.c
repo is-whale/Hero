@@ -1,14 +1,23 @@
+/**
+ * @file chassis_task.c
+ * @brief 底盘任务
+ * @version 0.1
+ * @date 2021-9-28
+ * @copyright Copyright (c) 2021
+ */
+
 #include "chassis_task.h"
 
-static const float motor_speed_multiple = 13.5;
 static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500); ///< 底盘跟随PID
 
-static Rc_Ctrl_t *rc_data_pt;
-static Robot_control_data_t *robot_mode_data_pt;
-static Motor_Measure_t *chassis_motor_feedback_parsed_data;
-static Motor_Measure_t *gimbal_motor_feedback_parsed_data;
-static const uint8_t *yaw_motor_index;
-static const uint8_t *pitch_motor_index;
+static const float motor_speed_multiple = 13.5;
+
+static Rc_Ctrl_t *rc_data_pt;                               ///< 指向解析后的遥控器结构体指针
+static Robot_control_data_t *robot_mode_data_pt;            ///< 指向解析后的机器人模式结构体指针
+static Motor_Measure_t *chassis_motor_feedback_parsed_data; ///< 解析后的底盘电机数据
+static Motor_Measure_t *gimbal_motor_feedback_parsed_data;  ///< 解析后的云台电机数据
+static const uint8_t *yaw_motor_index;                      ///< yaw 轴电机在云台电机数据中的下标
+static const uint8_t *pitch_motor_index;                    ///< pitch 轴电机在云台电机数据中的下标
 
 void StartChassisTask(void const *argument)
 {
@@ -34,9 +43,9 @@ void StartChassisTask(void const *argument)
             switch (robot_mode_data_pt->mode.rc_motion_mode)
             {
 
-            case rc_chassis_follow_mode_ENUM:   ///< 1
+            case rc_chassis_follow_mode_ENUM: ///< 1
             {
-                follow_pid_output = Calc_Chassis_Follow();      ///< 底盘跟随 pid,计算出 yaw 轴当前角度和 yaw 轴头之间的角度差，当作速度值加入各个轮子中
+                follow_pid_output = Calc_Chassis_Follow(); ///< 底盘跟随 pid,计算出 yaw 轴当前角度和 yaw 轴头之间的角度差，当作速度值加入各个轮子中
 
                 chassis_motor_speed[0] = -rc_data_pt->rc.ch3 + rc_data_pt->rc.ch2 + follow_pid_output + rc_data_pt->rc.ch0 / 2.9f;
                 chassis_motor_speed[1] = rc_data_pt->rc.ch3 + rc_data_pt->rc.ch2 + follow_pid_output + rc_data_pt->rc.ch0 / 2.9f;
@@ -60,7 +69,7 @@ void StartChassisTask(void const *argument)
                 break;
             }
 
-            case rc_special_mode_ENUM:  ///< 3
+            case rc_special_mode_ENUM: ///< 3
 
             {
                 chassis_motor_speed[0] = rc_data_pt->rc.ch3 - rc_data_pt->rc.ch2 + rc_data_pt->rc.ch0;

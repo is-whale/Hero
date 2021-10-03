@@ -13,7 +13,6 @@
 #define PRINT_USART_INIT() {Usart3_Tx_Init();Usart3_Rx_Init();}
 
 void Usart3_Idle_ITCallback(void);
-
 void Print_Dragon(void);
 void Print_Logo(void);
 

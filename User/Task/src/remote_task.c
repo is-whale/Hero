@@ -1,12 +1,20 @@
+/**
+ * @file remote_task.c
+ * @brief 遥控器数据解析任务，解析出遥控器数据，并根据遥控器数据设置机器人当前模式配置的相关参数
+ * @version 0.1
+ * @date 2021-9-27
+ * @copyright Copyright (c) 2021
+ */
+
 #include "remote_task.h"
 
 static Rc_Ctrl_t remote_controller;                    ///< 本次解析的遥控器数据
 static Rc_Ctrl_t last_time_remote_controller;          ///< 上次解析的遥控器数据
-static Robot_control_data_t robot_control_data;
+static Robot_control_data_t robot_control_data;        ///< 机器人模式配置数据
 static uint16_t *sbus_rxd_len;                         ///< 本次遥控器接收到的数据长度
 static uint8_t *rc_rx_buffer[2];                       ///< 遥控器两次接收数据缓冲
 static const uint32_t remote_get_data_signal = 0x0001; ///< 遥控器接收数据信号
-static const uint32_t remote_data_overtime = 50;      ///< 遥控器接收数据包超时时间
+static const uint32_t remote_data_overtime = 50;       ///< 遥控器接收数据包超时时间
 extern osThreadId remoteTaskHandle;                    ///< 遥控器任务句柄
 
 void StartRemoteTask(void const *argument)
@@ -37,7 +45,7 @@ void StartRemoteTask(void const *argument)
                 if (Rc_Data_Check_Parse(rc_rx_buffer[rx_available_buffer_index], &remote_controller, *sbus_rxd_len))
                 {
                     Parse_Robot_Control_Data(&remote_controller, &last_time_remote_controller, &robot_control_data); ///< 解析出遥控器模式
-                    
+
                     Rc_Data_Copy(&last_time_remote_controller, &remote_controller); ///< 保存本次遥控器状态
 
                     Module_Reload(remote_control); ///< 更新遥控器状态

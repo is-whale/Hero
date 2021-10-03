@@ -1,14 +1,14 @@
 #include "gimbal_task.h"
 
-static const uint8_t gimbal_motor_num = 2;  ///< 云台电机的数量
-static const uint8_t yaw_motor_index = 0;   ///< yaw 轴电机在电机数据结构体中的下标
-static const uint8_t pitch_motor_index = 1; ///< pitch 轴电机在电机数据结构体中的下标
-static const uint16_t pitch_up_angle_limit = 6960;
-static const uint16_t pitch_middle_angle = 7490;
-static const uint16_t pitch_down_angle_limit = 8010;
+static const uint8_t gimbal_motor_num = 2;           ///< 云台电机的数量
+static const uint8_t yaw_motor_index = 0;            ///< yaw 轴电机在电机数据结构体中的下标
+static const uint8_t pitch_motor_index = 1;          ///< pitch 轴电机在电机数据结构体中的下标
+static const uint16_t pitch_up_angle_limit = 6960;   ///< pitch 轴云台最低角度
+static const uint16_t pitch_middle_angle = 7490;     ///< pitch 轴云台中间角度
+static const uint16_t pitch_down_angle_limit = 8010; ///< pitch 轴云台最高角度
 
-static float yaw_angle_set = 0;
-static float pitch_angle_set = pitch_middle_angle;
+static float yaw_angle_set = 0;                    ///< yaw 轴云台设置的角度
+static float pitch_angle_set = pitch_middle_angle; ///< pitch 轴云台设置的角度
 
 static CAN_RxHeaderTypeDef *can2_rx_header_pt;   ///< can2 接收的头数据结构体指针
 static uint8_t *can2_rxd_data_buffer;            ///< can2 接收的数据存放的数组首地址
@@ -26,7 +26,7 @@ void StartGimbalTask(void const *argument)
     rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();
     robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();
 
-    (void)pitch_down_angle_limit;
+    (void)pitch_down_angle_limit;   ///< 测试阶段，避免 warning
     (void)pitch_up_angle_limit;
     (void)yaw_speed;
 
@@ -47,7 +47,7 @@ void StartGimbalTask(void const *argument)
             case 1:
 
             {
-                pitch_angle_set = (rc_data_pt->rc.ch0) * 10.0 ;
+                pitch_angle_set = (rc_data_pt->rc.ch0) * 10.0;
                 yaw_angle_set = (rc_data_pt->rc.ch1) / 12.0f;
 
                 (void)yaw_angle_set; ///< avoid warning
@@ -67,7 +67,10 @@ void StartGimbalTask(void const *argument)
             }
         }
 
-        Set_Gimbal_Motors_Speed(pitch_speed, pitch_speed, &gimbal_motor_parsed_feedback_data[yaw_motor_index], &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
+        Set_Gimbal_Motors_Speed(pitch_speed,
+                                pitch_speed,
+                                &gimbal_motor_parsed_feedback_data[yaw_motor_index],
+                                &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
         osDelay(10);
     }
 }
@@ -81,7 +84,7 @@ void StartGimbalTask(void const *argument)
  */
 void Parse_Can2_Gimbal_Rxd_Data(CAN_RxHeaderTypeDef *p_can_rx_header, uint8_t *data, Motor_Measure_t *motor)
 {
-    
+
     switch (p_can_rx_header->StdId)
     {
     case CAN_YAW_MOTOR_ID:
@@ -109,22 +112,41 @@ void Parse_Can2_Gimbal_Rxd_Data(CAN_RxHeaderTypeDef *p_can_rx_header, uint8_t *d
     }
 }
 
+/**
+ * @brief                       获取解析后的云台电机数据
+ * @param[in]                   void
+ * @return {Motor_Measure_t*}   解析后的云台电机数据
+ */
 Motor_Measure_t *Get_Gimbal_Parsed_FeedBack_Data(void)
 {
     return gimbal_motor_parsed_feedback_data;
 }
 
-const uint8_t* Get_Pitch_Motor_Index(void)
+/**
+ * @brief                       获取 pitch 轴电机在数组中的下标
+ * @param[in]                   void
+ * @return {const_uint8_t*}     下标
+ */
+const uint8_t *Get_Pitch_Motor_Index(void)
 {
     return &pitch_motor_index;
 }
 
-const uint8_t* Get_Yaw_Motor_Index(void)
+/**
+ * @brief                       获取 yaw 轴电机在数组中的下标
+ * @param[in]                   void
+ * @return {const_uint8_t*}     下标
+ */
+const uint8_t *Get_Yaw_Motor_Index(void)
 {
     return &yaw_motor_index;
 }
 
-
+/**
+ * @brief                       将 gm6020 的电机转子值换算成角度 
+ * @param[in] {gm6020_angle}    gm6020 的电机转子值
+ * @return {float}              角度值 
+ */
 float GM6020_YAW_Angle_To_360(uint16_t gm6020_angle)
 {
 #define ROBOT_HEAD_ANGLE YAW_GM6020_HEAD_ANGLE

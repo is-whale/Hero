@@ -1,6 +1,6 @@
 #include "shell_task.h"
 
-static uint8_t *shell_rx_buffer;
+static uint8_t *shell_rx_buffer;				
 const uint16_t *shell_rx_max_buffer_len;
 static uint16_t shell_rxd_data_len;
 extern osSemaphoreId shellGetDataBinarySemHandle;
@@ -36,11 +36,21 @@ void StartShellTask(void const *argument)
 	}
 }
 
+/**
+ * @brief 			通知 shell 任务对接收到的数据进行解析，在串口 3 的 idle 中断中调用
+ * @param[in]		void
+ * @retval			void
+ */
 static void Inform_ShellTask_Get_Data(void)
 {
 	osSignalSet(shellTaskHandle,shell_get_data_signal);
 }
 
+/**
+ * @brief 				串口 3 的 idle 中断处理函数，按道理不应该放在这里，规范的应该放在 usart3.c 文件中
+ * @param[in]			void
+ * @retval				void
+ */
 void Usart3_Idle_ITCallback(void)
 {
 	if (LL_USART_IsActiveFlag_IDLE(USART3))
@@ -66,6 +76,11 @@ void Usart3_Idle_ITCallback(void)
 	}
 }
 
+/**
+ * @brief 				打印 logo : dragon
+ * @param[in]			void
+ * @retval				void
+ */
 void Print_Dragon(void)
 {
 	__printf("     /\\_____/\\     \r\n");
@@ -77,6 +92,11 @@ void Print_Dragon(void)
 	__printf(" (__(__)___(__)__) \r\n");
 }
 
+/**
+ * @brief 				打印 logo : hll super hero
+ * @param[in]			void
+ * @retval				void
+ */
 void Print_Logo(void)
 {
 	__printf("    __  ____    __       _____                          __  __              \r\n");
@@ -87,6 +107,11 @@ void Print_Logo(void)
 	__printf("                                /_/                                         \r\n");
 }
 
+/**
+ * @brief 				初步解析串口 3 接收到的数据，去掉换行
+ * @param[in]			void
+ * @retval				void
+ */
 static void Shell_Str_Process(void)
 {
 	if (shell_rx_buffer[shell_rxd_data_len - 2] == '\r' && shell_rx_buffer[shell_rxd_data_len - 1] == '\n')
@@ -99,6 +124,11 @@ static void Shell_Str_Process(void)
 	}
 }
 
+/**
+ * @brief 				打印 AT 指令
+ * @param[in]			void
+ * @retval				void
+ */
 static void Print_At_First(void)
 {
 	__printf("\r\n");

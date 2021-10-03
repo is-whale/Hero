@@ -1,15 +1,23 @@
+/**
+ * @file buzzer_task.c
+ * @brief 蜂鸣器任务，使用消息队列，但是传入的参数是结构体指针，会出现覆盖情况，待改进
+ * @version 0.1
+ * @date 2021-10-03
+ * @copyright Copyright (c) 2021
+ */
+
 #include "buzzer_task.h"
 
-extern osMessageQId buzzerQueueHandle;
-extern osThreadId buzzerTaskHandle;
-static Beep_Play_t *beep_play;
+extern osMessageQId buzzerQueueHandle; ///< 蜂鸣器数据队列
+extern osThreadId buzzerTaskHandle;    ///< 蜂鸣器任务句柄
+static Beep_Play_t *beep_play;         ///< 蜂鸣器数据结构体指针
 
 void StartBuzzerTask(void const *argument)
 {
     osEvent buzzer_task_get_data_event;
 
     Buzzer_Init();
-    LL_TIM_OC_SetCompareCH1(TIM12, 0);
+
     osDelay(100);
 
     for (;;)

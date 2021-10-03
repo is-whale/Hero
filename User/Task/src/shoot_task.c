@@ -25,6 +25,8 @@ void StartShootTask(void const *argument)
     can2_rxd_data_buffer = Get_CAN2_Rxd_Buffer();
     can2_rx_header_p = Get_CAN2_Rx_Header();
 
+    (void)rc_data_pt;       ///< 避免 warning
+
     osDelay(100);
 
     for (;;)
@@ -76,6 +78,12 @@ void StartShootTask(void const *argument)
     }
 }
 
+/**
+ * @brief                           解析云台两个摩擦轮电机的数据
+ * @param CAN_RxHeaderTypeDef       can2 接受结构体头指针
+ * @param uint8_t_*                 can2 接受到的数据
+ * @retval                          void
+ */
 void Parse_Shoot_Wave_Motor_Feedback_Data(CAN_RxHeaderTypeDef *can_rx_header, uint8_t *can2_rxd_data_buffer)
 {
     static uint8_t i = 0;
