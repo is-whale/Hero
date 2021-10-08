@@ -87,6 +87,8 @@ osStaticThreadDef_t gyroscopeTaskControlBlock;
 osMessageQId buzzerQueueHandle;
 uint8_t buzzerQueueBuffer[ 5 * 5 ];
 osStaticMessageQDef_t buzzerQueueControlBlock;
+osMutexId printfMutexHandle;
+osStaticMutexDef_t printfMutexControlBlock;
 osSemaphoreId shellGetDataBinarySemHandle;
 osStaticSemaphoreDef_t myBinarySem01ControlBlock;
 osSemaphoreId remoteGetDataBinarySemHandle;
@@ -137,6 +139,10 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
+  /* Create the mutex(es) */
+  /* definition and creation of printfMutex */
+  osMutexStaticDef(printfMutex, &printfMutexControlBlock);
+  printfMutexHandle = osMutexCreate(osMutex(printfMutex));
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
