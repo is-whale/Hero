@@ -264,11 +264,10 @@ void Imu_AHRS_Update(void)
 }
 
 /**
-	* @brief  update imu attitude
+  * @brief  update imu attitude
   * @param  
-	* @retval 
-  * @usage  call in main() function
-	*/
+  * @retval 
+  */
 void Imu_Attitude_Update(void)
 {
     /* yaw    -pi----pi */
