@@ -1,15 +1,62 @@
 #include "can2_device.h"
 
-static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(12, 0, 2, 2000, 16000, 0, 1000, 500); //yawµç»úËÙ¶ÈPID
-// static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); //yawµç»ú½Ç¶ÈPID
-static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(12, 0, 2, 2000, 16000, 0, 1000, 500);		//pitchµç»úËÙ¶ÈPID
-static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 300, 0, 3000, 500); //pitchµç»ú½Ç¶ÈPID
+static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(12, 0, 2, 2000, 16000, 0, 1000, 500); ///< yawµç»úËÙ¶ÈPID
+// static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); ///< yawµç»ú½Ç¶ÈPID
+static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(12, 0, 2, 2000, 16000, 0, 1000, 500);		///< pitchµç»úËÙ¶ÈPID
+static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 300, 0, 3000, 500); ///< pitchµç»ú½Ç¶ÈPID
 
-static Pid_Position_t wave_motor_left_speed_pid = NEW_POSITION_PID(11, 0, 5.2, 2000, 16000, 0, 1000, 500);
-static Pid_Position_t wave_motor_right_speed_pid = NEW_POSITION_PID(11, 0, 5.2, 2000, 16000, 0, 1000, 500);
+static Pid_Position_t friction_motor_left_speed_pid = NEW_POSITION_PID(11, 0, 5.2, 2000, 16000, 0, 1000, 500);
+static Pid_Position_t friction_motor_right_speed_pid = NEW_POSITION_PID(11, 0, 5.2, 2000, 16000, 0, 1000, 500);
+static Pid_Position_t wave_motor_speed_pid = NEW_POSITION_PID(11, 0, 5.2, 2000, 16000, 0, 1000, 500);
+
+static Pid_Position_t wave_motor_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 300, 0, 3000, 500); ///<  ²¦ÂÖµç»ú½Ç¶ÈPID
+
+static int error_integral = 0;
+static uint16_t last_machine_angle = 0;
+static uint16_t this_machine_angle = 0;
 
 static uint8_t can2_rxd_data_buffer[8];	   ///< ¸¨Öú±äÁ¿£¬½ÓÊÜµç»ú·´À¡µÄÔ­Ê¼Êý¾Ý
 static CAN_RxHeaderTypeDef can2_rx_header; ///< ¸¨Öú±äÁ¿£¬ÓÃÓÚ HAL ¿âº¯Êý½ÓÊÜÊý¾Ý£¬´æ·Å¹ØÓÚ CAN ·´À¡Êý¾ÝµÄ ID ºÅµÈÐÅÏ¢
+
+static Motor_Measure_t wave_motor_feedback_data;
+
+/**
+ * @brief 			½âÎö²¨ÂÖµç»úÊý¾Ý
+ * @param[in]		void
+ * @retval			void
+ */
+static void Parse_Wave_Motor_Feedback_Data(void)
+{
+	uint8_t asd=1;
+	if(asd)
+	{
+		asd=0;
+		last_machine_angle = wave_motor_feedback_data.mechanical_angle;
+	}
+	float last,this_;
+	Calculate_Motor_Data(&wave_motor_feedback_data, can2_rxd_data_buffer);
+	this_machine_angle = wave_motor_feedback_data.mechanical_angle;
+	this_ = this_machine_angle;
+	last = last_machine_angle;
+	Handle_Angle8191_PID_Over_Zero(&this_, &last);
+	error_integral += (this_ - last);
+	last_machine_angle = this_machine_angle;
+}
+
+int *Get_Error_Integral(void)
+{
+	return &error_integral;
+}
+
+uint16_t *Get_Last_Machine_Angle(void)
+{
+	return &last_machine_angle;
+}
+
+uint16_t *Get_This_Machine_Angle(void)
+{
+	return &this_machine_angle;
+}
 
 /**
  * @brief 			can2 ½ÓÊÕ»Øµ÷º¯Êý,ÔÚ¸Ãº¯ÊýÄÚ£¬Ö»½ÓÊÜÊý¾Ý£¬¶ø¾ßÌåµÄÊý¾Ý½âÎöÔÚ¸÷×ÔÐèÒªµÄÈÎÎñÀïÃæ
@@ -19,6 +66,11 @@ static CAN_RxHeaderTypeDef can2_rx_header; ///< ¸¨Öú±äÁ¿£¬ÓÃÓÚ HAL ¿âº¯Êý½ÓÊÜÊý¾
 void Can2_Rx_FIFO0_IT_Callback(void)
 {
 	HAL_CAN_GetRxMessage(&hcan2, CAN_RX_FIFO0, &can2_rx_header, can2_rxd_data_buffer);
+	///< ËùÓÐ can Êý¾Ý£¬Ö»ÓÐ²¨ÂÖµç»úµÄÊý¾ÝÊÇÖ±½ÓÔÚÖÐ¶ÏÖÐ½øÐÐ½âÎöµÄ£¬ÒòÎªÒªÊµÊ±»ñÈ¡µç»úµÄ¾ø¶Ô½Ç¶È
+	if (can2_rx_header.StdId == CAN_3508_WAVE_ID)
+	{
+		Parse_Wave_Motor_Feedback_Data();
+	}
 }
 
 /**
@@ -39,6 +91,16 @@ CAN_RxHeaderTypeDef *Get_CAN2_Rx_Header(void)
 uint8_t *Get_CAN2_Rxd_Buffer(void)
 {
 	return can2_rxd_data_buffer;
+}
+
+/**
+ * @brief 		·µ»ØÖÐ¶Ï½âÎöºóµÄ²¨ÂÖµç»ú½á¹¹ÌåÖ¸Õë
+ * @param[in]	void
+ * @return 		Motor_Measure_t* ½âÎöºóµÄ²¨ÂÖµç»ú½á¹¹ÌåÖ¸Õë
+ */
+Motor_Measure_t *Get_Wave_Motor_Paresed_Data(void)
+{
+	return &wave_motor_feedback_data;
 }
 
 /**
@@ -95,20 +157,39 @@ float Calc_Pitch_Angle8191_Pid(float tar_angle, Motor_Measure_t *pitch_motor_par
 	return Pid_Position_Calc(&motor_pitch_angle_pid, pitch_tar_angle, pitch_cur_angle); ///< ÕâÊÇµÚÒ»²ã PID£¬¼ÆËãÉè¶¨½Ç¶ÈÓëÊµ¼Ê½Ç¶ÈÖ®¼äµÄÎó²î£¬µÃµ½ÏÂÒ»²½ÒªÉè¶¨µÄËÙ¶ÈÖµ£¬Èç¹ûÒÑ¾­´ïµ½Ä¿±êÖµ£¬ÔòÊä³öÎª 0
 }
 
+float Calc_Wave_Motor_Angle8191_Pid(float tar_angle, float current_angle)
+{
+	float wave_motor_tar_angle = tar_angle;
+	float wave_motor_cur_angle = current_angle;
+	//Handle_Angle8191_PID_Over_Zero(&tar_angle, &current_angle);
+	return Pid_Position_Calc(&wave_motor_angle_pid, wave_motor_tar_angle, wave_motor_cur_angle); ///< ÕâÊÇµÚÒ»²ã PID£¬¼ÆËãÉè¶¨½Ç¶ÈÓëÊµ¼Ê½Ç¶ÈÖ®¼äµÄÎó²î£¬µÃµ½ÏÂÒ»²½ÒªÉè¶¨µÄËÙ¶ÈÖµ£¬Èç¹ûÒÑ¾­´ïµ½Ä¿±êÖµ£¬ÔòÊä³öÎª 0
+}
+
 /**
  * @brief 								ÉèÖÃ²¨ÂÖµç»úµÄËÙ¶È
  * @param speed_left 					×ó±ß²¨ÂÖµç»úµÄËÙ¶È
  * @param speed_right 					ÓÒ±ß²¨ÂÖµç»úµÄËÙ¶È
  * @param wave_motor_feedback_data 		Á½¸ö²¨ÂÖµç»ú½âÎöºóµÄ·´À¡Êý¾Ý
  */
-void Set_Wave_Motor_Speed(float speed_left, float speed_right, Motor_Measure_t *wave_motor_feedback_data)
+void Set_Friction_Motor_Speed(float speed_left, float speed_right, Motor_Measure_t *friction_motor_feedback_data)
 {
-	int16_t left = Pid_Position_Calc(&wave_motor_left_speed_pid, speed_left, wave_motor_feedback_data[0].speed_rpm);
-	int16_t right = Pid_Position_Calc(&wave_motor_right_speed_pid, speed_right, wave_motor_feedback_data[1].speed_rpm);
+	int16_t left = Pid_Position_Calc(&friction_motor_left_speed_pid, speed_left, friction_motor_feedback_data[0].speed_rpm);
+	int16_t right = Pid_Position_Calc(&friction_motor_right_speed_pid, speed_right, friction_motor_feedback_data[1].speed_rpm);
 	Can2_Send_4Msg(
 		CAN_SHOOTER_ALL_ID,
 		left,
 		right,
 		0,
+		0);
+}
+
+void Set_Wave_Motor_Speed(float wave_motor_speed, Motor_Measure_t *wave_motor_feedback_data)
+{
+	int16_t wave_motor_pid_out_speed = Pid_Position_Calc(&wave_motor_speed_pid, wave_motor_speed, wave_motor_feedback_data->speed_rpm);
+	Can2_Send_4Msg(
+		CAN_SHOOTER_ALL_ID,
+		0,
+		0,
+		wave_motor_pid_out_speed,
 		0);
 }
