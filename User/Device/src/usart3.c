@@ -1,5 +1,7 @@
 #include "usart3.h"
 
+extern osMutexId printfMutexHandle;
+
 static volatile uint8_t usart3_tx_lock = 0;
 static volatile char usart3_dma_transmit_buf[256];
 static const uint16_t usart3_dma_rx_max_len = 50;
@@ -28,7 +30,7 @@ void Usart3_Transmit_Dma(uint32_t data_address, uint32_t len)
 	LL_DMA_SetDataLength(DMA1, LL_DMA_STREAM_3, len);
 	LL_USART_ClearFlag_TC(USART3);
 	LL_DMA_ClearFlag_TC3(DMA1);
-	LL_USART_EnableIT_TC(USART3);
+	// LL_USART_EnableIT_TC(USART3);
 	LL_DMA_EnableStream(DMA1, LL_DMA_STREAM_3);
 }
 
@@ -39,7 +41,7 @@ void Usart3_Transmit_Dma(uint32_t data_address, uint32_t len)
  */
 void Usart3_It_Tc_Callback(void)
 {
-	usart3_tx_lock = 0;
+	// usart3_tx_lock = 0;
 	LL_USART_DisableIT_TC(USART3);
 	LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_3);
 }
@@ -77,13 +79,21 @@ const uint16_t *Get_Usart3_DMA_Rx_MaxLen(void)
  */
 int __printf(const char *format, ...)
 {
-	while (usart3_tx_lock)
+	// while (usart3_tx_lock)
+	// {
+	// 	LED_RED_ON();
+	// }
+	// 这里获得锁
+	static uint8_t flag = 0;
+	if (flag == 0)
 	{
-		LED_RED_ON();
+		flag = 1;
+		osMutexRelease(printfMutexHandle);
 	}
-	if (usart3_tx_lock == 0)
-	{
-		usart3_tx_lock = 1;
+	osMutexWait(printfMutexHandle, osWaitForever);
+	// if (usart3_tx_lock == 0)
+	// {
+		// usart3_tx_lock = 1;
 		uint32_t len;
 		va_list args;
 		va_start(args, format);
@@ -91,8 +101,17 @@ int __printf(const char *format, ...)
 		va_end(args);
 		Usart3_Transmit_Dma((uint32_t)usart3_dma_transmit_buf, len);
 		LED_RED_OFF();
-		return len;
+	// 	return len;
+	// }
+	while (!((USART3->SR) & USART_SR_TC))
+	{
+		LED_RED_ON();
 	}
+	// 关闭 DMA
+	LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_3);
+	LED_RED_OFF();
+	// 这里释放锁
+	osMutexRelease(printfMutexHandle);
 	// else
 	// {
 	// 	LED_RED_ON();
