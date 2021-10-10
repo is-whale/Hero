@@ -7,9 +7,9 @@ static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.00
 
 static Pid_Position_t friction_motor_left_speed_pid = NEW_POSITION_PID(11, 0, 5.2, 2000, 16000, 0, 1000, 500);
 static Pid_Position_t friction_motor_right_speed_pid = NEW_POSITION_PID(11, 0, 5.2, 2000, 16000, 0, 1000, 500);
-static Pid_Position_t wave_motor_speed_pid = NEW_POSITION_PID(11, 0, 5.2, 2000, 16000, 0, 1000, 500);
+static Pid_Position_t wave_motor_speed_pid = NEW_POSITION_PID(9, 0, 3, 2000, 16000, 0, 1000, 500);
 
-static Pid_Position_t wave_motor_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 300, 0, 3000, 500); ///<  拨轮电机角度PID
+static Pid_Position_t wave_motor_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 4500, 0, 3000, 500); ///<  拨轮电机角度PID
 
 static int error_integral = 0;
 static uint16_t last_machine_angle = 0;
@@ -27,19 +27,19 @@ static Motor_Measure_t wave_motor_feedback_data;
  */
 static void Parse_Wave_Motor_Feedback_Data(void)
 {
-	uint8_t asd=1;
-	if(asd)
+	static uint8_t flag = 1;
+	float last_, this_;
+	Calculate_Motor_Data(&wave_motor_feedback_data, can2_rxd_data_buffer);
+	if (flag)
 	{
-		asd=0;
+		flag = 0;
 		last_machine_angle = wave_motor_feedback_data.mechanical_angle;
 	}
-	float last,this_;
-	Calculate_Motor_Data(&wave_motor_feedback_data, can2_rxd_data_buffer);
 	this_machine_angle = wave_motor_feedback_data.mechanical_angle;
 	this_ = this_machine_angle;
-	last = last_machine_angle;
-	Handle_Angle8191_PID_Over_Zero(&this_, &last);
-	error_integral += (this_ - last);
+	last_ = last_machine_angle;
+	Handle_Angle8191_PID_Over_Zero(&this_, &last_);
+	error_integral += (this_ - last_);
 	last_machine_angle = this_machine_angle;
 }
 
