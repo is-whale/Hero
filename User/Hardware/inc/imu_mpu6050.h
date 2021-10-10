@@ -6,6 +6,7 @@
 #include "stdio.h"
 #include "cmsis_os.h"
 #include "usart3.h"
+#include "string.h"
 
 typedef struct
 {
