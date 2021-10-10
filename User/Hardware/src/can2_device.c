@@ -187,9 +187,9 @@ void Set_Wave_Motor_Speed(float wave_motor_speed, Motor_Measure_t *wave_motor_fe
 {
 	int16_t wave_motor_pid_out_speed = Pid_Position_Calc(&wave_motor_speed_pid, wave_motor_speed, wave_motor_feedback_data->speed_rpm);
 	Can2_Send_4Msg(
-		CAN_SHOOTER_ALL_ID,
-		0,
+		0x1FF,
 		0,
 		wave_motor_pid_out_speed,
+		0,
 		0);
 }

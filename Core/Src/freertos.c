@@ -84,6 +84,9 @@ osStaticThreadDef_t shootTaskControlBlock;
 osThreadId gyroscopeTaskHandle;
 uint32_t gyroscopeTaskBuffer[ 512 ];
 osStaticThreadDef_t gyroscopeTaskControlBlock;
+osThreadId waveWheelTaskHandle;
+uint32_t waveWheelTaskBuffer[ 512 ];
+osStaticThreadDef_t waveWheelTaskControlBlock;
 osMessageQId buzzerQueueHandle;
 uint8_t buzzerQueueBuffer[ 5 * 5 ];
 osStaticMessageQDef_t buzzerQueueControlBlock;
@@ -110,6 +113,7 @@ void StartGimbalTask(void const * argument);
 void StartBuzzerTask(void const * argument);
 void StartShootTask(void const * argument);
 void StartGyroscopeTask(void const * argument);
+void StartWaveWheelTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -221,6 +225,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of gyroscopeTask */
   osThreadStaticDef(gyroscopeTask, StartGyroscopeTask, osPriorityNormal, 0, 512, gyroscopeTaskBuffer, &gyroscopeTaskControlBlock);
   gyroscopeTaskHandle = osThreadCreate(osThread(gyroscopeTask), NULL);
+
+  /* definition and creation of waveWheelTask */
+  osThreadStaticDef(waveWheelTask, StartWaveWheelTask, osPriorityAboveNormal, 0, 512, waveWheelTaskBuffer, &waveWheelTaskControlBlock);
+  waveWheelTaskHandle = osThreadCreate(osThread(waveWheelTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -442,6 +450,24 @@ __weak void StartGyroscopeTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartGyroscopeTask */
+}
+
+/* USER CODE BEGIN Header_StartWaveWheelTask */
+/**
+* @brief Function implementing the waveWheelTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartWaveWheelTask */
+__weak void StartWaveWheelTask(void const * argument)
+{
+  /* USER CODE BEGIN StartWaveWheelTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartWaveWheelTask */
 }
 
 /* Private application code --------------------------------------------------*/
