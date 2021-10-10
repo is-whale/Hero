@@ -22,6 +22,9 @@ void StartWaveWheelTask(void const *argument)
 	fire_one_bullet_signal = Get_Fire_One_Bullet_Signal();
 	fire_five_bullet_signal = Get_Fire_Five_Bullet_Signal();
 
+	(void)rc_data_pt;
+	(void)robot_control_data_pt;
+	
 	angle_integral = Get_Error_Integral();
 
 	osDelay(100);
@@ -31,11 +34,11 @@ void StartWaveWheelTask(void const *argument)
 		fire_event = osSignalWait((*fire_one_bullet_signal) | (*fire_five_bullet_signal), osWaitForever);
 		if (fire_event.status == osEventSignal)
 		{
-			if (fire_event.value.signals == *fire_one_bullet_signal)
+			if ((fire_event.value.signals == *fire_one_bullet_signal) && *is_ok_fire == 1)
 			{
 				Emission_Once_Time();
 			}
-			else if (fire_event.value.signals == *fire_five_bullet_signal)
+			else if ((fire_event.value.signals == *fire_five_bullet_signal) && *is_ok_fire == 1)
 			{
 			}
 		}
@@ -57,6 +60,7 @@ static void Emission_Once_Time(void)
 		wave_motor_speed = Calc_Wave_Motor_Angle8191_Pid(wave_once_machine_angle, *angle_integral);
 		Set_Wave_Motor_Speed(wave_motor_speed, wave_motor_feedback_data);
 		osDelay(5);
+		///< 堵转导致的速度较低问题待解决
 		if (abs((int)(wave_motor_feedback_data->speed_rpm)) < 5)
 		{
 			*angle_integral = 0;
@@ -65,6 +69,7 @@ static void Emission_Once_Time(void)
 		}
 		end_time = osKernelSysTick();
 		cal_pid_time += (end_time - start_time);
+		///< 是否使用 pid 计算时间作为结束条件待决定
 		if (cal_pid_time > 340)
 		{
 			*angle_integral = 0;
@@ -72,8 +77,6 @@ static void Emission_Once_Time(void)
 			break;
 		}
 	}
-
-	debug_print("ok time %d \r\n", cal_pid_time);
 	*angle_integral = 0;
 	wave_motor_speed = 0.0;
 	Can2_Send_4Msg(0x1FF, 0, 0, 0, 0);
