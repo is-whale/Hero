@@ -15,7 +15,6 @@ extern osThreadId waveWheelTaskHandle;
 static Rc_Ctrl_t *rc_data_pt;
 static Robot_control_data_t *robot_control_data_pt;
 static float fric_speed = 0;
-static float wave_motor_speed = 0.0;
 static CAN_RxHeaderTypeDef *can2_rx_header_p;
 static uint8_t *can2_rxd_data_buffer;
 static const uint8_t friction_motor_num = 2;
@@ -71,19 +70,17 @@ void StartShootTask(void const *argument)
         case fric_adaptive_speed_mode_ENUM: ///< 1
 
         {
-            fric_speed = 5000;
-            wave_motor_speed = 5000;
+            fric_speed = 3000;
             is_ok_fire = 1;
-            /* fric_speed = rc_data_pt->rc.ch1;
-            fric_speed *= 5; */
+            fric_speed = rc_data_pt->rc.ch1;
+            fric_speed *= 5;
             break;
         }
 
         case fric_high_speed_mode_ENUM: ///< 2
 
         {
-            fric_speed = 7000;
-            wave_motor_speed = 7000;
+            fric_speed = 4000;
             is_ok_fire = 1;
             /*  fric_speed = rc_data_pt->rc.ch1;
             fric_speed *= 5; */
@@ -93,8 +90,7 @@ void StartShootTask(void const *argument)
         case cover_on_ENUM: ///< 3
 
         {
-            fric_speed = 10000;
-            wave_motor_speed = 10000;
+            fric_speed = 5000;
             is_ok_fire = 1;
             /* fric_speed = rc_data_pt->rc.ch1;
             fric_speed *= 5; */
@@ -106,14 +102,13 @@ void StartShootTask(void const *argument)
             break;
         }
         }
-
+        
         if (Updata_Wave_Ch_Value(&last_wave_ch_value, &this_wave_ch_value))
         {
-            osSignalSet(waveWheelTaskHandle,fire_one_bullet);
-            //Emission_Once_Time();
+            osSignalSet(waveWheelTaskHandle, fire_one_bullet);
         }
 
-        Set_Friction_Motor_Speed(fric_speed, fric_speed, friction_motor_feedback_data);
+        Set_Friction_Motor_Speed(-fric_speed, fric_speed, friction_motor_feedback_data);
         osDelay(10);
     }
 }
@@ -157,7 +152,7 @@ int8_t Updata_Wave_Ch_Value(int16_t *last_wave_ch_value, int16_t *this_wave_ch_v
     }
 }
 
-void Emission_Once_Time(void)
+/* void Emission_Once_Time(void)
 {
     uint32_t start_time = 0;
     uint32_t cal_pid_time = 0;
@@ -190,19 +185,19 @@ void Emission_Once_Time(void)
     debug_print("ok time %d\r\n", cal_pid_time);
     *erroe_integral = 0;
     wave_motor_speed = 0.0;
-}
+} */
 
 int8_t *Get_Is_OK_Fire(void)
 {
     return &is_ok_fire;
 }
 
-const int32_t* Get_Fire_One_Bullet_Signal(void)
+const int32_t *Get_Fire_One_Bullet_Signal(void)
 {
     return &fire_one_bullet;
 }
 
-const int32_t* Get_Fire_Five_Bullet_Signal(void)
+const int32_t *Get_Fire_Five_Bullet_Signal(void)
 {
     return &fire_five_bullet;
 }

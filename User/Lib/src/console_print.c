@@ -5,7 +5,7 @@ void _warning(const char *,...);
 void _error(const char *,...);
 
 const Console_t Console = {
-    .log = _log,
+    .log = __printf,
     .error = _error,
     .warning = _warning
 };
@@ -19,7 +19,6 @@ const Console_t Console = {
 void _log(const char *fmt,...)
 {
     __printf(">>LOG>>  ");
-    __printf(fmt);
 }
 
 /**

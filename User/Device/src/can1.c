@@ -31,7 +31,15 @@ void Can1_Rx_FIFO0_IT_Callback(void)
 	// TODO 添加标志位判断
 	///< 接收数据
 	HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &can1_rx_header, can1_rxd_data);
-	Info_Can1_ParseData_Task();
+
+	if (can1_rx_header.StdId == SUPER_CAPACITOR_ID)
+	{
+		Info_Super_Capacitor_Parse_Data();
+	}
+	else
+	{
+		Info_Can1_ParseData_Task();
+	}
 }
 
 /**
