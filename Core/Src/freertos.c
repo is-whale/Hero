@@ -87,6 +87,9 @@ osStaticThreadDef_t gyroscopeTaskControlBlock;
 osThreadId waveWheelTaskHandle;
 uint32_t waveWheelTaskBuffer[ 512 ];
 osStaticThreadDef_t waveWheelTaskControlBlock;
+osThreadId superCapacitorTHandle;
+uint32_t superCapacitorTBuffer[ 512 ];
+osStaticThreadDef_t superCapacitorTControlBlock;
 osMessageQId buzzerQueueHandle;
 uint8_t buzzerQueueBuffer[ 5 * 5 ];
 osStaticMessageQDef_t buzzerQueueControlBlock;
@@ -114,6 +117,7 @@ void StartBuzzerTask(void const * argument);
 void StartShootTask(void const * argument);
 void StartGyroscopeTask(void const * argument);
 void StartWaveWheelTask(void const * argument);
+void StartSuperCapacitorTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -229,6 +233,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of waveWheelTask */
   osThreadStaticDef(waveWheelTask, StartWaveWheelTask, osPriorityAboveNormal, 0, 512, waveWheelTaskBuffer, &waveWheelTaskControlBlock);
   waveWheelTaskHandle = osThreadCreate(osThread(waveWheelTask), NULL);
+
+  /* definition and creation of superCapacitorT */
+  osThreadStaticDef(superCapacitorT, StartSuperCapacitorTask, osPriorityIdle, 0, 512, superCapacitorTBuffer, &superCapacitorTControlBlock);
+  superCapacitorTHandle = osThreadCreate(osThread(superCapacitorT), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -468,6 +476,24 @@ __weak void StartWaveWheelTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartWaveWheelTask */
+}
+
+/* USER CODE BEGIN Header_StartSuperCapacitorTask */
+/**
+* @brief Function implementing the superCapacitorT thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartSuperCapacitorTask */
+__weak void StartSuperCapacitorTask(void const * argument)
+{
+  /* USER CODE BEGIN StartSuperCapacitorTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartSuperCapacitorTask */
 }
 
 /* Private application code --------------------------------------------------*/
