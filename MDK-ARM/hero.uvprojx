@@ -1248,6 +1248,11 @@
               <FileType>1</FileType>
               <FilePath>..\User\Lib\src\quaternion.c</FilePath>
             </File>
+            <File>
+              <FileName>console_print.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Lib\src\console_print.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
