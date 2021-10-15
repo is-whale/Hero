@@ -3,8 +3,10 @@
 
 #include "usart3.h"
 
-
-typedef struct 
+/**
+ * @brief 串口打印函数指针结构体
+ */
+typedef struct
 {
     void (*log)(const char *, ...);
     void (*warning)(const char *, ...);
