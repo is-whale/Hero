@@ -6,6 +6,8 @@
 #include "stdio.h"
 #include "usart.h"
 #include "led.h"
+#include "stdlib.h"
+#include "string.h"
 
 #define INFORMATION 1
 #define DEBUG 1
@@ -40,6 +42,7 @@ void Usart3_Tx_Init(void);
 void Usart3_Transmit_Dma(uint32_t data_address, uint32_t len);
 void Usart3_It_Tc_Callback(void);
 int __printf(const char *format, ...);
+int __printf_error(const char *format, ...);
 
 void Usart3_Rx_Init(void);
 uint8_t *Get_Usart3_DMA_RxBuffer(void);

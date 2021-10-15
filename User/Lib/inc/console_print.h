@@ -8,9 +8,10 @@
  */
 typedef struct
 {
-    void (*log)(const char *, ...);
+    int (*log)(const char *format, ...);
+    // void (*log)(const char *, ...);
     void (*warning)(const char *, ...);
-    void (*error)(const char *, ...);
+    int (*error)(const char *, ...);
 
 } Console_t;
 

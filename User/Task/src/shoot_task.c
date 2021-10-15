@@ -102,7 +102,8 @@ void StartShootTask(void const *argument)
             break;
         }
         }
-        
+        Console.error("hello %d\r\n",10);
+        Console.log("log%d \r\n",100);
         if (Updata_Wave_Ch_Value(&last_wave_ch_value, &this_wave_ch_value))
         {
             osSignalSet(waveWheelTaskHandle, fire_one_bullet);

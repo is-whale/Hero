@@ -1,12 +1,12 @@
 #include "console_print.h"
 
-void _log(const char *,...);
+// void _log(char *info, const char *,...);
 void _warning(const char *,...);
 void _error(const char *,...);
 
 const Console_t Console = {
     .log = __printf,
-    .error = _error,
+    .error = __printf_error,
     .warning = _warning
 };
 
@@ -16,10 +16,10 @@ const Console_t Console = {
  * @param   fmt 
  * @param   ... 
  */
-void _log(const char *fmt,...)
-{
-    __printf(">>LOG>>  ");
-}
+// void _log(const char *fmt,...)
+// {
+//     __printf(">>LOG>>  ");
+// }
 
 /**
  * @brief   ´®¿Ú warning ´òÓ¡

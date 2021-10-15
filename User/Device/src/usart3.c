@@ -77,44 +77,66 @@ const uint16_t *Get_Usart3_DMA_Rx_MaxLen(void)
  * @param {char} *format 同printf
  * @return {int} 打印的字符长度
  */
+static uint8_t flag = 0;
+static char *log = ">>LOG>>";
 int __printf(const char *format, ...)
 {
-	// while (usart3_tx_lock)
-	// {
-	// 	LED_RED_ON();
-	// }
-	// 这里获得锁
-	static uint8_t flag = 0;
+	
 	if (flag == 0)
 	{
 		flag = 1;
 		osMutexRelease(printfMutexHandle);
 	}
 	osMutexWait(printfMutexHandle, osWaitForever);
-	// if (usart3_tx_lock == 0)
-	// {
-		// usart3_tx_lock = 1;
-		uint32_t len;
-		va_list args;
-		va_start(args, format);
-		len = vsnprintf((char *)usart3_dma_transmit_buf, sizeof(usart3_dma_transmit_buf), (char *)format, args);
-		va_end(args);
-		Usart3_Transmit_Dma((uint32_t)usart3_dma_transmit_buf, len);
-		LED_RED_OFF();
-	// 	return len;
-	// }
+
+	uint32_t len;
+	va_list args;
+	va_start(args, format);
+	len = vsnprintf((char *)usart3_dma_transmit_buf, sizeof(usart3_dma_transmit_buf), (const char *)format, args);
+	va_end(args);
+	strcat((char *)usart3_dma_transmit_buf, log);
+	Usart3_Transmit_Dma((uint32_t)usart3_dma_transmit_buf, len + strlen(log));
+	LED_RED_OFF();
 	while (!((USART3->SR) & USART_SR_TC))
 	{
 		LED_RED_ON();
 	}
-	// 关闭 DMA
+	///< 关闭 DMA
 	LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_3);
 	LED_RED_OFF();
-	// 这里释放锁
+	///< 这里释放锁
 	osMutexRelease(printfMutexHandle);
-	// else
-	// {
-	// 	LED_RED_ON();
-	// }
+
+	return -1;
+}
+static char *error = ">>ERROR>>";
+int __printf_error(const char *format, ...)
+{
+	
+	if (flag == 0)
+	{
+		flag = 1;
+		osMutexRelease(printfMutexHandle);
+	}
+	osMutexWait(printfMutexHandle, osWaitForever);
+
+	uint32_t len;
+	va_list args;
+	va_start(args, format);
+	len = vsnprintf((char *)usart3_dma_transmit_buf, sizeof(usart3_dma_transmit_buf), (const char *)format, args);
+	va_end(args);
+	strcat((char *)usart3_dma_transmit_buf, error);
+	Usart3_Transmit_Dma((uint32_t)usart3_dma_transmit_buf, len + strlen(error));
+	LED_RED_OFF();
+	while (!((USART3->SR) & USART_SR_TC))
+	{
+		LED_RED_ON();
+	}
+	///< 关闭 DMA
+	LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_3);
+	LED_RED_OFF();
+	///< 这里释放锁
+	osMutexRelease(printfMutexHandle);
+
 	return -1;
 }
