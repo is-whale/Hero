@@ -1,5 +1,14 @@
+/**
+ * @file gyroscope_task.c
+ * @brief ╟Етьмсбщрг╫БнЖхннЯ
+ * TODO: Kalman Filter
+ * @version 0.1
+ * @date 2021-10-17
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
 #include "gyroscope_task.h"
-
 
 void StartGyroscopeTask(void const * argument)
 {
@@ -7,7 +16,6 @@ void StartGyroscopeTask(void const * argument)
 
     Mpu_Device_Init();
     Init_Quaternion();
-
 
     for(;;)
     {
