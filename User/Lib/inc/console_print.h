@@ -10,7 +10,7 @@ typedef struct
 {
     int (*print)(const char *format, ...);
     int (*log)(const char *format, ...);
-    void (*warning)(const char *, ...);
+    int (*warning)(const char *, ...);
     int (*error)(const char *, ...);
 
 } Console_t;

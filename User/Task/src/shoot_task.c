@@ -48,6 +48,9 @@ void StartShootTask(void const *argument)
     (void)rc_data_pt; ///< ±ÜÃâ warning
     (void)last_machine_angle;
     (void)this_machine_angle;
+    (void)wave_motor_feedback_data;
+    (void)erroe_integral;
+    (void)wave_once_machine_angle;
 
     osDelay(100);
 
