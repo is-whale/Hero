@@ -8,8 +8,8 @@
  */
 typedef struct
 {
+    int (*print)(const char *format, ...);
     int (*log)(const char *format, ...);
-    // void (*log)(const char *, ...);
     void (*warning)(const char *, ...);
     int (*error)(const char *, ...);
 

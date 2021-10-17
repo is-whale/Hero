@@ -43,6 +43,8 @@ void Usart3_Transmit_Dma(uint32_t data_address, uint32_t len);
 void Usart3_It_Tc_Callback(void);
 int __printf(const char *format, ...);
 int __printf_error(const char *format, ...);
+int __printf_log(const char *format, ...);
+int __printf_warning(const char *format, ...);
 
 void Usart3_Rx_Init(void);
 uint8_t *Get_Usart3_DMA_RxBuffer(void);

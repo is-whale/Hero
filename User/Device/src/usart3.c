@@ -77,14 +77,77 @@ const uint16_t *Get_Usart3_DMA_Rx_MaxLen(void)
  * @param {char} *format 同printf
  * @return {int} 打印的字符长度
  */
-static uint8_t flag = 0;
-static char *log = ">>LOG>>";
+static uint8_t first_release_mutex_flag = 0;
+
 int __printf(const char *format, ...)
 {
 	
-	if (flag == 0)
+	if (first_release_mutex_flag == 0)
 	{
-		flag = 1;
+		first_release_mutex_flag = 1;
+		osMutexRelease(printfMutexHandle);
+	}
+	osMutexWait(printfMutexHandle, osWaitForever);
+
+	uint32_t len;
+	va_list args;
+	va_start(args, format);
+	len = vsnprintf((char *)usart3_dma_transmit_buf, sizeof(usart3_dma_transmit_buf), (const char *)format, args);
+	va_end(args);
+	Usart3_Transmit_Dma((uint32_t)usart3_dma_transmit_buf, len);
+	LED_RED_OFF();
+	while (!((USART3->SR) & USART_SR_TC))
+	{
+		LED_RED_ON();
+	}
+	///< 关闭 DMA
+	LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_3);
+	LED_RED_OFF();
+	///< 这里释放锁
+	osMutexRelease(printfMutexHandle);
+
+	return -1;
+}
+
+static char *error = ">>ERROR>>";
+int __printf_error(const char *format, ...)
+{
+	
+	if (first_release_mutex_flag == 0)
+	{
+		first_release_mutex_flag = 1;
+		osMutexRelease(printfMutexHandle);
+	}
+	osMutexWait(printfMutexHandle, osWaitForever);
+
+	uint32_t len;
+	va_list args;
+	va_start(args, format);
+	len = vsnprintf((char *)usart3_dma_transmit_buf, sizeof(usart3_dma_transmit_buf), (const char *)format, args);
+	va_end(args);
+	strcat((char *)usart3_dma_transmit_buf, error);
+	Usart3_Transmit_Dma((uint32_t)usart3_dma_transmit_buf, len + strlen(error));
+	LED_RED_OFF();
+	while (!((USART3->SR) & USART_SR_TC))
+	{
+		LED_RED_ON();
+	}
+	///< 关闭 DMA
+	LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_3);
+	LED_RED_OFF();
+	///< 这里释放锁
+	osMutexRelease(printfMutexHandle);
+
+	return -1;
+}
+
+static char *log = ">>LOG>> ";
+int __printf_log(const char *format, ...)
+{
+	
+	if (first_release_mutex_flag == 0)
+	{
+		first_release_mutex_flag = 1;
 		osMutexRelease(printfMutexHandle);
 	}
 	osMutexWait(printfMutexHandle, osWaitForever);
@@ -109,13 +172,14 @@ int __printf(const char *format, ...)
 
 	return -1;
 }
-static char *error = ">>ERROR>>";
-int __printf_error(const char *format, ...)
+
+static char *warning = ">>WARNING>> ";
+int __printf_warning(const char *format, ...)
 {
 	
-	if (flag == 0)
+	if (first_release_mutex_flag == 0)
 	{
-		flag = 1;
+		first_release_mutex_flag = 1;
 		osMutexRelease(printfMutexHandle);
 	}
 	osMutexWait(printfMutexHandle, osWaitForever);
@@ -125,8 +189,8 @@ int __printf_error(const char *format, ...)
 	va_start(args, format);
 	len = vsnprintf((char *)usart3_dma_transmit_buf, sizeof(usart3_dma_transmit_buf), (const char *)format, args);
 	va_end(args);
-	strcat((char *)usart3_dma_transmit_buf, error);
-	Usart3_Transmit_Dma((uint32_t)usart3_dma_transmit_buf, len + strlen(error));
+	strcat((char *)usart3_dma_transmit_buf, warning);
+	Usart3_Transmit_Dma((uint32_t)usart3_dma_transmit_buf, len + strlen(warning));
 	LED_RED_OFF();
 	while (!((USART3->SR) & USART_SR_TC))
 	{
