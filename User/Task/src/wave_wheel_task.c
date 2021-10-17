@@ -1,3 +1,12 @@
+/**
+ * @file wave_wheel_task.c
+ * @brief 波轮电机任务，任务开始进入阻塞状态，等待 shoot_task 的唤醒
+ * TODO: 待加入连发。改进 PID 计算的结束条件，在测试中出现了发射一次转多次的情况
+ * 
+ * @version 0.1
+ * @date 2021-10-17
+ * @copyright Copyright (c) 2021
+ */
 #include "wave_wheel_task.h"
 
 static Rc_Ctrl_t *rc_data_pt;
