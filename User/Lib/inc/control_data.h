@@ -102,5 +102,6 @@ typedef struct
 
 void Control_Data_Init(Robot_control_data_t* robot_control_data);
 void Parse_Robot_Control_Data(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data, Robot_control_data_t* robot_control_data);
+///<可能需要控制数据返回函数
 
 #endif // __CONTROL_DATA_H_

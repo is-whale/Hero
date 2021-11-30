@@ -5,7 +5,6 @@
  * @date 2021-9-28
  * @copyright Copyright (c) 2021
  */
-
 #include "chassis_task.h"
 
 static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500); ///< 底盘跟随PID
@@ -29,7 +28,7 @@ void StartChassisTask(void const *argument)
     gimbal_motor_feedback_parsed_data = Get_Gimbal_Parsed_FeedBack_Data();        //CAN2总线上电机的反馈数据
     yaw_motor_index = Get_Yaw_Motor_Index();                                      // 获取 yaw 轴电机在数组中的下标
     pitch_motor_index = Get_Pitch_Motor_Index();                                  //获取pitch轴电机在数据中的下标
-    
+    Get_Parsed_RobotMode_Pointer();
 
     (void)pitch_motor_index;
 
@@ -41,13 +40,32 @@ void StartChassisTask(void const *argument)
         switch(robot_mode_data_pt->mode.mouse_keyboard_chassis_mode)
 			{
                 //底盘跟随
-                case mk_chassis_follow_mode_ENUM;
-                {
+					case mk_chassis_follow_mode_ENUM:
+              {
                     follow_pid_output = Calc_Chassis_Follow();
-              			chassis_motor_speed[0] = robot_mode_data_pt->virtual_rocker.ch2 + remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
-						chassis_motor_speed[1] = robot_mode_data_pt->virtual_rocker.ch2 - remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
+
+                    #if 0  //0开启防滑(ESP) 1关闭防滑
+						chassis_motor_speed[0] = remoter_control->virtual_rocker.ch2 + remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
+						chassis_motor_speed[1] = remoter_control->virtual_rocker.ch2 - remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
 						chassis_motor_speed[2] = -remoter_control->virtual_rocker.ch2 + remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
 						chassis_motor_speed[3] = -remoter_control->virtual_rocker.ch2 - remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
+					#else
+						Calc_Gyro_Motors_Speed(chassis_motor_speed, \
+						0, \
+						GM6020_YAW_Angle_To_360(gimbal_motor_feedback_parsed_data -> mechanical_angle), \
+						robot_mode_data_pt->virtual_rocker.ch3, \
+						robot_mode_data_pt->virtual_rocker.ch2);
+
+						chassis_motor_speed[0] += follow_pid_output + rc_data_pt->mouse.x/0.38f;
+						chassis_motor_speed[1] += follow_pid_output +rc_data_pt->mouse.x/0.38f;
+						chassis_motor_speed[2] += follow_pid_output +rc_data_pt->mouse.x/0.38f;
+						chassis_motor_speed[3] += follow_pid_output +rc_data_pt->mouse.x/0.38f;
+					#endif
+                    follow_pid_output = Calc_Chassis_Follow();
+              			chassis_motor_speed[0] = robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
+						chassis_motor_speed[1] = robot_mode_data_pt->virtual_rocker.ch2 - robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
+						chassis_motor_speed[2] = -robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
+						chassis_motor_speed[3] = -robot_mode_data_pt->virtual_rocker.ch2 - robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
                    
                 }
 
