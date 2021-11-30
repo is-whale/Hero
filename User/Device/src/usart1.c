@@ -3,7 +3,7 @@
 static const uint16_t usart1_dma_rx_max_len = 36;					  ///< USART1 DMA 最大接收长度
 static volatile uint8_t usart1_dma_rx_buffer0[usart1_dma_rx_max_len]; ///< USART1 DMA 接受缓冲区 1
 static volatile uint8_t usart1_dma_rx_buffer1[usart1_dma_rx_max_len]; ///< USART1 DMA 接受缓冲区 2
-static volatile uint16_t usart1_dma_rxd_data_len;				      ///< USART1 DMA 已经接收到的数据长度
+static volatile uint16_t usart1_dma_rxd_data_len;					  ///< USART1 DMA 已经接收到的数据长度
 
 /**
  * @brief       初始化串口 1 的接收 DMA 
@@ -95,7 +95,7 @@ const uint16_t *Get_Usart1_DMA_RxMaxLen(void)
  */
 uint16_t *Get_Usart1_DMA_Rxd_DataLen(void)
 {
-	return (uint16_t*)&usart1_dma_rxd_data_len;
+	return (uint16_t *)&usart1_dma_rxd_data_len;
 }
 
 /**

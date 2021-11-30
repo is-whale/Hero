@@ -29,6 +29,7 @@ void StartChassisTask(void const *argument)
     gimbal_motor_feedback_parsed_data = Get_Gimbal_Parsed_FeedBack_Data();
     yaw_motor_index = Get_Yaw_Motor_Index();
     pitch_motor_index = Get_Pitch_Motor_Index();
+    
 
     (void)pitch_motor_index;
 
@@ -36,8 +37,25 @@ void StartChassisTask(void const *argument)
 
     for (;;)
     {
-
         if (robot_mode_data_pt->mode.control_device == remote_controller_device_ENUM) ///< 最好是使用枚举定义
+        switch(robot_mode_data_pt->mode.mouse_keyboard_chassis_mode)
+			{
+                //底盘跟随
+                case mk_chassis_follow_mode_ENUM;
+                {
+                    follow_pid_output = Calc_Chassis_Follow();
+              			chassis_motor_speed[0] = remoter_control->virtual_rocker.ch2 + remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
+						chassis_motor_speed[1] = remoter_control->virtual_rocker.ch2 - remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
+						chassis_motor_speed[2] = -remoter_control->virtual_rocker.ch2 + remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
+						chassis_motor_speed[3] = -remoter_control->virtual_rocker.ch2 - remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
+
+
+                   
+                }
+                
+
+
+        else if (robot_mode_date_pt-> mode.control_device == mouse_keyboard_device_ENUM)///<键鼠
         {
 
             switch (robot_mode_data_pt->mode.rc_motion_mode)

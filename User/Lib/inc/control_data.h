@@ -95,7 +95,7 @@ typedef struct
 
 	//ctrl按下切换
 	//陀螺开关、正反-1 0 1
-	//归入地盘模式
+	//归入底盘模式
 	//或者单独一个小陀螺 正反	
 	
 }Robot_control_data_t;

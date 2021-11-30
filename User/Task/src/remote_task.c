@@ -36,6 +36,7 @@ void StartRemoteTask(void const *argument)
     for (;;)
     {
         remote_get_data_event = osSignalWait(remote_get_data_signal, remote_data_overtime);
+        //利用超时时间做不同的任务处理
         if (remote_get_data_event.status == osEventSignal)
         {
             if (remote_get_data_event.value.signals == remote_get_data_signal)

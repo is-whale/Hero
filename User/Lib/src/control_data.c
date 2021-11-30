@@ -39,7 +39,14 @@ void Control_Data_Init(Robot_control_data_t* robot_control_data)
 	robot_control_data->virtual_rocker.ch2 = 0;
 	robot_control_data->virtual_rocker.ch3 = 0;
 }
-
+/**
+ * @brief 解析机器人控制模式		
+ * @param[in] {rc_data}   					本次解析的遥控器数据
+ * @param[in] {last_rc_data}   				上次解析的遥控器数据
+ * @param[in] {uint16_t}					机器人模式配置数据
+ * @retval    {uint8_t}						1 : 数据解析并校验成功
+ * 											0 : 数据解析校验失败	            					
+ */
 void Parse_Robot_Control_Data(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data, Robot_control_data_t* robot_control_data)
 {
 	Robot_Rc_Mode_Change_Control(rc_data, last_rc_data, robot_control_data); ///< 机器人模式变换响应
