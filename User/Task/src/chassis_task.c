@@ -23,12 +23,12 @@ void StartChassisTask(void const *argument)
 {
     static float chassis_motor_speed[4] = {0.0, 0.0, 0.0, 0.0};
     float follow_pid_output;
-    rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();
-    robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();
-    chassis_motor_feedback_parsed_data = Get_Can1_Feedback_Data();
-    gimbal_motor_feedback_parsed_data = Get_Gimbal_Parsed_FeedBack_Data();
-    yaw_motor_index = Get_Yaw_Motor_Index();
-    pitch_motor_index = Get_Pitch_Motor_Index();
+    rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();                              // 获取解析后的遥控器数据
+    robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();                          //机器人模式结构体指针
+    chassis_motor_feedback_parsed_data = Get_Can1_Feedback_Data();                //CAN1 总线上电机的反馈数据
+    gimbal_motor_feedback_parsed_data = Get_Gimbal_Parsed_FeedBack_Data();        //CAN2总线上电机的反馈数据
+    yaw_motor_index = Get_Yaw_Motor_Index();                                      // 获取 yaw 轴电机在数组中的下标
+    pitch_motor_index = Get_Pitch_Motor_Index();                                  //获取pitch轴电机在数据中的下标
     
 
     (void)pitch_motor_index;
@@ -44,15 +44,24 @@ void StartChassisTask(void const *argument)
                 case mk_chassis_follow_mode_ENUM;
                 {
                     follow_pid_output = Calc_Chassis_Follow();
-              			chassis_motor_speed[0] = remoter_control->virtual_rocker.ch2 + remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
-						chassis_motor_speed[1] = remoter_control->virtual_rocker.ch2 - remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
+              			chassis_motor_speed[0] = robot_mode_data_pt->virtual_rocker.ch2 + remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
+						chassis_motor_speed[1] = robot_mode_data_pt->virtual_rocker.ch2 - remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
 						chassis_motor_speed[2] = -remoter_control->virtual_rocker.ch2 + remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
 						chassis_motor_speed[3] = -remoter_control->virtual_rocker.ch2 - remoter_control->virtual_rocker.ch3 + follow_pid_output + remoter_control->mouse.x/0.38f;
-
-
                    
                 }
-                
+
+                //小陀螺
+                case mk_chassis_gyro_mode_ENUM; 
+                {
+
+                }
+
+                //特殊模式
+                case mk_chassis_special_mode_ENUM;
+                {
+
+                }
 
 
         else if (robot_mode_date_pt-> mode.control_device == mouse_keyboard_device_ENUM)///<键鼠

@@ -91,7 +91,7 @@ static uint8_t Remoter_Data_Value_Check(Rc_Ctrl_t *rc)
  * @param[in] {volatile_const_uint8_t}   	遥控器数据缓冲区
  * @param[in] {Rc_Ctrl_t}   				遥控器数据指针结构体
  * @param[in] {uint16_t}					本次接收到的数据长度
- * @retval    {uint8_t}						遥控器模式
+ * @retval    {uint8_t}						遥控器模式（检验结果）
 	            					
  */
 uint8_t Rc_Data_Check_Parse(volatile const uint8_t *sbus_buf, Rc_Ctrl_t *rc_ctrl, uint16_t rc_data_len)
