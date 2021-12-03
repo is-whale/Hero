@@ -111,9 +111,15 @@ static void Robot_Rc_Mode_Change_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_
 #undef S1_CHANGED_TO
 #undef S2_CHANGED_TO
 }
-
+/**
+ * @brief               					键盘数据解析为虚拟摇杆
+ * @param[in] {Rc_Ctrl_t*}   				遥控器数据缓冲区
+ * @param[in] {Robot_control_data_t*}   	遥控器数据指针结构体
+ * @retval    {uint8_t}						无	            					
+ */
 static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t* robot_control_data)
 {
+///<保证可移植性
 #define KEY_W            0x01
 #define KEY_A            0x04
 #define KEY_S            0x02

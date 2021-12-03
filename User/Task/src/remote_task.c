@@ -43,7 +43,7 @@ void StartRemoteTask(void const *argument)
             {
                 rx_available_buffer_index = Get_Rc_Available_Bufferx();
 
-                if (Rc_Data_Check_Parse(rc_rx_buffer[rx_available_buffer_index], &remote_controller, *sbus_rxd_len))
+                if (Rc_Data_Check_Parse(rc_rx_buffer[rx_available_buffer_index], &remote_controller, *sbus_rxd_len))///<解析数据并检验
                 {
                     Parse_Robot_Control_Data(&remote_controller, &last_time_remote_controller, &robot_control_data); ///< 解析出遥控器模式
 

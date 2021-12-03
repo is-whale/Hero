@@ -9,7 +9,7 @@
 enum controlDevice
 {
 	mouse_keyboard_device_ENUM = 1u, ///< 操作设备为键鼠
-	remote_controller_device_ENUM    ///< 操作设备为遥控器
+	remote_controller_device_ENUM	 ///< 操作设备为遥控器
 };
 
 enum rcMotionMode
@@ -37,8 +37,8 @@ enum mouseKeyboardAimMode
 
 enum gyroDirection
 {
-	gyro_positive_ENUM = 1,  ///< 陀螺正向
-	gyro_negative_ENUM = -1  ///< 陀螺反向
+	gyro_positive_ENUM = 1, ///< 陀螺正向
+	gyro_negative_ENUM = -1 ///< 陀螺反向
 };
 
 enum fricCoverMode
@@ -63,10 +63,10 @@ typedef struct
 		uint8_t rc_motion_mode;				 ///< 底盘云台模式 1底盘跟随 2小陀螺 3自瞄 底盘跟随 4自瞄小陀螺 5特殊
 		uint8_t mouse_keyboard_chassis_mode; ///< 1跟随 2小陀螺 3特殊
 		uint8_t mouse_keyboard_gimbal_mode;	 ///< 1手动 2自瞄 3特殊
-		int8_t gyro_direction;              ///< -1陀螺反向 1陀螺正向
+		int8_t gyro_direction;				 ///< -1陀螺反向 1陀螺正向
 		uint8_t fric_cover_mode;			 ///< 摩擦轮模式 0关闭 1自适应 2最高速 3开舱盖
 		uint8_t shoot_mode;					 ///< 射击模式 1单发 2连发（最大速度）
-		uint8_t shoot_key;                   ///< 射击开关 0关闭
+		uint8_t shoot_key;					 ///< 射击开关 0关闭
 	} mode;
 
 	struct
@@ -83,7 +83,7 @@ typedef struct
 		int16_t chassis_acceleration;
 		//底盘最大速度
 		int16_t chassis_max_speed; //虚拟摇杆最大值
-	}parameter;
+	} parameter;
 
 	struct
 	{
@@ -96,11 +96,12 @@ typedef struct
 	//ctrl按下切换
 	//陀螺开关、正反-1 0 1
 	//归入底盘模式
-	//或者单独一个小陀螺 正反	
-	
-}Robot_control_data_t;
+	//或者单独一个小陀螺 正反
 
-void Control_Data_Init(Robot_control_data_t* robot_control_data);
-void Parse_Robot_Control_Data(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data, Robot_control_data_t* robot_control_data);
+} Robot_control_data_t;
+
+void Control_Data_Init(Robot_control_data_t *robot_control_data);
+void Parse_Robot_Control_Data(Rc_Ctrl_t *rc_data, Rc_Ctrl_t *last_rc_data, Robot_control_data_t *robot_control_data);
+///<可能需要控制数据返回函数
 
 #endif // __CONTROL_DATA_H_
