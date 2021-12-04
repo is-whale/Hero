@@ -8,101 +8,101 @@
 
 enum controlDevice
 {
-	mouse_keyboard_device_ENUM = 1u, ///< ²Ù×÷Éè±¸Îª¼üÊó
-	remote_controller_device_ENUM	 ///< ²Ù×÷Éè±¸ÎªÒ£¿ØÆ÷
+	mouse_keyboard_device_ENUM = 1u, ///< æ“ä½œè®¾å¤‡ä¸ºé”®é¼ 
+	remote_controller_device_ENUM	 ///< æ“ä½œè®¾å¤‡ä¸ºé¥æŽ§å™¨
 };
 
 enum rcMotionMode
 {
-	rc_chassis_follow_mode_ENUM = 1u,		  ///< µ×ÅÌ¸úËæ+ÊÖ¶¯Ãé×¼
-	rc_chassis_gyro_mode_ENUM,				  ///< µ×ÅÌÐ¡ÍÓÂÝ+ÊÖ¶¯Ãé×¼
-	rc_autoaim_chassis_follow_mode_ENUM = 1u, ///< µ×ÅÌ¸úËæ+×Ô¶¯Ãé×¼
-	rc_autoaim_chassis_gyro_mode_ENUM,		  ///< µ×ÅÌÐ¡ÍÓÂÝ+×Ô¶¯Ãé×¼
-	rc_special_mode_ENUM					  ///< ÌØÊâÄ£Ê½
+	rc_chassis_follow_mode_ENUM = 1u,		  ///< åº•ç›˜è·Ÿéš+æ‰‹åŠ¨çž„å‡†
+	rc_chassis_gyro_mode_ENUM,				  ///< åº•ç›˜å°é™€èžº+æ‰‹åŠ¨çž„å‡†
+	rc_autoaim_chassis_follow_mode_ENUM = 1u, ///< åº•ç›˜è·Ÿéš+è‡ªåŠ¨çž„å‡†
+	rc_autoaim_chassis_gyro_mode_ENUM,		  ///< åº•ç›˜å°é™€èžº+è‡ªåŠ¨çž„å‡†
+	rc_special_mode_ENUM					  ///< ç‰¹æ®Šæ¨¡å¼
 };
 
 enum mouseKeyboardChassisMode
 {
-	mk_chassis_follow_mode_ENUM = 1u, ///< µ×ÅÌ¸úËæ
-	mk_chassis_gyro_mode_ENUM,		  ///< µ×ÅÌÐ¡ÍÓÂÝ
-	mk_chassis_special_mode_ENUM	  ///< µ×ÅÌÌØÊâÄ£Ê½
+	mk_chassis_follow_mode_ENUM = 1u, ///< åº•ç›˜è·Ÿéš
+	mk_chassis_gyro_mode_ENUM,		  ///< åº•ç›˜å°é™€èžº
+	mk_chassis_special_mode_ENUM	  ///< åº•ç›˜ç‰¹æ®Šæ¨¡å¼
 };
 
 enum mouseKeyboardAimMode
 {
-	mk_manual_aim_mode_ENUM = 1u, ///< ÊÖ¶¯Ãé×¼
-	mk_auto_aim_mode_ENUM,		  ///< ×Ô¶¯Ãé×¼
-	mk_special_aim_mode_ENUM	  ///< ÔÆÌ¨ÌØÊâÄ£Ê½
+	mk_manual_aim_mode_ENUM = 1u, ///< æ‰‹åŠ¨çž„å‡†
+	mk_auto_aim_mode_ENUM,		  ///< è‡ªåŠ¨çž„å‡†
+	mk_special_aim_mode_ENUM	  ///< äº‘å°ç‰¹æ®Šæ¨¡å¼
 };
 
 enum gyroDirection
 {
-	gyro_positive_ENUM = 1, ///< ÍÓÂÝÕýÏò
-	gyro_negative_ENUM = -1 ///< ÍÓÂÝ·´Ïò
+	gyro_positive_ENUM = 1, ///< é™€èžºæ­£å‘
+	gyro_negative_ENUM = -1 ///< é™€èžºåå‘
 };
 
 enum fricCoverMode
 {
-	fric_cover_off_mode_ENUM = 0u, ///< Ä¦²ÁÂÖ¹Ø±Õ£¬µ¯²Õ¸Ç¹Ø±Õ
-	fric_adaptive_speed_mode_ENUM, ///< Ä¦²ÁÂÖ×ÔÊÊÓ¦ËÙ¶È£¬µ¯²Õ¸Ç¹Ø±Õ
-	fric_high_speed_mode_ENUM,	   ///< Ä¦²ÁÂÖ×î¸ßËÙ¶ÈËÙ¶È£¬µ¯²Õ¸Ç¹Ø±Õ
-	cover_on_ENUM				   ///< Ä¦²ÁÂÖ¹Ø±Õ£¬µ¯²Õ¸Ç¿ªÆô
+	fric_cover_off_mode_ENUM = 0u, ///< æ‘©æ“¦è½®å…³é—­ï¼Œå¼¹èˆ±ç›–å…³é—­
+	fric_adaptive_speed_mode_ENUM, ///< æ‘©æ“¦è½®è‡ªé€‚åº”é€Ÿåº¦ï¼Œå¼¹èˆ±ç›–å…³é—­
+	fric_high_speed_mode_ENUM,	   ///< æ‘©æ“¦è½®æœ€é«˜é€Ÿåº¦é€Ÿåº¦ï¼Œå¼¹èˆ±ç›–å…³é—­
+	cover_on_ENUM				   ///< æ‘©æ“¦è½®å…³é—­ï¼Œå¼¹èˆ±ç›–å¼€å¯
 };
 
 enum shooterMode
 {
-	on_shoot_mode_ENUM = 1u, ///< µ¥·¢
-	rapid_fire_max_mode_ENUM ///< ¸ßËÙÁ¬·¢
+	on_shoot_mode_ENUM = 1u, ///< å•å‘
+	rapid_fire_max_mode_ENUM ///< é«˜é€Ÿè¿žå‘
 };
 
 typedef struct
 {
 	struct
 	{
-		uint8_t control_device;				 ///< ¿ØÖÆÉè±¸ 1¼üÊóÄ£Ê½(rc) 2Ò£¿ØÆ÷Ä£Ê½(mouse_key)
-		uint8_t rc_motion_mode;				 ///< µ×ÅÌÔÆÌ¨Ä£Ê½ 1µ×ÅÌ¸úËæ 2Ð¡ÍÓÂÝ 3×ÔÃé µ×ÅÌ¸úËæ 4×ÔÃéÐ¡ÍÓÂÝ 5ÌØÊâ
-		uint8_t mouse_keyboard_chassis_mode; ///< 1¸úËæ 2Ð¡ÍÓÂÝ 3ÌØÊâ
-		uint8_t mouse_keyboard_gimbal_mode;	 ///< 1ÊÖ¶¯ 2×ÔÃé 3ÌØÊâ
-		int8_t gyro_direction;				 ///< -1ÍÓÂÝ·´Ïò 1ÍÓÂÝÕýÏò
-		uint8_t fric_cover_mode;			 ///< Ä¦²ÁÂÖÄ£Ê½ 0¹Ø±Õ 1×ÔÊÊÓ¦ 2×î¸ßËÙ 3¿ª²Õ¸Ç
-		uint8_t shoot_mode;					 ///< Éä»÷Ä£Ê½ 1µ¥·¢ 2Á¬·¢£¨×î´óËÙ¶È£©
-		uint8_t shoot_key;					 ///< Éä»÷¿ª¹Ø 0¹Ø±Õ
+		uint8_t control_device;				 ///< æŽ§åˆ¶è®¾å¤‡ 1é”®é¼ æ¨¡å¼(rc) 2é¥æŽ§å™¨æ¨¡å¼(mouse_key)
+		uint8_t rc_motion_mode;				 ///< åº•ç›˜äº‘å°æ¨¡å¼ 1åº•ç›˜è·Ÿéš 2å°é™€èžº 3è‡ªçž„ åº•ç›˜è·Ÿéš 4è‡ªçž„å°é™€èžº 5ç‰¹æ®Š
+		uint8_t mouse_keyboard_chassis_mode; ///< 1è·Ÿéš 2å°é™€èžº 3ç‰¹æ®Š
+		uint8_t mouse_keyboard_gimbal_mode;	 ///< 1æ‰‹åŠ¨ 2è‡ªçž„ 3ç‰¹æ®Š
+		int8_t gyro_direction;				 ///< -1é™€èžºåå‘ 1é™€èžºæ­£å‘
+		uint8_t fric_cover_mode;			 ///< æ‘©æ“¦è½®æ¨¡å¼ 0å…³é—­ 1è‡ªé€‚åº” 2æœ€é«˜é€Ÿ 3å¼€èˆ±ç›–
+		uint8_t shoot_mode;					 ///< å°„å‡»æ¨¡å¼ 1å•å‘ 2è¿žå‘ï¼ˆæœ€å¤§é€Ÿåº¦ï¼‰
+		uint8_t shoot_key;					 ///< å°„å‡»å¼€å…³ 0å…³é—­
 	} mode;
 
 	struct
 	{
-		//Êó±ê×î´óËÙ¶È
+		//é¼ æ ‡æœ€å¤§é€Ÿåº¦
 		int16_t mouse_x_max_value;
 		int16_t mouse_y_max_value;
 
-		//Êó±êÊý¾Ý±¶ÂÊ(ÁéÃô¶È)
+		//é¼ æ ‡æ•°æ®å€çŽ‡(çµæ•åº¦)
 		float mouse_x_sensitivity;
 		float mouse_y_sensitivity;
 
-		//µ×ÅÌ¼ÓËÙ¶È
+		//åº•ç›˜åŠ é€Ÿåº¦
 		int16_t chassis_acceleration;
-		//µ×ÅÌ×î´óËÙ¶È
-		int16_t chassis_max_speed; //ÐéÄâÒ¡¸Ë×î´óÖµ
+		//åº•ç›˜æœ€å¤§é€Ÿåº¦
+		int16_t chassis_max_speed; //è™šæ‹Ÿæ‘‡æ†æœ€å¤§å€¼
 	} parameter;
 
 	struct
 	{
-		int16_t ch0; //Êó±ê
-		int16_t ch1; //Êó±ê
-		int16_t ch2; //×óÓÒ ¼üÅÌWS
-		int16_t ch3; //Ç°ºó ¼üÅÌAD
+		int16_t ch0; //é¼ æ ‡
+		int16_t ch1; //é¼ æ ‡
+		int16_t ch2; //å·¦å³ é”®ç›˜WS
+		int16_t ch3; //å‰åŽ é”®ç›˜AD
 	} virtual_rocker;
 
-	//ctrl°´ÏÂÇÐ»»
-	//ÍÓÂÝ¿ª¹Ø¡¢Õý·´-1 0 1
-	//¹éÈëµ×ÅÌÄ£Ê½
-	//»òÕßµ¥¶ÀÒ»¸öÐ¡ÍÓÂÝ Õý·´
+	//ctrlæŒ‰ä¸‹åˆ‡æ¢
+	//é™€èžºå¼€å…³ã€æ­£å-1 0 1
+	//å½’å…¥åº•ç›˜æ¨¡å¼
+	//æˆ–è€…å•ç‹¬ä¸€ä¸ªå°é™€èžº æ­£å
 
 <<<<<<< HEAD
 } Robot_control_data_t;
 
 void Control_Data_Init(Robot_control_data_t *robot_control_data);
 void Parse_Robot_Control_Data(Rc_Ctrl_t *rc_data, Rc_Ctrl_t *last_rc_data, Robot_control_data_t *robot_control_data);
-///<¿ÉÄÜÐèÒª¿ØÖÆÊý¾Ý·µ»Øº¯Êý
+///<å¯èƒ½éœ€è¦æŽ§åˆ¶æ•°æ®è¿”å›žå‡½æ•°
 
 #endif // __CONTROL_DATA_H_

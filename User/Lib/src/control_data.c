@@ -40,20 +40,20 @@ void Control_Data_Init(Robot_control_data_t* robot_control_data)
 	robot_control_data->virtual_rocker.ch3 = 0;
 }
 /**
- * @brief ½âÎö»úÆ÷ÈË¿ØÖÆÄ£Ê½		
- * @param[in] {rc_data}   					±¾´Î½âÎöµÄÒ£¿ØÆ÷Êı¾İ
- * @param[in] {last_rc_data}   				ÉÏ´Î½âÎöµÄÒ£¿ØÆ÷Êı¾İ
- * @param[in] {uint16_t}					»úÆ÷ÈËÄ£Ê½ÅäÖÃÊı¾İ
- * @retval    {uint8_t}						1 : Êı¾İ½âÎö²¢Ğ£Ñé³É¹¦
- * 											0 : Êı¾İ½âÎöĞ£ÑéÊ§°Ü	            					
+ * @brief è§£ææœºå™¨äººæ§åˆ¶æ¨¡å¼		
+ * @param[in] {rc_data}   					æœ¬æ¬¡è§£æçš„é¥æ§å™¨æ•°æ®
+ * @param[in] {last_rc_data}   				ä¸Šæ¬¡è§£æçš„é¥æ§å™¨æ•°æ®
+ * @param[in] {uint16_t}					æœºå™¨äººæ¨¡å¼é…ç½®æ•°æ®
+ * @retval    {uint8_t}						1 : æ•°æ®è§£æå¹¶æ ¡éªŒæˆåŠŸ
+ * 											0 : æ•°æ®è§£ææ ¡éªŒå¤±è´¥	            					
  */
 void Parse_Robot_Control_Data(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data, Robot_control_data_t* robot_control_data)
 {
-	Robot_Rc_Mode_Change_Control(rc_data, last_rc_data, robot_control_data); ///< »úÆ÷ÈËÄ£Ê½±ä»»ÏìÓ¦
-	Wasd_Key_To_Virtual_Rocker(rc_data, robot_control_data); ///< WASDĞéÄâÎªÒ¡¸Ë
-	Mouse_To_Virtual_Rocker(rc_data, robot_control_data); ///< Êó±êĞéÄâÎªÒ¡¸Ë
-	Switch_Mouse_Key_Change(rc_data, last_rc_data, robot_control_data); ///< ÏìÓ¦¼üÅÌ¿ØÖÆ
-	Shoot_Key_Control(rc_data, last_rc_data, robot_control_data); ///< Éä»÷°´Å¥
+	Robot_Rc_Mode_Change_Control(rc_data, last_rc_data, robot_control_data); ///< æœºå™¨äººæ¨¡å¼å˜æ¢å“åº”
+	Wasd_Key_To_Virtual_Rocker(rc_data, robot_control_data); ///< WASDè™šæ‹Ÿä¸ºæ‘‡æ†
+	Mouse_To_Virtual_Rocker(rc_data, robot_control_data); ///< é¼ æ ‡è™šæ‹Ÿä¸ºæ‘‡æ†
+	Switch_Mouse_Key_Change(rc_data, last_rc_data, robot_control_data); ///< å“åº”é”®ç›˜æ§åˆ¶
+	Shoot_Key_Control(rc_data, last_rc_data, robot_control_data); ///< å°„å‡»æŒ‰é’®
 }
 
 static void Robot_Rc_Mode_Change_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data, Robot_control_data_t* robot_control_data)
@@ -66,7 +66,7 @@ static void Robot_Rc_Mode_Change_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_
 #define S1_CHANGED_TO(a,b) ((OLD_S1_VALUE == (a)) && (S1_VALUE == (b)))
 #define S2_CHANGED_TO(a,b) ((OLD_S2_VALUE == (a)) && (S2_VALUE == (b)))
 
-	/* ²Ù¿ØÉè±¸Ñ¡Ôñ */
+	/* æ“æ§è®¾å¤‡é€‰æ‹© */
 	if(S2_CHANGED_TO(3,2))
 	{
 		ROBOT_MODE.control_device++;
@@ -74,7 +74,7 @@ static void Robot_Rc_Mode_Change_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_
 		Set_Beep_Time(ROBOT_MODE.control_device, 1000, 55);
 	}
 	
-	/* µ×ÅÌÔÆÌ¨Ä£Ê½ */
+	/* åº•ç›˜äº‘å°æ¨¡å¼ */
 	if(S2_CHANGED_TO(3,1))
 	{
 		ROBOT_MODE.rc_motion_mode++;
@@ -87,7 +87,7 @@ static void Robot_Rc_Mode_Change_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_
 		return;
 	}
 
-	/* Ä¦²ÁÂÖËÙ¶ÈÄ£Ê½£¬²Õ¸Ç¿ª¹Ø */
+	/* æ‘©æ“¦è½®é€Ÿåº¦æ¨¡å¼ï¼Œèˆ±ç›–å¼€å…³ */
 	if(S1_CHANGED_TO(3,2))
 	{
 		ROBOT_MODE.fric_cover_mode++;
@@ -95,7 +95,7 @@ static void Robot_Rc_Mode_Change_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_
 		Set_Beep_Time(ROBOT_MODE.fric_cover_mode+1, 800, 60);
 	}
 
-	/* Éä»÷Ä£Ê½Ñ¡ÔñÆ÷ */
+	/* å°„å‡»æ¨¡å¼é€‰æ‹©å™¨ */
 	if(S1_CHANGED_TO(3,1))
 	{
 		ROBOT_MODE.shoot_mode++;
@@ -112,14 +112,14 @@ static void Robot_Rc_Mode_Change_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_
 #undef S2_CHANGED_TO
 }
 /**
- * @brief               					¼üÅÌÊı¾İ½âÎöÎªĞéÄâÒ¡¸Ë
- * @param[in] {Rc_Ctrl_t*}   				Ò£¿ØÆ÷Êı¾İ»º³åÇø
- * @param[in] {Robot_control_data_t*}   	Ò£¿ØÆ÷Êı¾İÖ¸Õë½á¹¹Ìå
- * @retval    {uint8_t}						ÎŞ	            					
+ * @brief               					é”®ç›˜æ•°æ®è§£æä¸ºè™šæ‹Ÿæ‘‡æ†
+ * @param[in] {Rc_Ctrl_t*}   				é¥æ§å™¨æ•°æ®ç¼“å†²åŒº
+ * @param[in] {Robot_control_data_t*}   	é¥æ§å™¨æ•°æ®æŒ‡é’ˆç»“æ„ä½“
+ * @retval    {uint8_t}						æ— 	            					
  */
 static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t* robot_control_data)
 {
-///<±£Ö¤¿ÉÒÆÖ²ĞÔ
+///<ä¿è¯å¯ç§»æ¤æ€§
 #define KEY_W            0x01
 #define KEY_A            0x04
 #define KEY_S            0x02
@@ -131,7 +131,7 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 #define VIRTUAL_ROCKER_MAX  robot_control_data->parameter.chassis_max_speed
 #define VIRTUAL_ROCKER    robot_control_data->virtual_rocker
 
-	/* ch3 min maxÏŞÖÆ */
+	/* ch3 min maxé™åˆ¶ */
 	if(VIRTUAL_ROCKER.ch3 > VIRTUAL_ROCKER_MAX)
 	{
 		Int16_Minus_Limit(&VIRTUAL_ROCKER.ch3, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MAX);
@@ -141,7 +141,7 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 		Int16_Add_Limit(&VIRTUAL_ROCKER.ch3, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MIN);
 	}
 
-	/*Ö»°´ÏÂWÊ±£¬²»°´ÏÂS*/
+	/*åªæŒ‰ä¸‹Wæ—¶ï¼Œä¸æŒ‰ä¸‹S*/
 	if(KEY_PRESSED(KEY_W) && !(KEY_PRESSED(KEY_S)))
 	{
 		if(VIRTUAL_ROCKER.ch3 < 0)
@@ -153,7 +153,7 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 			Int16_Add_Limit(&VIRTUAL_ROCKER.ch3, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MAX);
 		}
 	}
-	/*Ö»°´ÏÂSÊ±£¬²»°´ÏÂW*/
+	/*åªæŒ‰ä¸‹Sæ—¶ï¼Œä¸æŒ‰ä¸‹W*/
 	else if(KEY_PRESSED(KEY_S) && !(KEY_PRESSED(KEY_W)))
 	{
 		if(VIRTUAL_ROCKER.ch3 > 0)
@@ -165,7 +165,7 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 			Int16_Minus_Limit(&VIRTUAL_ROCKER.ch3, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MIN);
 		}
 	}
-	/*W¡¢S¶¼Î´°´ÏÂÊ±*/
+	/*Wã€Séƒ½æœªæŒ‰ä¸‹æ—¶*/
 	else
 	{
 		if(VIRTUAL_ROCKER.ch3 < 0)
@@ -178,7 +178,7 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 		}
 	}
 
-	/* ch2 min maxÏŞÖÆ */
+	/* ch2 min maxé™åˆ¶ */
 	if(VIRTUAL_ROCKER.ch2 > VIRTUAL_ROCKER_MAX)
 	{
 		Int16_Minus_Limit(&VIRTUAL_ROCKER.ch2, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MAX);
@@ -188,7 +188,7 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 		Int16_Add_Limit(&VIRTUAL_ROCKER.ch2, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MIN);
 	}
 
-	/*Ö»°´ÏÂDÊ±*/
+	/*åªæŒ‰ä¸‹Dæ—¶*/
 	if(KEY_PRESSED(KEY_D) && !(KEY_PRESSED(KEY_A)))
 	{
 		if(VIRTUAL_ROCKER.ch2 < 0)
@@ -200,7 +200,7 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 			Int16_Add_Limit(&VIRTUAL_ROCKER.ch2, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MAX);
 		}
 	}
-	/*Ö»°´ÏÂAÊ±*/
+	/*åªæŒ‰ä¸‹Aæ—¶*/
 	else if(KEY_PRESSED(KEY_A) && !(KEY_PRESSED(KEY_D)))
 	{
 		if(VIRTUAL_ROCKER.ch2 > 0)
@@ -212,7 +212,7 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 			Int16_Minus_Limit(&VIRTUAL_ROCKER.ch2, VIRTUAL_ROCKER_STEP, VIRTUAL_ROCKER_MIN);
 		}
 	}
-	/*A¡¢D¶¼Î´°´ÏÂÊ±*/
+	/*Aã€Déƒ½æœªæŒ‰ä¸‹æ—¶*/
 	else
 	{
 		if(VIRTUAL_ROCKER.ch2 < 0)
@@ -239,16 +239,16 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 
 static void Mouse_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t* robot_control_data)
 {
-	//Êó±êÉÏÏÂÏŞÏŞÖÆ
+	//é¼ æ ‡ä¸Šä¸‹é™é™åˆ¶
 	robot_control_data->virtual_rocker.ch0 = Int16_Limit(rc_data->mouse.x, -robot_control_data->parameter.mouse_x_max_value, robot_control_data->parameter.mouse_x_max_value);
 	robot_control_data->virtual_rocker.ch1 = Int16_Limit(rc_data->mouse.y, -robot_control_data->parameter.mouse_y_max_value, robot_control_data->parameter.mouse_y_max_value);
 
-	//Êó±êÊıÖµ*ÁéÃô¶È
+	//é¼ æ ‡æ•°å€¼*çµæ•åº¦
 	robot_control_data->virtual_rocker.ch0 *= robot_control_data->parameter.mouse_x_sensitivity;
 	robot_control_data->virtual_rocker.ch1 *= robot_control_data->parameter.mouse_y_sensitivity;
 }
 
-/* ÏìÓ¦¼üÅÌÇĞ»»Ä£Ê½ */
+/* å“åº”é”®ç›˜åˆ‡æ¢æ¨¡å¼ */
 static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data, Robot_control_data_t* robot_control_data)
 {
 #define KEY_CTRL         0x20
@@ -269,13 +269,13 @@ static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data,
 #define KEY_CLICKED(key) ((KEY_VALUE & key) && (!(OLD_KEY_VALUE & key)))
 
 
-	//ÅĞ¶ÏÊÇ²»ÊÇ¼üÊóÄ£Ê½
+	//åˆ¤æ–­æ˜¯ä¸æ˜¯é”®é¼ æ¨¡å¼
 	if(robot_control_data->mode.control_device != 1)
 	{
 		return;
 	}
 
-	//°´×¡shiftµ×ÅÌ¼ÓËÙ
+	//æŒ‰ä½shiftåº•ç›˜åŠ é€Ÿ
 	if( KEY_PRESSED(KEY_SHIFT) )
 	{
 		robot_control_data->parameter.chassis_acceleration = 50;
@@ -287,7 +287,7 @@ static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data,
 		robot_control_data->parameter.chassis_max_speed = 360;
 	}
 
-	//µ×ÅÌÄ£Ê½(°´ÏÂctrl¸ü¸Äµ×ÅÌÄ£Ê½1¸úËæÄ£Ê½2Ğ¡ÍÓÂİÄ£Ê½)
+	//åº•ç›˜æ¨¡å¼(æŒ‰ä¸‹ctrlæ›´æ”¹åº•ç›˜æ¨¡å¼1è·Ÿéšæ¨¡å¼2å°é™€èºæ¨¡å¼)
 	if(KEY_CLICKED(KEY_CTRL))
 	{
 		if(robot_control_data->mode.mouse_keyboard_chassis_mode == mk_chassis_follow_mode_ENUM)
@@ -302,7 +302,7 @@ static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data,
 		}
 	}
 
-	//ÔÆÌ¨Ä£Ê½ G (ÊÖ¶¯¿ØÖÆ ×ÔÃéÄ£Ê½)
+	//äº‘å°æ¨¡å¼ G (æ‰‹åŠ¨æ§åˆ¶ è‡ªç„æ¨¡å¼)
 	if(KEY_CLICKED(KEY_G))
 	{
 		if(robot_control_data->mode.mouse_keyboard_gimbal_mode == mk_manual_aim_mode_ENUM)
@@ -317,7 +317,7 @@ static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data,
 		}
 	}
 
-	//ÌØÊâÄ£Ê½
+	//ç‰¹æ®Šæ¨¡å¼
 	if( KEY_CLICKED(KEY_V) )
 	{
 		robot_control_data->mode.mouse_keyboard_chassis_mode = mk_chassis_special_mode_ENUM;
@@ -325,7 +325,7 @@ static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data,
 		Set_Beep_Time(5, 1200, 50);
 	}
 
-	//·ÇÌØÊâÄ£Ê½¼ì²é
+	//éç‰¹æ®Šæ¨¡å¼æ£€æŸ¥
 	if(robot_control_data->mode.mouse_keyboard_chassis_mode == 3 && robot_control_data->mode.mouse_keyboard_gimbal_mode != 3)
 	{
 		robot_control_data->mode.mouse_keyboard_chassis_mode = 1;
@@ -335,7 +335,7 @@ static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data,
 		robot_control_data->mode.mouse_keyboard_gimbal_mode = 1;
 	}
 
-	//µ¯²ÕÄ£Ê½ R £¨¿ª¹Øµ¯²Õ¸Ç£©
+	//å¼¹èˆ±æ¨¡å¼ R ï¼ˆå¼€å…³å¼¹èˆ±ç›–ï¼‰
 	if(KEY_CLICKED(KEY_R))
 	{
 		if(robot_control_data->mode.fric_cover_mode == cover_on_ENUM)
@@ -350,7 +350,7 @@ static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data,
 		}
 	}
 
-	//Ä¦²ÁÂÖÄ£Ê½ E
+	//æ‘©æ“¦è½®æ¨¡å¼ E
 	if(KEY_CLICKED(KEY_E))
 	{
 		if(robot_control_data->mode.fric_cover_mode == fric_adaptive_speed_mode_ENUM)
@@ -383,13 +383,13 @@ static void Switch_Mouse_Key_Change(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data,
 #undef KEY_CLICKED
 }
 
-/* ÏìÓ¦Éä»÷Ä£Ê½ */
+/* å“åº”å°„å‡»æ¨¡å¼ */
 static void Shoot_Key_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data, Robot_control_data_t* robot_control_data)
 {
-	//Ò£¿ØÆ÷Ä£Ê½
+	//é¥æ§å™¨æ¨¡å¼
 	if(robot_control_data->mode.control_device == remote_controller_device_ENUM)
 	{
-		/* Éä»÷°´Å¥ */
+		/* å°„å‡»æŒ‰é’® */
 		if (robot_control_data->mode.shoot_mode == on_shoot_mode_ENUM)
 		{
 			if (last_rc_data->rc.ch4 <= 120 && rc_data->rc.ch4 > 120)
@@ -410,7 +410,7 @@ static void Shoot_Key_Control(Rc_Ctrl_t* rc_data, Rc_Ctrl_t* last_rc_data, Robot
 		}
 	}
 	
-	//¼üÅÌÄ£Ê½
+	//é”®ç›˜æ¨¡å¼
 	else if (robot_control_data->mode.control_device == 1)
 	{
 		if (rc_data->mouse.press_l && (!last_rc_data->mouse.press_l))

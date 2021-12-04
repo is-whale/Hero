@@ -1,7 +1,7 @@
 /**
  * @file wave_wheel_task.c
- * @brief ²¨ÂÖµç»úÈÎÎñ£¬ÈÎÎñ¿ªÊ¼½øÈë×èÈû×´Ì¬£¬µÈ´ı shoot_task µÄ»½ĞÑ
- * TODO: ´ı¼ÓÈëÁ¬·¢¡£¸Ä½ø PID ¼ÆËãµÄ½áÊøÌõ¼ş£¬ÔÚ²âÊÔÖĞ³öÏÖÁË·¢ÉäÒ»´Î×ª¶à´ÎµÄÇé¿ö
+ * @brief æ³¢è½®ç”µæœºä»»åŠ¡ï¼Œä»»åŠ¡å¼€å§‹è¿›å…¥é˜»å¡çŠ¶æ€ï¼Œç­‰å¾… shoot_task çš„å”¤é†’
+ * TODO: å¾…åŠ å…¥è¿å‘ã€‚æ”¹è¿› PID è®¡ç®—çš„ç»“æŸæ¡ä»¶ï¼Œåœ¨æµ‹è¯•ä¸­å‡ºç°äº†å‘å°„ä¸€æ¬¡è½¬å¤šæ¬¡çš„æƒ…å†µ
  * 
  * @version 0.1
  * @date 2021-10-17
@@ -40,7 +40,7 @@ void StartWaveWheelTask(void const *argument)
 
 	for (;;)
 	{
-		fire_event = osSignalWait((*fire_one_bullet_signal) | (*fire_five_bullet_signal), osWaitForever);
+		fire_event = osSignalWait((*fire_one_bullet_signal) | (*fire_five_bullet_signal), osWaitForever);///<ç­‰å¾…å°„å‡»ä»»åŠ¡å”¤é†’ã€‚å³æ‘©æ“¦è½®è½¬åŠ¨åæ³¢è½®æ‰ä¼šè½¬åŠ¨
 		if (fire_event.status == osEventSignal)
 		{
 			if ((fire_event.value.signals == *fire_one_bullet_signal) && *is_ok_fire == 1)
@@ -62,14 +62,14 @@ static void Emission_Once_Time(void)
 	uint32_t end_time = 0;
 	wave_motor_speed = Calc_Wave_Motor_Angle8191_Pid(wave_once_machine_angle, *angle_integral);
 
-	///< ³õ²½²âÊÔ£¬·¢ÉäÒ»¿Åµ¯ÍèµÄ pid ¼ÆËãÊ±¼ä×î¶àÊÇ 320 ms,Ê±¼äÔÚ 290-320 Ö®¼äÅÇ»²
+	///< åˆæ­¥æµ‹è¯•ï¼Œå‘å°„ä¸€é¢—å¼¹ä¸¸çš„ pid è®¡ç®—æ—¶é—´æœ€å¤šæ˜¯ 320 ms,æ—¶é—´åœ¨ 290-320 ä¹‹é—´å¾˜å¾Š
 	while ((fabs(wave_motor_speed) > 10) && (*angle_integral > -31300))
 	{
 		start_time = osKernelSysTick();
 		wave_motor_speed = Calc_Wave_Motor_Angle8191_Pid(wave_once_machine_angle, *angle_integral);
 		Set_Wave_Motor_Speed(wave_motor_speed, wave_motor_feedback_data);
 		osDelay(5);
-		///< ¶Â×ªµ¼ÖÂµÄËÙ¶È½ÏµÍÎÊÌâ´ı½â¾ö
+		///< å µè½¬å¯¼è‡´çš„é€Ÿåº¦è¾ƒä½é—®é¢˜å¾…è§£å†³
 		if (abs((int)(wave_motor_feedback_data->speed_rpm)) < 5)
 		{
 			*angle_integral = 0;
@@ -78,7 +78,7 @@ static void Emission_Once_Time(void)
 		}
 		end_time = osKernelSysTick();
 		cal_pid_time += (end_time - start_time);
-		///< ÊÇ·ñÊ¹ÓÃ pid ¼ÆËãÊ±¼ä×÷Îª½áÊøÌõ¼ş´ı¾ö¶¨
+		///< æ˜¯å¦ä½¿ç”¨ pid è®¡ç®—æ—¶é—´ä½œä¸ºç»“æŸæ¡ä»¶å¾…å†³å®š
 		// if (cal_pid_time > 340)
 		// {
 		// 	*angle_integral = 0;
