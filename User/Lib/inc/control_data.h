@@ -98,6 +98,7 @@ typedef struct
 	//归入底盘模式
 	//或者单独一个小陀螺 正反
 
+<<<<<<< HEAD
 } Robot_control_data_t;
 
 void Control_Data_Init(Robot_control_data_t *robot_control_data);

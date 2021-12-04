@@ -31,8 +31,11 @@ void StartChassisTask(void const *argument)
     robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();                          //机器人模式结构体指针
     chassis_motor_feedback_parsed_data = Get_Can1_Feedback_Data();                //CAN1 总线上电机的反馈数据
     gimbal_motor_feedback_parsed_data = Get_Gimbal_Parsed_FeedBack_Data();        //CAN2总线上电机的反馈数据
-    yaw_motor_index = Get_Yaw_Motor_Index();                                      //获取 yaw 轴电机在数组中的下标
+
+    yaw_motor_index = Get_Yaw_Motor_Index();                                      // 获取 yaw 轴电机在数组中的下标
     pitch_motor_index = Get_Pitch_Motor_Index();                                  //获取pitch轴电机在数据中的下标
+    Get_Parsed_RobotMode_Pointer();
+>>>>>>> badeb59d7d0561cb4de19e9baceec030f6fdf5e2
 
     (void)pitch_motor_index;
 
@@ -45,6 +48,7 @@ for (;;)
 
         switch(robot_mode_data_pt->mode.mouse_keyboard_chassis_mode)
 			{
+<<<<<<< HEAD
 					case mk_chassis_follow_mode_ENUM:///<底盘跟随
                 {
                         follow_pid_output = Calc_Chassis_Follow();
