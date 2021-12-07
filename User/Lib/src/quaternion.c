@@ -19,7 +19,7 @@ volatile float exInt, eyInt, ezInt;        ///< error integral
                                             */
 
 /**
- * @brief               ³õÊ¼»¯ËÄÔªÊý
+ * @brief               åˆå§‹åŒ–å››å…ƒæ•°
  * @param[in]           void
  * @retval              void
  */
@@ -173,7 +173,7 @@ void Init_Quaternion(void)
 }
 
 /**
- * @brief           ¸ù¾ÝÍÓÂÝÒÇ²âµÄÊý¾Ý¸üÐÂËÄÔªÊý
+ * @brief           æ ¹æ®é™€èžºä»ªæµ‹çš„æ•°æ®æ›´æ–°å››å…ƒæ•°
  * @param[in]       void
  * @retval          void
  */
@@ -275,7 +275,7 @@ void Imu_AHRS_Update(void)
 }
 
 /**
-  * @brief          update imu attitude
+  * @brief          æ›´æ–°é™€èžºä»ªæ•°æ®
   * @param          void
   * @retval         void
   */

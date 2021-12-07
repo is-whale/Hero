@@ -1,7 +1,7 @@
 /**
  * @file wave_wheel_task.c
  * @brief 波轮电机任务，任务开始进入阻塞状态，等待 shoot_task 的唤醒
- * TODO: 待加入连发。改进 PID 计算的结束条件，在测试中出现了发射一次转多次的情况
+ * TODO: 待加入连发。改进 PID 计算的结束条件，在测试中出现了发射一次转多次的情况（英雄暂定不加入连发模式，全部单发）
  * 
  * @version 0.1
  * @date 2021-10-17
@@ -24,10 +24,10 @@ static void Emission_Once_Time(void);
 
 void StartWaveWheelTask(void const *argument)
 {
-	osEvent fire_event;
+	osEvent fire_event;///<等待摩擦轮就绪
 	rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();
 	wave_motor_feedback_data = Get_Wave_Motor_Paresed_Data();
-	is_ok_fire = Get_Is_OK_Fire();
+	is_ok_fire = Get_Is_OK_Fire();///<摩擦轮设置速度就绪标志位
 	fire_one_bullet_signal = Get_Fire_One_Bullet_Signal();
 	fire_five_bullet_signal = Get_Fire_Five_Bullet_Signal();
 

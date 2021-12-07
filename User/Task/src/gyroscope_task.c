@@ -9,7 +9,8 @@
  * 
  */
 #include "gyroscope_task.h"
-
+static Imu_t * imu_date_pt;///?????IMU??
+extern imu;
 void StartGyroscopeTask(void const * argument)
 {
     osDelay(100);
@@ -22,6 +23,11 @@ void StartGyroscopeTask(void const * argument)
         Mpu6050_Get_Data();
         Imu_AHRS_Update();
         Imu_Attitude_Update();
+        Imu_t *Get_IMU_Date(void)
+        {
+            return &imu;
+        }
+
         osDelay(100);
     }
 }

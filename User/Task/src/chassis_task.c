@@ -8,7 +8,7 @@
 #include "chassis_task.h"
 
 #define CHASSIS_SPEED_ZERO  0 ///<底盘速度关闭 1为开启
-#define OUTPUT_LIMIT(data, limit)  Float_Constrain(data, -limit, limit)
+//#define OUTPUT_LIMIT(data, limit) Float_Constrain(data, -limit, limit)
 #define CHASSIS_MOTOR_DEFAULT_BASE_RATE 5.5f
 #define CHASSIS_MOTOR_GYRO_BASE_RATE 5.0f
 
@@ -35,8 +35,6 @@ void StartChassisTask(void const *argument)
     yaw_motor_index = Get_Yaw_Motor_Index();                                      // 获取 yaw 轴电机在数组中的下标
     pitch_motor_index = Get_Pitch_Motor_Index();                                  //获取pitch轴电机在数据中的下标
     Get_Parsed_RobotMode_Pointer();
->>>>>>> badeb59d7d0561cb4de19e9baceec030f6fdf5e2
-
     (void)pitch_motor_index;
 
     osDelay(1000); ///< 等待遥控器任务初始化完成
@@ -48,7 +46,6 @@ for (;;)
 
         switch(robot_mode_data_pt->mode.mouse_keyboard_chassis_mode)
 			{
-<<<<<<< HEAD
 					case mk_chassis_follow_mode_ENUM:///<底盘跟随
                 {
                         follow_pid_output = Calc_Chassis_Follow();
