@@ -15,7 +15,7 @@ static CAN_RxHeaderTypeDef *can2_rx_header_pt;   ///< can2 ½ÓÊÕµÄÍ·Êý¾Ý½á¹¹ÌåÖ¸Õ
 static uint8_t *can2_rxd_data_buffer;            ///< can2 ½ÓÊÕµÄÊý¾Ý´æ·ÅµÄÊý×éÊ×µØÖ·
 static Rc_Ctrl_t *rc_data_pt;                    ///< Ö¸ÏòÒ£¿ØÆ÷Êý¾ÝµÄ½á¹¹ÌåÖ¸Õë
 static Robot_control_data_t *robot_mode_data_pt; ///< Ö¸Ïò»úÆ÷ÈËÄ£Ê½µÄ½á¹¹ÌåÖ¸Õë
-static Mpu_Data_t *mpu_date_pt;                  ///<Ö¸Ïò°åÔØÍÓÂÝÒÇ·´À¡Êý¾ÝµÄ½á¹¹Ìå(ing)
+//static Mpu_Data_t *mpu_date_pt;                  ///<Ö¸Ïò°åÔØÍÓÂÝÒÇ·´À¡Êý¾ÝµÄ½á¹¹Ìå(ing)
 
 static Motor_Measure_t gimbal_motor_parsed_feedback_data[gimbal_motor_num]; ///< ½âÎöºóµÄÔÆÌ¨µç»úÊý¾ÝÊý×é
 

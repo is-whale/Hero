@@ -97,10 +97,7 @@ typedef struct
 	//陀螺开关、正反-1 0 1
 	//归入底盘模式
 	//或者单独一个小陀螺 正反
-
-<<<<<<< HEAD
 } Robot_control_data_t;
-
 void Control_Data_Init(Robot_control_data_t *robot_control_data);
 void Parse_Robot_Control_Data(Rc_Ctrl_t *rc_data, Rc_Ctrl_t *last_rc_data, Robot_control_data_t *robot_control_data);
 ///<可能需要控制数据返回函数

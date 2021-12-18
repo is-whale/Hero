@@ -141,7 +141,7 @@ void Parse_Friction_Wave_Motor_Feedback_Data(CAN_RxHeaderTypeDef *can_rx_header,
 
 int8_t Updata_Wave_Ch_Value(int16_t *last_wave_ch_value, int16_t *this_wave_ch_value)
 {
-    *last_wave_ch_value = *this_wave_ch_value;
+    *last_wave_ch_value = *this_wave_ch_value; 
     *this_wave_ch_value = rc_data_pt->rc.ch4;
 
     if ((*this_wave_ch_value == 660) && (*last_wave_ch_value != 660))
