@@ -5,6 +5,7 @@
 #include "can2.h"
 #include "can2_device.h"
 #include "remote_task.h"
+#include "console_print.h"
 
 #define YAW_GM6020_HEAD_ANGLE 5450
 

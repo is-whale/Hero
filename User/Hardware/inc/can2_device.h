@@ -16,11 +16,11 @@ typedef enum
 	CAN_SHOOTER_ALL_ID = 0x200,
 	CAN_3508_FRIC_ID_LEFT = 0x201,
 	CAN_3508_FRIC_ID_RIGHT = 0x202,
-	CAN_3508_WAVE_ID = 0x206,
+	CAN_3508_WAVE_ID = 0x206,///<波轮ID从6更换为3
 	
 	CAN_GIMBAL_ALL_ID = 0x2FF,
-	CAN_YAW_MOTOR_ID = 0x209,	///< x
-	CAN_PITCH_MOTOR_ID = 0x20B, ///< y
+	CAN_YAW_MOTOR_ID = 0x209,	///< x  5
+	CAN_PITCH_MOTOR_ID = 0x20A, ///< y  从步兵抄过来，原来是（7）
 } Can2_RxMsg_ID;
 
 void Can2_Rx_FIFO0_IT_Callback(void);

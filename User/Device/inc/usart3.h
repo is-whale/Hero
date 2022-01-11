@@ -10,7 +10,7 @@
 #include "string.h"
 
 #define INFORMATION 1
-#define DEBUG 1
+#define DEBUG 0
 
 #if INFORMATION
 	#define info_print(format, ...) __printf(format, ##__VA_ARGS__)

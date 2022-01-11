@@ -64,8 +64,6 @@ void StartShootTask(void const *argument)
         {
             fric_speed = 0;
             is_ok_fire = 0;
-            //debug_print("ch4: %d\r\n", rc_data_pt->rc.ch4);
-            // wave_motor_speed = Calc_Wave_Motor_Angle8191_Pid(wave_once_machine_angle, *erroe_integral);
 
             break;
         }
@@ -73,30 +71,25 @@ void StartShootTask(void const *argument)
         case fric_adaptive_speed_mode_ENUM: ///< 1
 
         {
-            fric_speed = 3000;
+            fric_speed = 6500;
             is_ok_fire = 1;
-            fric_speed = rc_data_pt->rc.ch1;
-            fric_speed *= 5;
             break;
         }
 
         case fric_high_speed_mode_ENUM: ///< 2
 
         {
-            fric_speed = 4000;
+            fric_speed = 16000;
             is_ok_fire = 1;
-            /*  fric_speed = rc_data_pt->rc.ch1;
-            fric_speed *= 5; */
             break;
         }
 
         case cover_on_ENUM: ///< 3
 
         {
-            fric_speed = 5000;
+            fric_speed = 7000;
             is_ok_fire = 1;
-            /* fric_speed = rc_data_pt->rc.ch1;
-            fric_speed *= 5; */
+
             break;
         }
 

@@ -27,6 +27,8 @@ void StartGimbalTask(void const *argument)
     can2_rxd_data_buffer = Get_CAN2_Rxd_Buffer();
     rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();
     robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();
+    //添加获取陀螺仪角度
+   // mpu_date_pt = Get_IMU_Date();
 
     (void)pitch_down_angle_limit;   ///< 测试阶段，避免 warning
     (void)pitch_up_angle_limit;
@@ -44,23 +46,28 @@ void StartGimbalTask(void const *argument)
     for (;;)
     {
         Parse_Can2_Gimbal_Rxd_Data(can2_rx_header_pt, can2_rxd_data_buffer, gimbal_motor_parsed_feedback_data);
-        if (robot_mode_data_pt->mode.control_device == 0)///<选择机器人模式
+        if (robot_mode_data_pt->mode.control_device == remote_controller_device_ENUM)///<选择机器人模式
         {
             switch (1)
             {
             case 1:
 
             {
-                pitch_angle_set = (rc_data_pt->rc.ch0) * 10.0;
-                yaw_angle_set = (rc_data_pt->rc.ch1) / 12.0f;
+                pitch_angle_set = (rc_data_pt->rc.ch1) * 10.0;
+                yaw_angle_set = (rc_data_pt->rc.ch0) / 12.0f;
+
+                //yaw轴角度回环
+                if(yaw_angle_set>360) yaw_angle_set -= 360;
+					if(yaw_angle_set<0) yaw_angle_set += 360;
 
                 (void)yaw_angle_set; ///< avoid warning
-
+          //      yaw_speed = Calc_Yaw_Angle360_Pid(yaw_angle_set, wt61c_data->angle.yaw_z);
                 // Float_Constraion(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit); ///< pitch 角度限幅
                 // Pitch_Angle_Limit(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit);
                 pitch_speed = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
                 // pitch_speed = (rc_data_pt->rc.ch0);
-                // debug_print("   speed %.2f \r\n",pitch_speed);
+                // debug_print("%.2f \r\n",pitch_speed);
+                Console.print("%0.2f ,%0.2f \r\n",pitch_speed,rc_data_pt->rc.ch0);
                 break;
             }
 
@@ -70,7 +77,7 @@ void StartGimbalTask(void const *argument)
             }
             }
         }
-
+       // Console.print("%d,%d",pitch_speed,)
         Set_Gimbal_Motors_Speed(pitch_speed,
                                 pitch_speed,
                                 &gimbal_motor_parsed_feedback_data[yaw_motor_index],

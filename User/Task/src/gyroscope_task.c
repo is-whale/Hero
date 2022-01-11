@@ -1,16 +1,17 @@
 /**
  * @file gyroscope_task.c
- * @brief °åÔØÍÓÂİÒÇ½âÎöÈÎÎñ
+ * @brief æ¿è½½é™€èºä»ªè§£æä»»åŠ¡
  * TODO: Kalman Filter
  * @version 0.1
- * @date 2021-10-17
- * 
+ * @date 2021-10-17 
  * @copyright Copyright (c) 2021
- * 
  */
+/*inlcude*/
 #include "gyroscope_task.h"
-//static Imu_t * imu_date_pt;///?????IMU??
-//extern imu;
+#include "quaternion.h"
+
+//static Imu_Angle imu_Angle_now;
+
 void StartGyroscopeTask(void const * argument)
 {
     osDelay(100);
@@ -22,12 +23,9 @@ void StartGyroscopeTask(void const * argument)
     {
         Mpu6050_Get_Data();
         Imu_AHRS_Update();
-        Imu_Attitude_Update();
-//        Imu_t *Get_IMU_Date(void)
-//        {
-//            return &imu;
-//        }
-
+        Imu_Attitude_Update();///<æ£€æŸ¥æ˜¯å¦éœ€è¦æ•°æ®æ£€æŸ¥å‡½æ•°
+//        Get_Imu_Angle(imu_Angle_now);
+        
         osDelay(100);
     }
 }

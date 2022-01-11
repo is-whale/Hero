@@ -3,7 +3,6 @@
 #define MPU_DELAY(ms) osDelay(ms);
 
 uint8_t mpu_buff[14];
-
 Mpu_Data_t mpu_data;
 Imu_t imu = {0};
 

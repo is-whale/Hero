@@ -2,8 +2,6 @@
 #define __GYROSCOPE_TASK_H_
 
 #include "quaternion.h"
-Imu_t *Get_IMU_Date(void);
-
+#include "imu_mpu6050.h"
 
 #endif //__GYROSCOPE_TASK_H_
-
