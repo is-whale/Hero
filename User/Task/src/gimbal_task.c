@@ -52,7 +52,7 @@ void StartGimbalTask(void const *argument)
             case 1:
 
             {
-                pitch_angle_set = (rc_data_pt->rc.ch1) * 10.0;
+                pitch_angle_set = (rc_data_pt->rc.ch1) * 10.0;//步兵是106f
                 yaw_angle_set = (rc_data_pt->rc.ch0) / 12.0f;
 
                 //yaw轴设定值角度回环
