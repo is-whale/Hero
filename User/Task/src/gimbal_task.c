@@ -15,7 +15,6 @@ static CAN_RxHeaderTypeDef *can2_rx_header_pt;   ///< can2 ½ÓÊÕµÄÍ·Êý¾Ý½á¹¹ÌåÖ¸Õ
 static uint8_t *can2_rxd_data_buffer;            ///< can2 ½ÓÊÕµÄÊý¾Ý´æ·ÅµÄÊý×éÊ×µØÖ·
 static Rc_Ctrl_t *rc_data_pt;                    ///< Ö¸ÏòÒ£¿ØÆ÷Êý¾ÝµÄ½á¹¹ÌåÖ¸Õë
 static Robot_control_data_t *robot_mode_data_pt; ///< Ö¸Ïò»úÆ÷ÈËÄ£Ê½µÄ½á¹¹ÌåÖ¸Õë
-//static Mpu_Data_t *mpu_date_pt;                  ///<Ö¸Ïò°åÔØÍÓÂÝÒÇ·´À¡Êý¾ÝµÄ½á¹¹Ìå(ing)
 
 static Motor_Measure_t gimbal_motor_parsed_feedback_data[gimbal_motor_num]; ///< ½âÎöºóµÄÔÆÌ¨µç»úÊý¾ÝÊý×é
 
@@ -27,8 +26,8 @@ void StartGimbalTask(void const *argument)
     can2_rxd_data_buffer = Get_CAN2_Rxd_Buffer();
     rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();
     robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();
+
     //Ìí¼Ó»ñÈ¡ÍÓÂÝÒÇ½Ç¶È
-   // mpu_date_pt = Get_IMU_Date();
 
     (void)pitch_down_angle_limit;   ///< ²âÊÔ½×¶Î£¬±ÜÃâ warning
     (void)pitch_up_angle_limit;
@@ -56,20 +55,25 @@ void StartGimbalTask(void const *argument)
                 pitch_angle_set = (rc_data_pt->rc.ch1) * 10.0;
                 yaw_angle_set = (rc_data_pt->rc.ch0) / 12.0f;
 
-                //yawÖá½Ç¶È»Ø»·
-                if(yaw_angle_set>360) yaw_angle_set -= 360;
-					if(yaw_angle_set<0) yaw_angle_set += 360;
+                //yawÖáÉè¶¨Öµ½Ç¶È»Ø»·
+                if(yaw_angle_set > 360) yaw_angle_set -= 360;
+					if(yaw_angle_set < 0) yaw_angle_set += 360;
 
                 (void)yaw_angle_set; ///< avoid warning
-          //      yaw_speed = Calc_Yaw_Angle360_Pid(yaw_angle_set, wt61c_data->angle.yaw_z);
+                
+      //          yaw_speed = Calc_Yaw_Angle360_Pid(yaw_angle_set, 0);
                 // Float_Constraion(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit); ///< pitch ½Ç¶ÈÏÞ·ù
-                // Pitch_Angle_Limit(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit);
+                //Pitch_Angle_Limit(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit);//ÐèÒªÖØÐÂ²âÁ¿
+
                 pitch_speed = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
-                // pitch_speed = (rc_data_pt->rc.ch0);
-                // debug_print("%.2f \r\n",pitch_speed);
-                Console.print("%0.2f ,%0.2f \r\n",pitch_speed,rc_data_pt->rc.ch0);
+
+             // pitch_speed = (rc_data_pt->rc.ch0);
+             // debug_print("%.2f \r\n",pitch_speed);
+             // Console.print("%0.2f ,%0.2f \r\n",pitch_speed,);
+           //  Console.print("%0.2f\r\n",1);
                 break;
             }
+            //gimbal_motor_parsed_feedback_data[pitch_motor_index].speed_rpm
 
             default:
             {
@@ -78,7 +82,7 @@ void StartGimbalTask(void const *argument)
             }
         }
        // Console.print("%d,%d",pitch_speed,)
-        Set_Gimbal_Motors_Speed(pitch_speed,
+        Set_Gimbal_Motors_Speed(0,
                                 pitch_speed,
                                 &gimbal_motor_parsed_feedback_data[yaw_motor_index],
                                 &gimbal_motor_parsed_feedback_data[pitch_motor_index]);

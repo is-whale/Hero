@@ -1,7 +1,6 @@
 #include "quaternion.h"
 
 extern Imu_t imu;
-
 volatile float q0 = 1.0f;
 volatile float q1 = 0.0f;
 volatile float q2 = 0.0f;
@@ -17,6 +16,7 @@ volatile float exInt, eyInt, ezInt;        ///< error integral
                                             * integral gain governs rate of   \
                                             * convergence of gyroscope biases \
                                             */
+																						extern Imu_t imu;
 
 /**
  * @brief               初始化四元数
@@ -25,7 +25,7 @@ volatile float exInt, eyInt, ezInt;        ///< error integral
  */
 void Init_Quaternion(void)
 {
-    int16_t hx, hy; ///< hz;
+    float hx, hy; ///< hz;
 
     hx = imu.mx;
     hy = imu.my;

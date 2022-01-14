@@ -95,3 +95,7 @@ uint8_t Mpu_Device_Init(void)
 	Mpu_Offset_Call();
 	return 0;
 }
+Imu_t* Get_imu_date_now(void)
+{
+ return & imu;
+}

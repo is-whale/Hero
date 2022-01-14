@@ -1,10 +1,10 @@
 #include "math2.h"
 
 /**
- * @brief int16ÀàĞÍ±äÁ¿´óĞ¡ÏŞÖÆ
- * @param {int16_t*} ´ıÏŞÖÆµÄ±äÁ¿Ö¸Õë£¬»áÖ±½Ó¸ü¸ÄµØÖ·Ëù´æ·ÅµÄÊı¾İ
- * @param {int16_t} min_value ×îĞ¡Öµ
- * @param {int16_t} max_value ×î´óÖµ
+ * @brief int16ç±»å‹å˜é‡å¤§å°é™åˆ¶
+ * @param {int16_t*} å¾…é™åˆ¶çš„å˜é‡æŒ‡é’ˆï¼Œä¼šç›´æ¥æ›´æ”¹åœ°å€æ‰€å­˜æ”¾çš„æ•°æ®
+ * @param {int16_t} min_value æœ€å°å€¼
+ * @param {int16_t} max_value æœ€å¤§å€¼
  * @return {*}
  */
 void Int16_Constrain(int16_t *data, int16_t min_value, int16_t max_value)
@@ -16,11 +16,11 @@ void Int16_Constrain(int16_t *data, int16_t min_value, int16_t max_value)
 }
 
 /**
- * @brief int16ÀàĞÍ±äÁ¿´óĞ¡ÏŞÖÆ
- * @param {int16_t} data ´ıÏŞÖÆµÄ±äÁ¿
- * @param {int16_t} min_value ×îĞ¡Öµ
- * @param {int16_t} max_value ×î´óÖµ
- * @return {int16_t} ÏŞÖÆºóµÄÊı¾İ
+ * @brief int16ç±»å‹å˜é‡å¤§å°é™åˆ¶
+ * @param {int16_t} data å¾…é™åˆ¶çš„å˜é‡
+ * @param {int16_t} min_value æœ€å°å€¼
+ * @param {int16_t} max_value æœ€å¤§å€¼
+ * @return {int16_t} é™åˆ¶åçš„æ•°æ®
  */
 int16_t Int16_Limit(int16_t data, int16_t min_value, int16_t max_value)
 {
@@ -61,10 +61,13 @@ void Float_Constraion(float *data, float min_value, float max_value)
 	}
 }
 
-/* ½Ç¶ÈPidÊ±£¬ÔÚ»ñÈ¡tarºÍcurÖ®ºó½ô½Ó×Åµ÷ÓÃ  0~8191 */
+/* è§’åº¦Pidæ—¶ï¼Œåœ¨è·å–tarå’Œcurä¹‹åç´§æ¥ç€è°ƒç”¨ 
+
+åŸå§‹æ•°æ®è¿‡é›¶å¤„ç†	0~8191
+ */
 void Handle_Angle8191_PID_Over_Zero(float *tar, float *cur)
 {
-	if(*tar - *cur > 4096)   //4096 £º°ëÈ¦»úĞµ½Ç¶È, Èç¹ûÉè¶¨ÖµºÍÄ¿±êÖµÖ®¼äµÄ½Ç¶È²îÒÑ¾­³¬¹ıÁË°ëÈ¦
+	if(*tar - *cur > 4096)   //4096 ï¼šåŠåœˆæœºæ¢°è§’åº¦, å¦‚æœè®¾å®šå€¼å’Œç›®æ ‡å€¼ä¹‹é—´çš„è§’åº¦å·®å·²ç»è¶…è¿‡äº†åŠåœˆ
 	{
 		*cur += 8192;
 	}
@@ -73,6 +76,21 @@ void Handle_Angle8191_PID_Over_Zero(float *tar, float *cur)
 		*cur = *cur - 8192;
 	}
 }
+/*
+è§’åº¦Pidæ—¶ï¼Œåœ¨è·å–tarå’Œcurä¹‹åç´§æ¥ç€è°ƒç”¨ 
+è§’åº¦è¿‡é›¶å¤„ç†ï¼Œé˜²æ­¢ç–¯è½¬
+*/
+//void Handle_Angle360_PID_Over_Zero(float *tar, float *cur)
+//{
+//	if(*tar - *cur > 180)   //4096 ï¼šåŠåœˆæœºæ¢°è§’åº¦
+//	{
+//		*cur += 360;
+//	}
+//	else if(*tar - *cur < -180)
+//	{
+//		*cur = *cur - 360;
+//	}
+//}
 
 /**
   * @brief  fast inverse square-root, to calculate 1/Sqrt(x)

@@ -15,7 +15,6 @@
 //} Imu_Angle;///<存放结算后的角度
 
 void Imu_AHRS_Update(void);
-void Init_Quaternion(void);
-void Imu_Attitude_Update(void);
-//const void Get_Imu_Angle(Imu_Angle*)
+void Init_Quaternion(void);///<初始化四元数
+void Imu_Attitude_Update(void);//更新陀螺仪数据
 #endif //__QUATERNION_H_
