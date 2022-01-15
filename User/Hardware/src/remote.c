@@ -1,9 +1,9 @@
 #include "remote.h"
 
 /**
- * @brief                                   è§£æä¸²å£æ¥æ”¶çš„é¥æ§å™¨æ•°æ®
- * @param[in]  {volatile_const_uint8_t_*}   sbus_buf å­˜å‚¨ä¸²å£æ¥æ”¶çš„æ•°æ®ç¼“å†²åŒº
- * @param[in]  {Rc_Ctrl_t_*}                rc_ctrl æŒ‡å‘é¥æ§å™¨çš„ç»“æ„ä½“æŒ‡é’ˆ
+ * @brief                                   ½âÎö´®¿Ú½ÓÊÕµÄÒ£¿ØÆ÷Êı¾İ
+ * @param[in]  {volatile_const_uint8_t_*}   sbus_buf ´æ´¢´®¿Ú½ÓÊÕµÄÊı¾İ»º³åÇø
+ * @param[in]  {Rc_Ctrl_t_*}                rc_ctrl Ö¸ÏòÒ£¿ØÆ÷µÄ½á¹¹ÌåÖ¸Õë
  * @retval                                  void
  */
 static void Parse_Remoter_Data(volatile const uint8_t *sbus_buf, Rc_Ctrl_t *rc_ctrl)
@@ -29,14 +29,14 @@ static void Parse_Remoter_Data(volatile const uint8_t *sbus_buf, Rc_Ctrl_t *rc_c
 	rc_ctrl->rc.ch2 -= RC_CH_VALUE_OFFSET;
 	rc_ctrl->rc.ch3 -= RC_CH_VALUE_OFFSET;
 	rc_ctrl->rc.ch4 -= RC_CH_VALUE_OFFSET;
-	//Wasd_Key_To_Virtual_Rocker(rc_ctrlï¼Œ);
+	//Wasd_Key_To_Virtual_Rocker(rc_ctrl£¬);
 }
 
 /**
- * @brief                   æ£€éªŒæ¥æ”¶åˆ°çš„æ•°æ®é•¿åº¦
- * @param[in]  {uint16_t}  æœ¬æ¬¡æ¥æ”¶åˆ°çš„æ•°æ®é•¿åº¦
- * @retval                  1: ä¸åˆæ³•
- *                          0: åˆæ³•
+ * @brief                   ¼ìÑé½ÓÊÕµ½µÄÊı¾İ³¤¶È
+ * @param[in]  {uint16_t}  ±¾´Î½ÓÊÕµ½µÄÊı¾İ³¤¶È
+ * @retval                  1: ²»ºÏ·¨
+ *                          0: ºÏ·¨
  */
 static uint8_t Rc_Data_Len_Check(uint16_t len)
 {
@@ -53,10 +53,10 @@ static uint8_t Rc_Data_Len_Check(uint16_t len)
 }
 
 /**
- * @brief                   æ£€éªŒé¥æ§å™¨æ•°æ®æ˜¯å¦åˆæ³•
- * @param[in]  {Rc_Ctrl_t}  é¥æ§å™¨æ•°æ®æŒ‡é’ˆ
- * @retval                  1: ä¸åˆæ³•
- *                          0: åˆæ³•
+ * @brief                   ¼ìÑéÒ£¿ØÆ÷Êı¾İÊÇ·ñºÏ·¨
+ * @param[in]  {Rc_Ctrl_t}  Ò£¿ØÆ÷Êı¾İÖ¸Õë
+ * @retval                  1: ²»ºÏ·¨
+ *                          0: ºÏ·¨
  */
 static uint8_t Remoter_Data_Value_Check(Rc_Ctrl_t *rc)
 {
@@ -88,11 +88,11 @@ static uint8_t Remoter_Data_Value_Check(Rc_Ctrl_t *rc)
 }
 
 /**
- * @brief               					è§£æé¥æ§å™¨æ•°æ®å¹¶æ£€éªŒ
- * @param[in] {volatile_const_uint8_t}   	é¥æ§å™¨æ•°æ®ç¼“å†²åŒº
- * @param[in] {Rc_Ctrl_t}   				é¥æ§å™¨æ•°æ®æŒ‡é’ˆç»“æ„ä½“
- * @param[in] {uint16_t}					æœ¬æ¬¡æ¥æ”¶åˆ°çš„æ•°æ®é•¿åº¦
- * @retval    {uint8_t}						é¥æ§å™¨æ¨¡å¼ï¼ˆæ£€éªŒç»“æœï¼‰
+ * @brief               					½âÎöÒ£¿ØÆ÷Êı¾İ²¢¼ìÑé
+ * @param[in] {volatile_const_uint8_t}   	Ò£¿ØÆ÷Êı¾İ»º³åÇø
+ * @param[in] {Rc_Ctrl_t}   				Ò£¿ØÆ÷Êı¾İÖ¸Õë½á¹¹Ìå
+ * @param[in] {uint16_t}					±¾´Î½ÓÊÕµ½µÄÊı¾İ³¤¶È
+ * @retval    {uint8_t}						Ò£¿ØÆ÷Ä£Ê½£¨¼ìÑé½á¹û£©
 	            					
  */
 uint8_t Rc_Data_Check_Parse(volatile const uint8_t *sbus_buf, Rc_Ctrl_t *rc_ctrl, uint16_t rc_data_len)
@@ -106,9 +106,9 @@ uint8_t Rc_Data_Check_Parse(volatile const uint8_t *sbus_buf, Rc_Ctrl_t *rc_ctrl
 }
 
 /**
- * @brief               å°† rc2 èµ‹å€¼ç»™ rc1 
- * @param {Rc_Ctrl_t}   é¥æ§å™¨æ•°æ® 1
- * @param {Rc_Ctrl_t}   é¥æ§å™¨æ•°æ® 2
+ * @brief               ½« rc2 ¸³Öµ¸ø rc1 
+ * @param {Rc_Ctrl_t}   Ò£¿ØÆ÷Êı¾İ 1
+ * @param {Rc_Ctrl_t}   Ò£¿ØÆ÷Êı¾İ 2
  * @retval              void
  */
 void Rc_Data_Copy(Rc_Ctrl_t *rc1, Rc_Ctrl_t *rc2)
@@ -131,8 +131,8 @@ void Rc_Data_Copy(Rc_Ctrl_t *rc1, Rc_Ctrl_t *rc2)
 }
 
 /**
- * @brief               é‡ç½®é¥æ§å™¨æ•°æ® 
- * @param {Rc_Ctrl_t}   é¥æ§å™¨æ•°æ®
+ * @brief               ÖØÖÃÒ£¿ØÆ÷Êı¾İ 
+ * @param {Rc_Ctrl_t}   Ò£¿ØÆ÷Êı¾İ
  * @retval              void
  */
 void Rc_Data_Reset(Rc_Ctrl_t *rc)

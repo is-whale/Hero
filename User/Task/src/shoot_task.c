@@ -1,7 +1,7 @@
 /**
  * @file shoot_task.c
- * @brief å‘å°„æœºæ„ï¼Œä¸¤ä¸ªæ³¢è½® 3508 ç”µæœºçš„ id åˆ†åˆ«ä¸º 201 å’Œ 202, æŒ‚è½½åœ¨ can2 æ€»çº¿ä¸Š
- *        è§£æåçš„æ•°æ®åˆ†åˆ«æ”¾åœ¨ shoot_motor_feedback_data[0]ã€shoot_motor_feedback_data[1]
+ * @brief ·¢Éä»ú¹¹£¬Á½¸ö²¨ÂÖ 3508 µç»úµÄ id ·Ö±ğÎª 201 ºÍ 202, ¹ÒÔØÔÚ can2 ×ÜÏßÉÏ
+ *        ½âÎöºóµÄÊı¾İ·Ö±ğ·ÅÔÚ shoot_motor_feedback_data[0]¡¢shoot_motor_feedback_data[1]
  * @version 0.1
  * @date 2021-10-02
  * 
@@ -45,7 +45,7 @@ void StartShootTask(void const *argument)
     last_machine_angle = Get_Last_Machine_Angle();
     this_machine_angle = Get_This_Machine_Angle();
 
-    (void)rc_data_pt; ///< é¿å… warning
+    (void)rc_data_pt; ///< ±ÜÃâ warning
     (void)last_machine_angle;
     (void)this_machine_angle;
     (void)wave_motor_feedback_data;
@@ -109,9 +109,9 @@ void StartShootTask(void const *argument)
 }
 
 /**
- * @brief                           è§£æäº‘å°ä¸¤ä¸ªæ‘©æ“¦è½®ç”µæœºå’Œæ³¢è½®ç”µæœºçš„æ•°æ®
- * @param CAN_RxHeaderTypeDef       can2 æ¥å—ç»“æ„ä½“å¤´æŒ‡é’ˆ
- * @param uint8_t_*                 can2 æ¥å—åˆ°çš„æ•°æ®
+ * @brief                           ½âÎöÔÆÌ¨Á½¸öÄ¦²ÁÂÖµç»úºÍ²¨ÂÖµç»úµÄÊı¾İ
+ * @param CAN_RxHeaderTypeDef       can2 ½ÓÊÜ½á¹¹ÌåÍ·Ö¸Õë
+ * @param uint8_t_*                 can2 ½ÓÊÜµ½µÄÊı¾İ
  * @retval                          void
  */
 void Parse_Friction_Wave_Motor_Feedback_Data(CAN_RxHeaderTypeDef *can_rx_header, uint8_t *can2_rxd_data_buffer)
@@ -154,7 +154,7 @@ int8_t Updata_Wave_Ch_Value(int16_t *last_wave_ch_value, int16_t *this_wave_ch_v
     uint32_t end_time = 0;
     wave_motor_speed = Calc_Wave_Motor_Angle8191_Pid(wave_once_machine_angle, *erroe_integral);
 
-    ///< åˆæ­¥æµ‹è¯•ï¼Œå‘å°„ä¸€é¢—å¼¹ä¸¸çš„ pid è®¡ç®—æ—¶é—´æœ€å¤šæ˜¯ 320 ms,æ—¶é—´åœ¨ 290-320 ä¹‹é—´å¾˜å¾Š
+    ///< ³õ²½²âÊÔ£¬·¢ÉäÒ»¿Åµ¯ÍèµÄ pid ¼ÆËãÊ±¼ä×î¶àÊÇ 320 ms,Ê±¼äÔÚ 290-320 Ö®¼äÅÇ»²
     while ((fabs(wave_motor_speed) > 10) && (*erroe_integral < 119900))
     {
         start_time = osKernelSysTick();

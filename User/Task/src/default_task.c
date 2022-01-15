@@ -2,11 +2,11 @@
 
 void StartDefaultTask(void const *argument)
 {
-	/* å…³é—­çº¢ç»¿LED */
+	/* ¹Ø±ÕºìÂÌLED */
 	LED_GREEN_OFF();
 	LED_RED_OFF();
 
-	Laser_ON();///<æ‰“å¼€æ¿€å…‰
+	Laser_ON();///<´ò¿ª¼¤¹â
 	for (;;)
 	{
 		LED_GREEN_TOGGLE();

@@ -1,11 +1,11 @@
 #include "monitor.h"
 
 /**
- * @brief æ¨¡å—çŠ¶æ€åˆå§‹åŒ–
- * @param {Module_status_t*} module æ¨¡å—ç»“æ„ä½“çš„æŒ‡é’ˆ
- * @param {uint8_t} cnt_num æ¨¡å—è¶…æ—¶æ—¶é—´ï¼ˆå®é™…æ—¶é—´ä¸º cnt_num*ä»»åŠ¡å»¶æ—¶æ—¶é—´ï¼‰
- * @param {void} Online_Callback æ¨¡å—ä¸Šçº¿çš„å›è°ƒå‡½æ•°
- * @param {void} Offline_Callback æ¨¡å—ç¦»çº¿çš„å›è°ƒå‡½æ•°
+ * @brief Ä£¿é×´Ì¬³õÊ¼»¯
+ * @param {Module_status_t*} module Ä£¿é½á¹¹ÌåµÄÖ¸Õë
+ * @param {uint8_t} cnt_num Ä£¿é³¬Ê±Ê±¼ä£¨Êµ¼ÊÊ±¼äÎª cnt_num*ÈÎÎñÑÓÊ±Ê±¼ä£©
+ * @param {void} Online_Callback Ä£¿éÉÏÏßµÄ»Øµ÷º¯Êı
+ * @param {void} Offline_Callback Ä£¿éÀëÏßµÄ»Øµ÷º¯Êı
  * @return {*}
  */
 void Module_Status_Init(Module_status_t* module, uint8_t cnt_num, void Online_Callback(void), void Offline_Callback(void))
@@ -21,8 +21,8 @@ void Module_Status_Init(Module_status_t* module, uint8_t cnt_num, void Online_Ca
 }
 
 /**
- * @brief æ¨¡å—ç›‘å¬ï¼Œåœ¨å®šæ—¶å™¨æˆ–ä»»åŠ¡ä¸­å®šæ—¶ç›‘å¬
- * @param {Module_status_t*} module æ¨¡å—ç»“æ„ä½“çš„æŒ‡é’ˆ
+ * @brief Ä£¿é¼àÌı£¬ÔÚ¶¨Ê±Æ÷»òÈÎÎñÖĞ¶¨Ê±¼àÌı
+ * @param {Module_status_t*} module Ä£¿é½á¹¹ÌåµÄÖ¸Õë
  * @return {*}
  */
 void Module_Status_Listen(Module_status_t* module)
@@ -49,8 +49,8 @@ void Module_Status_Listen(Module_status_t* module)
 }
 
 /**
- * @brief å¾—åˆ°æ¨¡å—çŠ¶æ€
- * @param {Module_status_t*} module æ¨¡å—ç»“æ„ä½“çš„æŒ‡é’ˆ
+ * @brief µÃµ½Ä£¿é×´Ì¬
+ * @param {Module_status_t*} module Ä£¿é½á¹¹ÌåµÄÖ¸Õë
  * @return {*}
  */
 uint8_t Get_Module_Status(Module_status_t* module)
@@ -67,8 +67,8 @@ uint8_t Get_Module_Status(Module_status_t* module)
 }
 
 /**
- * @brief æ¨¡å—çŠ¶æ€é‡ç½®ï¼ˆä¾‹å¦‚åœ¨æ¨¡å—æ”¶åˆ°æ•°æ®æ—¶è°ƒç”¨ï¼‰
- * @param {Module_status_t*} module æ¨¡å—ç»“æ„ä½“çš„æŒ‡é’ˆ
+ * @brief Ä£¿é×´Ì¬ÖØÖÃ£¨ÀıÈçÔÚÄ£¿éÊÕµ½Êı¾İÊ±µ÷ÓÃ£©
+ * @param {Module_status_t*} module Ä£¿é½á¹¹ÌåµÄÖ¸Õë
  * @return {*}
  */
 void Module_Status_Reload(Module_status_t* module)

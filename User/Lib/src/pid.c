@@ -49,7 +49,6 @@ static void Calc_Position_Pid(Pid_Position_t *pid)
 		pid->err_integral += pid->err;
 	}
 
-	/* »ı·ÖÏŞ·ù */
 	pid->err_integral = Pid_Limit(pid->err_integral, -pid->max_err_integral, pid->max_err_integral);
 
 	pid->p_out = pid->kp * pid->err;

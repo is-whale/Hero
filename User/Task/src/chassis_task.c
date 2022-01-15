@@ -1,77 +1,77 @@
 /**
  * @file chassis_task.c
- * @brief åº•ç›˜ä»»åŠ¡
+ * @brief µ×ÅÌÈÎÎñ
  * @version 0.1
  * @date 2021-9-28
  * @copyright Copyright (c) 2021
  */
 #include "chassis_task.h"
 
-#define CHASSIS_SPEED_ZERO  0 ///<å…³é—­åº•ç›˜é€Ÿåº¦ 1ä¸ºå¼€å¯
+#define CHASSIS_SPEED_ZERO  0 ///<¹Ø±Õµ×ÅÌËÙ¶È 1Îª¿ªÆô
 //#define OUTPUT_LIMIT(data, limit) Float_Constrain(data, -limit, limit)///<
 #define CHASSIS_MOTOR_DEFAULT_BASE_RATE 5.5f
 #define CHASSIS_MOTOR_GYRO_BASE_RATE 5.0f
 
-static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500); ///< åº•ç›˜è·ŸéšPID
-static float chassis_motor_boost_rate = 1.0f;  ///<è°ƒç”¨ç›¸åº”å‡½æ•°æ›´æ”¹ï¼ˆåº•ç›˜é€Ÿåº¦å€çŽ‡ï¼‰
+static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500); ///< µ×ÅÌ¸úËæPID
+static float chassis_motor_boost_rate = 1.0f;  ///<µ÷ÓÃÏàÓ¦º¯Êý¸ü¸Ä£¨µ×ÅÌËÙ¶È±¶ÂÊ£©
 static const float motor_speed_multiple = 13.5;
 
-static Rc_Ctrl_t *rc_data_pt;                               ///< æŒ‡å‘è§£æžåŽçš„é¥æŽ§å™¨ç»“æž„ä½“æŒ‡é’ˆ
-static Robot_control_data_t *robot_mode_data_pt;            ///< æŒ‡å‘è§£æžåŽçš„æœºå™¨äººæ¨¡å¼ç»“æž„ä½“æŒ‡é’ˆ(ä¹ŸåŒ…æ‹¬äº†è™šæ‹Ÿé”®é¼ é€šé“çš„å€¼)
-static Motor_Measure_t *chassis_motor_feedback_parsed_data; ///< è§£æžåŽçš„åº•ç›˜ç”µæœºæ•°æ®
-static Motor_Measure_t *gimbal_motor_feedback_parsed_data;  ///< è§£æžåŽçš„äº‘å°ç”µæœºæ•°æ®
-static const uint8_t *yaw_motor_index;                      ///< yaw è½´ç”µæœºåœ¨äº‘å°ç”µæœºæ•°æ®ä¸­çš„ä¸‹æ ‡
-static const uint8_t *pitch_motor_index;                    ///< pitch è½´ç”µæœºåœ¨äº‘å°ç”µæœºæ•°æ®ä¸­çš„ä¸‹æ ‡
+static Rc_Ctrl_t *rc_data_pt;                               ///< Ö¸Ïò½âÎöºóµÄÒ£¿ØÆ÷½á¹¹ÌåÖ¸Õë
+static Robot_control_data_t *robot_mode_data_pt;            ///< Ö¸Ïò½âÎöºóµÄ»úÆ÷ÈËÄ£Ê½½á¹¹ÌåÖ¸Õë(Ò²°üÀ¨ÁËÐéÄâ¼üÊóÍ¨µÀµÄÖµ)
+static Motor_Measure_t *chassis_motor_feedback_parsed_data; ///< ½âÎöºóµÄµ×ÅÌµç»úÊý¾Ý
+static Motor_Measure_t *gimbal_motor_feedback_parsed_data;  ///< ½âÎöºóµÄÔÆÌ¨µç»úÊý¾Ý
+static const uint8_t *yaw_motor_index;                      ///< yaw Öáµç»úÔÚÔÆÌ¨µç»úÊý¾ÝÖÐµÄÏÂ±ê
+static const uint8_t *pitch_motor_index;                    ///< pitch Öáµç»úÔÚÔÆÌ¨µç»úÊý¾ÝÖÐµÄÏÂ±ê
 
 void StartChassisTask(void const *argument)
 {
     static float chassis_motor_speed[4] = {0.0, 0.0, 0.0, 0.0};
     float follow_pid_output;
-    rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();                              // èŽ·å–è§£æžåŽçš„é¥æŽ§å™¨æ•°æ®
-    robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();                          //æœºå™¨äººæ¨¡å¼ç»“æž„ä½“æŒ‡é’ˆ
-    chassis_motor_feedback_parsed_data = Get_Can1_Feedback_Data();                //CAN1 æ€»çº¿ä¸Šç”µæœºçš„åé¦ˆæ•°æ®
-    gimbal_motor_feedback_parsed_data = Get_Gimbal_Parsed_FeedBack_Data();        //CAN2æ€»çº¿ä¸Šç”µæœºçš„åé¦ˆæ•°æ®
+    rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();                              // »ñÈ¡½âÎöºóµÄÒ£¿ØÆ÷Êý¾Ý
+    robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();                          //»úÆ÷ÈËÄ£Ê½½á¹¹ÌåÖ¸Õë
+    chassis_motor_feedback_parsed_data = Get_Can1_Feedback_Data();                //CAN1 ×ÜÏßÉÏµç»úµÄ·´À¡Êý¾Ý
+    gimbal_motor_feedback_parsed_data = Get_Gimbal_Parsed_FeedBack_Data();        //CAN2×ÜÏßÉÏµç»úµÄ·´À¡Êý¾Ý
 
-    yaw_motor_index = Get_Yaw_Motor_Index();                                      // èŽ·å– yaw è½´ç”µæœºåœ¨æ•°ç»„ä¸­çš„ä¸‹æ ‡
-    pitch_motor_index = Get_Pitch_Motor_Index();                                  //èŽ·å–pitchè½´ç”µæœºåœ¨æ•°æ®ä¸­çš„ä¸‹æ ‡
+    yaw_motor_index = Get_Yaw_Motor_Index();                                      // »ñÈ¡ yaw Öáµç»úÔÚÊý×éÖÐµÄÏÂ±ê
+    pitch_motor_index = Get_Pitch_Motor_Index();                                  //»ñÈ¡pitchÖáµç»úÔÚÊý¾ÝÖÐµÄÏÂ±ê
     Get_Parsed_RobotMode_Pointer();
     (void)pitch_motor_index;
 
-    osDelay(1000); ///< ç­‰å¾…é¥æŽ§å™¨ä»»åŠ¡åˆå§‹åŒ–å®Œæˆ
+    osDelay(1000); ///< µÈ´ýÒ£¿ØÆ÷ÈÎÎñ³õÊ¼»¯Íê³É
 
 for (;;)
 {
-        ///<é€‰æ‹©æ“ä½œè®¾å¤‡    é”®é¼ &é¥æŽ§å™¨
-    if (robot_mode_data_pt->mode.control_device == mouse_keyboard_device_ENUM) ///< æœ€å¥½æ˜¯ä½¿ç”¨æžšä¸¾å®šä¹‰
+        ///<Ñ¡Ôñ²Ù×÷Éè±¸    ¼üÊó&Ò£¿ØÆ÷
+    if (robot_mode_data_pt->mode.control_device == mouse_keyboard_device_ENUM) ///< ×îºÃÊÇÊ¹ÓÃÃ¶¾Ù¶¨Òå
     {
-            ///<é€‰æ‹©åº•ç›˜äº‘å°æ¨¡å¼    1åº•ç›˜è·Ÿéš   2å°é™€èžº   3ç‰¹æ®Šæ¨¡å¼
+            ///<Ñ¡Ôñµ×ÅÌÔÆÌ¨Ä£Ê½    1µ×ÅÌ¸úËæ   2Ð¡ÍÓÂÝ   3ÌØÊâÄ£Ê½
         switch(robot_mode_data_pt->mode.mouse_keyboard_chassis_mode)
 			{
-					case mk_chassis_follow_mode_ENUM:///<åº•ç›˜è·Ÿéš
+					case mk_chassis_follow_mode_ENUM:///<µ×ÅÌ¸úËæ
                 {
                         follow_pid_output = Calc_Chassis_Follow();
               			chassis_motor_speed[0] = robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
 						chassis_motor_speed[1] = robot_mode_data_pt->virtual_rocker.ch2 - robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
 						chassis_motor_speed[2] = -robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
 						chassis_motor_speed[3] = -robot_mode_data_pt->virtual_rocker.ch2 - robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
-                    ///<ä¹˜ä¸€ä¸ªå€çŽ‡
+                    ///<³ËÒ»¸ö±¶ÂÊ
                     chassis_motor_speed[0] *= (float)(CHASSIS_MOTOR_DEFAULT_BASE_RATE * chassis_motor_boost_rate);
 					chassis_motor_speed[1] *= (float)(CHASSIS_MOTOR_DEFAULT_BASE_RATE * chassis_motor_boost_rate);
 					chassis_motor_speed[2] *= (float)(CHASSIS_MOTOR_DEFAULT_BASE_RATE * chassis_motor_boost_rate);
 				    chassis_motor_speed[3] *= (float)(CHASSIS_MOTOR_DEFAULT_BASE_RATE * chassis_motor_boost_rate);
                 }
 
-					case mk_chassis_gyro_mode_ENUM:///<åº•ç›˜å°é™€èžº
+					case mk_chassis_gyro_mode_ENUM:///<µ×ÅÌÐ¡ÍÓÂÝ
                 {
                     	Calc_Gyro_Motors_Speed(chassis_motor_speed, \
-					//Calc_Gyro_Speed_By_Power_Limit(judge_data->game_robot_status.chassis_power_limit), \\\\<è§’åº¦æš‚æ—¶ä¸ºé›¶ï¼ŒåŽç»­ä¿®æ”¹åˆ é™¤ä¸€ä¸‹è¡Œ
+					//Calc_Gyro_Speed_By_Power_Limit(judge_data->game_robot_status.chassis_power_limit), \\\\<½Ç¶ÈÔÝÊ±ÎªÁã£¬ºóÐøÐÞ¸ÄÉ¾³ýÒ»ÏÂÐÐ
                     0,\
 					 GM6020_YAW_Angle_To_360(gimbal_motor_feedback_parsed_data[*yaw_motor_index].mechanical_angle),\
 					(float)robot_mode_data_pt->virtual_rocker.ch3 * CHASSIS_MOTOR_GYRO_BASE_RATE * chassis_motor_boost_rate, \
 					(float)robot_mode_data_pt->virtual_rocker.ch2 * CHASSIS_MOTOR_GYRO_BASE_RATE * chassis_motor_boost_rate );
                 }
                 
-			       case mk_chassis_special_mode_ENUM:///<ç‰¹æ®Šæ¨¡å¼
+			       case mk_chassis_special_mode_ENUM:///<ÌØÊâÄ£Ê½
                 {
                 chassis_motor_speed[0] = -robot_mode_data_pt->virtual_rocker.ch3 - robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch0;
                 chassis_motor_speed[1] = robot_mode_data_pt->virtual_rocker.ch3 - robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch0;
@@ -96,12 +96,12 @@ for (;;)
     else if (robot_mode_data_pt-> mode.control_device == remote_controller_device_ENUM)///<RC_ctrl
         {
 
-        switch (robot_mode_data_pt->mode.rc_motion_mode)///<é€‰æ‹©åº•ç›˜äº‘å°æ¨¡å¼
+        switch (robot_mode_data_pt->mode.rc_motion_mode)///<Ñ¡Ôñµ×ÅÌÔÆÌ¨Ä£Ê½
         {
 
-                case rc_chassis_follow_mode_ENUM: ///< 1ï¼›åº•ç›˜è·Ÿéš+æ‰‹åŠ¨çž„å‡†
+                case rc_chassis_follow_mode_ENUM: ///< 1£»µ×ÅÌ¸úËæ+ÊÖ¶¯Ãé×¼
             {
-                follow_pid_output = Calc_Chassis_Follow(); ///< åº•ç›˜è·Ÿéš pid,è®¡ç®—å‡º yaw è½´å½“å‰è§’åº¦å’Œ yaw è½´å¤´ä¹‹é—´çš„è§’åº¦å·®ï¼Œå½“ä½œé€Ÿåº¦å€¼åŠ å…¥å„ä¸ªè½®å­ä¸­
+                follow_pid_output = Calc_Chassis_Follow(); ///< µ×ÅÌ¸úËæ pid,¼ÆËã³ö yaw Öáµ±Ç°½Ç¶ÈºÍ yaw ÖáÍ·Ö®¼äµÄ½Ç¶È²î£¬µ±×÷ËÙ¶ÈÖµ¼ÓÈë¸÷¸öÂÖ×ÓÖÐ
 
                 chassis_motor_speed[0] = -rc_data_pt->rc.ch3 + rc_data_pt->rc.ch2 + follow_pid_output + rc_data_pt->rc.ch0 / 2.9f;
                 chassis_motor_speed[1] = rc_data_pt->rc.ch3 + rc_data_pt->rc.ch2 + follow_pid_output + rc_data_pt->rc.ch0 / 2.9f;
@@ -115,7 +115,7 @@ for (;;)
                 break;
             }
 
-            case rc_chassis_gyro_mode_ENUM: ///< 2ï¼›åº•ç›˜å°é™€èžº+æ‰‹åŠ¨çž„å‡†
+            case rc_chassis_gyro_mode_ENUM: ///< 2£»µ×ÅÌÐ¡ÍÓÂÝ+ÊÖ¶¯Ãé×¼
             {
                 Calc_Gyro_Motors_Speed(chassis_motor_speed,
                                        0,
@@ -125,7 +125,7 @@ for (;;)
                 break;
             }
 
-            case rc_special_mode_ENUM: ///< 3ï¼›ç‰¹æ®Šæ¨¡å¼
+            case rc_special_mode_ENUM: ///< 3£»ÌØÊâÄ£Ê½
 
             {
                 chassis_motor_speed[0] = rc_data_pt->rc.ch3 - rc_data_pt->rc.ch2 + rc_data_pt->rc.ch0;
@@ -153,7 +153,7 @@ for (;;)
 //        OUTPUT_LIMIT(&chassis_motor_speed[2], 8899);
 //        OUTPUT_LIMIT(&chassis_motor_speed[3], 8899);
 
-        ///< è®¾ç½®åº•ç›˜ç”µæœºé€Ÿåº¦
+        ///< ÉèÖÃµ×ÅÌµç»úËÙ¶È
         Set_ChassisMotor_Speed(chassis_motor_speed[0],
                                chassis_motor_speed[1],
                                chassis_motor_speed[2],
@@ -165,35 +165,35 @@ for (;;)
 }
 
 /**
-  * @brief          è®¡ç®—å°é™€èžºæ—¶ï¼Œå„ä¸ªç”µæœºé€Ÿåº¦
-  * @details        æ•ˆæžœï¼šåº•ç›˜ä»¥è®¾ç½®é€Ÿåº¦å°é™€èžºæ—‹è½¬æˆ–å¤„äºŽç‰¹æ®ŠçŠ¶æ€ï¼ŒåŒæ—¶å¯ä»¥ä»¥äº‘å°æžªç®¡ä¸ºå¤´ï¼Œå‰è¿›åŽé€€ã€å·¦å³å¹³ç§»
-  * @param[in]      {float *motors_speed }      å‚¨å­˜ç”µæœºé€Ÿåº¦çš„æŒ‡é’ˆ
-  * @param[in]      {float rotate_speed }       æ—‹è½¬çš„ç”µæœºé€Ÿåº¦
-  * @param[in]      {float move_direction }     è¿åŠ¨çš„æ–¹å‘è§’åº¦0Â°~360Â°ï¼Œä»¥æœºå™¨æœå‘ä¸º0Â°(äº‘å°GM6020ç”µæœºç›¸å¯¹åº•ç›˜çš„è§’åº¦)
-  * @param[in]      {float x_move_speed}        xè½´é€Ÿåº¦ï¼ˆXæ‘‡æ†ï¼‰
-  * @param[in]      {float y_move_speed}        yè½´é€Ÿåº¦ï¼ˆYæ‘‡æ†ï¼‰
+  * @brief          ¼ÆËãÐ¡ÍÓÂÝÊ±£¬¸÷¸öµç»úËÙ¶È
+  * @details        Ð§¹û£ºµ×ÅÌÒÔÉèÖÃËÙ¶ÈÐ¡ÍÓÂÝÐý×ª»ò´¦ÓÚÌØÊâ×´Ì¬£¬Í¬Ê±¿ÉÒÔÒÔÔÆÌ¨Ç¹¹ÜÎªÍ·£¬Ç°½øºóÍË¡¢×óÓÒÆ½ÒÆ
+  * @param[in]      {float *motors_speed }      ´¢´æµç»úËÙ¶ÈµÄÖ¸Õë
+  * @param[in]      {float rotate_speed }       Ðý×ªµÄµç»úËÙ¶È
+  * @param[in]      {float move_direction }     ÔË¶¯µÄ·½Ïò½Ç¶È0¡ã~360¡ã£¬ÒÔ»úÆ÷³¯ÏòÎª0¡ã(ÔÆÌ¨GM6020µç»úÏà¶Ôµ×ÅÌµÄ½Ç¶È)
+  * @param[in]      {float x_move_speed}        xÖáËÙ¶È£¨XÒ¡¸Ë£©
+  * @param[in]      {float y_move_speed}        yÖáËÙ¶È£¨YÒ¡¸Ë£©
   * @retval                                     void
   */
 void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed, float move_direction, float x_move_speed, float y_move_speed)
 {
-    ///< åˆ¤æ–­è§’åº¦æ˜¯å¦é”™è¯¯
+    ///< ÅÐ¶Ï½Ç¶ÈÊÇ·ñ´íÎó
     if (move_direction > 360)
     {
         return;
     }
 
-    ///< è§’åº¦æ¢ç®—å¼§åº¦
+    ///< ½Ç¶È»»Ëã»¡¶È
     float move_radin = move_direction * 3.14159f / 180.0f;
     float radin_sin = sinf(move_radin); ///< sin(x)
     float radin_cos = cosf(move_radin);
 
-    ///< é™€èžºé€Ÿåº¦èµ‹å€¼
+    ///< ÍÓÂÝËÙ¶È¸³Öµ
     motors_speed[0] = rotate_speed;
     motors_speed[1] = rotate_speed;
     motors_speed[2] = rotate_speed;
     motors_speed[3] = rotate_speed;
 
-    ///< è®¡ç®—é€Ÿåº¦å¢žåŠ å€¼
+    ///< ¼ÆËãËÙ¶ÈÔö¼ÓÖµ
     float x_x_speed = x_move_speed * radin_cos;
     float x_y_speed = x_move_speed * radin_sin;
 
@@ -207,9 +207,9 @@ void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed, float move_
 }
 
 /**
- * @brief           è®¡ç®—åº•ç›˜è·Ÿéš pid
+ * @brief           ¼ÆËãµ×ÅÌ¸úËæ pid
  * @param[in]       void
- * @return          float è®¡ç®—å‡ºçš„é€Ÿåº¦å€¼
+ * @return          float ¼ÆËã³öµÄËÙ¶ÈÖµ
  */
 float Calc_Chassis_Follow(void)
 {

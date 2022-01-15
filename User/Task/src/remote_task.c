@@ -1,6 +1,6 @@
 /**
  * @file remote_task.c
- * @brief é¥æ§å™¨æ•°æ®è§£æä»»åŠ¡ï¼Œè§£æå‡ºé¥æ§å™¨æ•°æ®ï¼Œå¹¶æ ¹æ®é¥æ§å™¨æ•°æ®è®¾ç½®æœºå™¨äººå½“å‰æ¨¡å¼é…ç½®çš„ç›¸å…³å‚æ•°
+ * @brief Ò£¿ØÆ÷Êı¾İ½âÎöÈÎÎñ£¬½âÎö³öÒ£¿ØÆ÷Êı¾İ£¬²¢¸ù¾İÒ£¿ØÆ÷Êı¾İÉèÖÃ»úÆ÷ÈËµ±Ç°Ä£Ê½ÅäÖÃµÄÏà¹Ø²ÎÊı
  * @version 0.1
  * @date 2021-9-27
  * @copyright Copyright (c) 2021
@@ -8,14 +8,14 @@
 
 #include "remote_task.h"
 
-static Rc_Ctrl_t remote_controller;                    ///< æœ¬æ¬¡è§£æçš„é¥æ§å™¨æ•°æ®
-static Rc_Ctrl_t last_time_remote_controller;          ///< ä¸Šæ¬¡è§£æçš„é¥æ§å™¨æ•°æ®
-static Robot_control_data_t robot_control_data;        ///< æœºå™¨äººæ¨¡å¼é…ç½®æ•°æ®
-static uint16_t *sbus_rxd_len;                         ///< æœ¬æ¬¡é¥æ§å™¨æ¥æ”¶åˆ°çš„æ•°æ®é•¿åº¦
-static uint8_t *rc_rx_buffer[2];                       ///< é¥æ§å™¨ä¸¤æ¬¡æ¥æ”¶æ•°æ®ç¼“å†²
-static const uint32_t remote_get_data_signal = 0x0001; ///< é¥æ§å™¨æ¥æ”¶æ•°æ®ä¿¡å·
-static const uint32_t remote_data_overtime = 50;       ///< é¥æ§å™¨æ¥æ”¶æ•°æ®åŒ…è¶…æ—¶æ—¶é—´
-extern osThreadId remoteTaskHandle;                    ///< é¥æ§å™¨ä»»åŠ¡å¥æŸ„
+static Rc_Ctrl_t remote_controller;                    ///< ±¾´Î½âÎöµÄÒ£¿ØÆ÷Êı¾İ
+static Rc_Ctrl_t last_time_remote_controller;          ///< ÉÏ´Î½âÎöµÄÒ£¿ØÆ÷Êı¾İ
+static Robot_control_data_t robot_control_data;        ///< »úÆ÷ÈËÄ£Ê½ÅäÖÃÊı¾İ
+static uint16_t *sbus_rxd_len;                         ///< ±¾´ÎÒ£¿ØÆ÷½ÓÊÕµ½µÄÊı¾İ³¤¶È
+static uint8_t *rc_rx_buffer[2];                       ///< Ò£¿ØÆ÷Á½´Î½ÓÊÕÊı¾İ»º³å
+static const uint32_t remote_get_data_signal = 0x0001; ///< Ò£¿ØÆ÷½ÓÊÕÊı¾İĞÅºÅ
+static const uint32_t remote_data_overtime = 50;       ///< Ò£¿ØÆ÷½ÓÊÕÊı¾İ°ü³¬Ê±Ê±¼ä
+extern osThreadId remoteTaskHandle;                    ///< Ò£¿ØÆ÷ÈÎÎñ¾ä±ú
 
 void StartRemoteTask(void const *argument)
 {
@@ -36,25 +36,25 @@ void StartRemoteTask(void const *argument)
     for (;;)
     {
         remote_get_data_event = osSignalWait(remote_get_data_signal, remote_data_overtime);
-        //åˆ©ç”¨è¶…æ—¶æ—¶é—´åšä¸åŒçš„ä»»åŠ¡å¤„ç†
+        //ÀûÓÃ³¬Ê±Ê±¼ä×ö²»Í¬µÄÈÎÎñ´¦Àí
         if (remote_get_data_event.status == osEventSignal)
         {
             if (remote_get_data_event.value.signals == remote_get_data_signal)
             {
                 rx_available_buffer_index = Get_Rc_Available_Bufferx();
 
-                if (Rc_Data_Check_Parse(rc_rx_buffer[rx_available_buffer_index], &remote_controller, *sbus_rxd_len))///<è§£ææ•°æ®å¹¶æ£€éªŒ
+                if (Rc_Data_Check_Parse(rc_rx_buffer[rx_available_buffer_index], &remote_controller, *sbus_rxd_len))///<½âÎöÊı¾İ²¢¼ìÑé
                 {
-                    Parse_Robot_Control_Data(&remote_controller, &last_time_remote_controller, &robot_control_data); ///< è§£æå‡ºé¥æ§å™¨æ¨¡å¼
+                    Parse_Robot_Control_Data(&remote_controller, &last_time_remote_controller, &robot_control_data); ///< ½âÎö³öÒ£¿ØÆ÷Ä£Ê½
 
-                    Rc_Data_Copy(&last_time_remote_controller, &remote_controller); ///< ä¿å­˜æœ¬æ¬¡é¥æ§å™¨çŠ¶æ€
+                    Rc_Data_Copy(&last_time_remote_controller, &remote_controller); ///< ±£´æ±¾´ÎÒ£¿ØÆ÷×´Ì¬
 
-                    Module_Reload(remote_control); ///< æ›´æ–°é¥æ§å™¨çŠ¶æ€
+                    Module_Reload(remote_control); ///< ¸üĞÂÒ£¿ØÆ÷×´Ì¬
                 }
                 else
                 {
                     Usart1_Rx_DMA_Reset();
-                    Rc_Data_Copy(&remote_controller, &last_time_remote_controller); ///< æ ¡éªŒå‡ºé”™ä¿æŒé¥æ§å™¨æ•°æ®ä¸å˜
+                    Rc_Data_Copy(&remote_controller, &last_time_remote_controller); ///< Ğ£Ñé³ö´í±£³ÖÒ£¿ØÆ÷Êı¾İ²»±ä
                 }
             }
         }
@@ -67,7 +67,7 @@ void StartRemoteTask(void const *argument)
 }
 
 /**
- * @brief           é€šçŸ¥ remoteTask è¿›è¡Œé¥æ§å™¨æ•°æ®çš„è§£æï¼Œåœ¨ USART1 çš„ä¸²å£ä¸­æ–­ä¸­è°ƒç”¨
+ * @brief           Í¨Öª remoteTask ½øĞĞÒ£¿ØÆ÷Êı¾İµÄ½âÎö£¬ÔÚ USART1 µÄ´®¿ÚÖĞ¶ÏÖĞµ÷ÓÃ
  * @param[in]       none
  * @retval          void
  */
@@ -77,9 +77,9 @@ void Info_RemoteTask_Parse_Data(void)
 }
 
 /**
- * @brief                       è·å–è§£æåçš„é¥æ§å™¨æ•°æ®
+ * @brief                       »ñÈ¡½âÎöºóµÄÒ£¿ØÆ÷Êı¾İ
  * @param[in]                   void
- * @retval {Rc_Ctrl_t*}         è§£æåçš„é¥æ§å™¨æ•°æ®ç»“æ„ä½“æŒ‡é’ˆ
+ * @retval {Rc_Ctrl_t*}         ½âÎöºóµÄÒ£¿ØÆ÷Êı¾İ½á¹¹ÌåÖ¸Õë
  */
 Rc_Ctrl_t *Get_Rc_Parsed_RemoteData_Pointer(void)
 {
@@ -87,9 +87,9 @@ Rc_Ctrl_t *Get_Rc_Parsed_RemoteData_Pointer(void)
 }
 
 /**
- * @brief                       è·å–è§£æåçš„æœºå™¨äººæ¨¡å¼ç»“æ„ä½“æŒ‡é’ˆ
+ * @brief                       »ñÈ¡½âÎöºóµÄ»úÆ÷ÈËÄ£Ê½½á¹¹ÌåÖ¸Õë
  * @param[in]                   void
- * @retval {Rc_Ctrl_t*}         è§£æåçš„è§£æåçš„æœºå™¨äººæ¨¡å¼ç»“æ„ä½“æŒ‡é’ˆ
+ * @retval {Rc_Ctrl_t*}         ½âÎöºóµÄ½âÎöºóµÄ»úÆ÷ÈËÄ£Ê½½á¹¹ÌåÖ¸Õë
  */
 Robot_control_data_t *Get_Parsed_RobotMode_Pointer(void)
 {

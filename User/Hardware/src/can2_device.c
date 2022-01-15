@@ -1,27 +1,27 @@
 #include "can2_device.h"
 
-static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); ///< yawç”µæœºé€Ÿåº¦PID
-static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); ///< yawç”µæœºè§’åº¦PID
-static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(20, 0, 3, 2000, 40000, 0, 1000, 500);		///< pitchç”µæœºé€Ÿåº¦PID
-static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 1000, 0, 3000, 500); ///< pitchç”µæœºè§’åº¦PID
+static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); ///< yawµç»úËÙ¶ÈPID
+static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); ///< yawµç»ú½Ç¶ÈPID
+static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(20, 0, 3, 2000, 40000, 0, 1000, 500);		///< pitchµç»úËÙ¶ÈPID
+static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 1000, 0, 3000, 500); ///< pitchµç»ú½Ç¶ÈPID
 
 static Pid_Position_t friction_motor_left_speed_pid = NEW_POSITION_PID(7, 0, 0.7, 2000, 16383, 0, 1000, 500);
 static Pid_Position_t friction_motor_right_speed_pid = NEW_POSITION_PID(7, 0, 0.7, 2000, 16383, 0, 1000, 500);
 static Pid_Position_t wave_motor_speed_pid = NEW_POSITION_PID(9, 0, 3, 2000, 16000, 0, 1000, 500);
 
-static Pid_Position_t wave_motor_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 4500, 0, 3000, 500); ///<  æ‹¨è½®ç”µæœºè§’åº¦PID
+static Pid_Position_t wave_motor_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 4500, 0, 3000, 500); ///<  ²¦ÂÖµç»ú½Ç¶ÈPID
 
 static int error_integral = 0;
 static uint16_t last_machine_angle = 0;
 static uint16_t this_machine_angle = 0;
 
-static uint8_t can2_rxd_data_buffer[8];	   ///< è¾…åŠ©å˜é‡ï¼ŒæŽ¥å—ç”µæœºåé¦ˆçš„åŽŸå§‹æ•°æ®
-static CAN_RxHeaderTypeDef can2_rx_header; ///< è¾…åŠ©å˜é‡ï¼Œç”¨äºŽ HAL åº“å‡½æ•°æŽ¥å—æ•°æ®ï¼Œå­˜æ”¾å…³äºŽ CAN åé¦ˆæ•°æ®çš„ ID å·ç­‰ä¿¡æ¯
+static uint8_t can2_rxd_data_buffer[8];	   ///< ¸¨Öú±äÁ¿£¬½ÓÊÜµç»ú·´À¡µÄÔ­Ê¼Êý¾Ý
+static CAN_RxHeaderTypeDef can2_rx_header; ///< ¸¨Öú±äÁ¿£¬ÓÃÓÚ HAL ¿âº¯Êý½ÓÊÜÊý¾Ý£¬´æ·Å¹ØÓÚ CAN ·´À¡Êý¾ÝµÄ ID ºÅµÈÐÅÏ¢
 
 static Motor_Measure_t wave_motor_feedback_data;
 
 /**
- * @brief 			è§£æžæ³¢è½®ç”µæœºæ•°æ®
+ * @brief 			½âÎö²¨ÂÖµç»úÊý¾Ý
  * @param[in]		void
  * @retval			void
  */
@@ -60,14 +60,14 @@ uint16_t *Get_This_Machine_Angle(void)
 }
 
 /**
- * @brief 			can2 æŽ¥æ”¶å›žè°ƒå‡½æ•°,åœ¨è¯¥å‡½æ•°å†…ï¼ŒåªæŽ¥å—æ•°æ®ï¼Œè€Œå…·ä½“çš„æ•°æ®è§£æžåœ¨å„è‡ªéœ€è¦çš„ä»»åŠ¡é‡Œé¢
+ * @brief 			can2 ½ÓÊÕ»Øµ÷º¯Êý,ÔÚ¸Ãº¯ÊýÄÚ£¬Ö»½ÓÊÜÊý¾Ý£¬¶ø¾ßÌåµÄÊý¾Ý½âÎöÔÚ¸÷×ÔÐèÒªµÄÈÎÎñÀïÃæ
  * @param[in]		void
  * @retval			void
  */
 void Can2_Rx_FIFO0_IT_Callback(void)
 {
 	HAL_CAN_GetRxMessage(&hcan2, CAN_RX_FIFO0, &can2_rx_header, can2_rxd_data_buffer);
-	///< æ‰€æœ‰ can æ•°æ®ï¼Œåªæœ‰æ³¢è½®ç”µæœºçš„æ•°æ®æ˜¯ç›´æŽ¥åœ¨ä¸­æ–­ä¸­è¿›è¡Œè§£æžçš„ï¼Œå› ä¸ºè¦å®žæ—¶èŽ·å–ç”µæœºçš„ç»å¯¹è§’åº¦
+	///< ËùÓÐ can Êý¾Ý£¬Ö»ÓÐ²¨ÂÖµç»úµÄÊý¾ÝÊÇÖ±½ÓÔÚÖÐ¶ÏÖÐ½øÐÐ½âÎöµÄ£¬ÒòÎªÒªÊµÊ±»ñÈ¡µç»úµÄ¾ø¶Ô½Ç¶È
 	if (can2_rx_header.StdId == CAN_3508_WAVE_ID)
 	{
 		Parse_Wave_Motor_Feedback_Data();
@@ -75,9 +75,9 @@ void Can2_Rx_FIFO0_IT_Callback(void)
 }
 
 /**
- * @brief                           è¿”å›ž CAN_RxHeaderTypeDef è½´äº‘å°ç”µæœºåœ¨å­˜å‚¨ç”µæœºæ•°ç»„ä¸­çš„ä¸‹æ ‡
+ * @brief                           ·µ»Ø CAN_RxHeaderTypeDef ÖáÔÆÌ¨µç»úÔÚ´æ´¢µç»úÊý×éÖÐµÄÏÂ±ê
  * @param[in]                       void
- * @return CAN_RxHeaderTypeDef*     æŒ‡å‘ä¸‹æ ‡çš„ç´¢å¼•
+ * @return CAN_RxHeaderTypeDef*     Ö¸ÏòÏÂ±êµÄË÷Òý
  */
 CAN_RxHeaderTypeDef *Get_CAN2_Rx_Header(void)
 {
@@ -85,9 +85,9 @@ CAN_RxHeaderTypeDef *Get_CAN2_Rx_Header(void)
 }
 
 /**
- * @brief 				è¿”å›ž can2 æŽ¥æ”¶åˆ°çš„æ•°ç»„é¦–åœ°å€ï¼Œä¾›å„ä¸ªä»»åŠ¡è§£æž
+ * @brief 				·µ»Ø can2 ½ÓÊÕµ½µÄÊý×éÊ×µØÖ·£¬¹©¸÷¸öÈÎÎñ½âÎö
  * @param[in]			void
- * @return uint8_t* 	æŒ‡å‘æŽ¥æ”¶æ•°æ®çš„æ•°ç»„é¦–åœ°å€æŒ‡é’ˆ
+ * @return uint8_t* 	Ö¸Ïò½ÓÊÕÊý¾ÝµÄÊý×éÊ×µØÖ·Ö¸Õë
  */
 uint8_t *Get_CAN2_Rxd_Buffer(void)
 {
@@ -95,9 +95,9 @@ uint8_t *Get_CAN2_Rxd_Buffer(void)
 }
 
 /**
- * @brief 		è¿”å›žä¸­æ–­è§£æžåŽçš„æ³¢è½®ç”µæœºç»“æž„ä½“æŒ‡é’ˆ
+ * @brief 		·µ»ØÖÐ¶Ï½âÎöºóµÄ²¨ÂÖµç»ú½á¹¹ÌåÖ¸Õë
  * @param[in]	void
- * @return 		Motor_Measure_t* è§£æžåŽçš„æ³¢è½®ç”µæœºç»“æž„ä½“æŒ‡é’ˆ
+ * @return 		Motor_Measure_t* ½âÎöºóµÄ²¨ÂÖµç»ú½á¹¹ÌåÖ¸Õë
  */
 Motor_Measure_t *Get_Wave_Motor_Paresed_Data(void)
 {
@@ -105,12 +105,12 @@ Motor_Measure_t *Get_Wave_Motor_Paresed_Data(void)
 }
 
 /**
- * @brief 									è®¾ç½®äº‘å°ç”µæœºçš„é€Ÿåº¦ï¼Œä½†æ˜¯ä¸€èˆ¬äº‘å°æ˜¯é€šè¿‡è§’åº¦è¿›è¡ŒæŽ§åˆ¶ï¼Œè¿™é‡Œè¾“å…¥çš„é€Ÿåº¦å€¼
- * 											å…¶å®žæ˜¯ç»è¿‡è§’åº¦ pid è®¡ç®—å¾—åˆ°çš„é€Ÿåº¦å€¼
- * @param yaw_speed 						è®¾ç½®çš„ yaw è½´ç”µæœºçš„é€Ÿåº¦å€¼
- * @param pitch_speed 						è®¾ç½®çš„ pitch è½´ç”µæœºçš„é€Ÿåº¦å€¼
- * @param yaw_motor_parsed_feedback_data 	æŒ‡å‘ yaw è½´ç”µæœºè§£æžåŽçš„ç»“æž„ä½“æŒ‡é’ˆ
- * @param pitch_motor_parsed_feedback_data  æŒ‡å‘ pitch è½´ç”µæœºè§£æžåŽçš„ç»“æž„ä½“æŒ‡é’ˆ
+ * @brief 									ÉèÖÃÔÆÌ¨µç»úµÄËÙ¶È£¬µ«ÊÇÒ»°ãÔÆÌ¨ÊÇÍ¨¹ý½Ç¶È½øÐÐ¿ØÖÆ£¬ÕâÀïÊäÈëµÄËÙ¶ÈÖµ
+ * 											ÆäÊµÊÇ¾­¹ý½Ç¶È pid ¼ÆËãµÃµ½µÄËÙ¶ÈÖµ
+ * @param yaw_speed 						ÉèÖÃµÄ yaw Öáµç»úµÄËÙ¶ÈÖµ
+ * @param pitch_speed 						ÉèÖÃµÄ pitch Öáµç»úµÄËÙ¶ÈÖµ
+ * @param yaw_motor_parsed_feedback_data 	Ö¸Ïò yaw Öáµç»ú½âÎöºóµÄ½á¹¹ÌåÖ¸Õë
+ * @param pitch_motor_parsed_feedback_data  Ö¸Ïò pitch Öáµç»ú½âÎöºóµÄ½á¹¹ÌåÖ¸Õë
  */
 void Set_Gimbal_Motors_Speed(float yaw_speed, float pitch_speed, Motor_Measure_t *yaw_motor_parsed_feedback_data, Motor_Measure_t *pitch_motor_parsed_feedback_data)
 {
@@ -123,10 +123,10 @@ void Set_Gimbal_Motors_Speed(float yaw_speed, float pitch_speed, Motor_Measure_t
 }
 
 /**
- * @brief 				é™åˆ¶ pitch è½´ç”µæœºçš„è§’åº¦
- * @param angle 		å½“å‰å°†è¦è®¾å®šçš„è§’åº¦
- * @param down_angle 	æœ€ä½Žè§’åº¦
- * @param up_angle 		æœ€é«˜è§’åº¦
+ * @brief 				ÏÞÖÆ pitch Öáµç»úµÄ½Ç¶È
+ * @param angle 		µ±Ç°½«ÒªÉè¶¨µÄ½Ç¶È
+ * @param down_angle 	×îµÍ½Ç¶È
+ * @param up_angle 		×î¸ß½Ç¶È
  */
 void Pitch_Angle_Limit(float *angle, float down_angle, float up_angle)
 {
@@ -147,33 +147,33 @@ void Pitch_Angle_Limit(float *angle, float down_angle, float up_angle)
 }
 
 /**
- * @brief 									è®¡ç®—äº‘å°Yawç”µæœºçš„è§’åº¦çŽ¯è¾“å‡º
- * @param tar_angle 						è®¾å®šè§’åº¦å€¼(å€çŽ‡åŽçš„é€šé“å€¼)
- * @param tar_angle							å®žé™…è§’åº¦å€¼ï¼ˆè„±è½åé¦ˆè§’åº¦å€¼ï¼Œç©ºé—´åæ ‡ç³»ä¸‹çš„ç»å¯¹è§’åº¦ï¼‰ 
- * @param pitch_motor_parsed_feedback_data  æŒ‡å‘ yaw è½´ç”µæœºåé¦ˆç»“æž„ä½“æŒ‡é’ˆï¼ˆå®žé™…å€¼ï¼‰
- * @return float 							ä¸²çº§pidè§’åº¦çŽ¯è¾“å‡º
+ * @brief 									¼ÆËãÔÆÌ¨Yawµç»úµÄ½Ç¶È»·Êä³ö
+ * @param tar_angle 						Éè¶¨½Ç¶ÈÖµ(±¶ÂÊºóµÄÍ¨µÀÖµ)
+ * @param tar_angle							Êµ¼Ê½Ç¶ÈÖµ£¨ÍÑÂä·´À¡½Ç¶ÈÖµ£¬¿Õ¼ä×ø±êÏµÏÂµÄ¾ø¶Ô½Ç¶È£© 
+ * @param pitch_motor_parsed_feedback_data  Ö¸Ïò yaw Öáµç»ú·´À¡½á¹¹ÌåÖ¸Õë£¨Êµ¼ÊÖµ£©
+ * @return float 							´®¼¶pid½Ç¶È»·Êä³ö
  */
 float Calc_Yaw_Angle360_Pid(float tar_angle, float cur_angle)
 {
-	float yaw_tar_angle = tar_angle;///<ch0 é€šé“å€¼
-	float yaw_cur_angle = cur_angle;///<é™€èžºä»ªåé¦ˆå€¼
+	float yaw_tar_angle = tar_angle;///<ch0 Í¨µÀÖµ
+	float yaw_cur_angle = cur_angle;///<ÍÓÂÝÒÇ·´À¡Öµ
 	
 	Handle_Angle360_PID_Over_Zero(&yaw_tar_angle, &yaw_cur_angle);
 	return Pid_Position_Calc(&motor_yaw_angle_pid, yaw_tar_angle, yaw_cur_angle);
 }
 
 /**
- * @brief 									è®¡ç®—äº‘å°ç”µæœºçš„è§’åº¦ pid
- * @param tar_angle 						è®¾å®šè§’åº¦å€¼
- * @param pitch_motor_parsed_feedback_data  æŒ‡å‘ pitch è½´ç”µæœºåé¦ˆç»“æž„ä½“æŒ‡é’ˆï¼ˆå®žé™…å€¼ï¼‰
- * @return float 							pid è®¡ç®—ç»“æžœ
+ * @brief 									¼ÆËãÔÆÌ¨µç»úµÄ½Ç¶È pid
+ * @param tar_angle 						Éè¶¨½Ç¶ÈÖµ
+ * @param pitch_motor_parsed_feedback_data  Ö¸Ïò pitch Öáµç»ú·´À¡½á¹¹ÌåÖ¸Õë£¨Êµ¼ÊÖµ£©
+ * @return float 							pid ¼ÆËã½á¹û
  */
 float Calc_Pitch_Angle8191_Pid(float tar_angle, Motor_Measure_t *pitch_motor_parsed_feedback_data)
 {
 	float pitch_tar_angle = tar_angle;
 	float pitch_cur_angle = pitch_motor_parsed_feedback_data->mechanical_angle;
 	Handle_Angle8191_PID_Over_Zero(&pitch_tar_angle, &pitch_cur_angle);
-	return Pid_Position_Calc(&motor_pitch_angle_pid, pitch_tar_angle, pitch_cur_angle); ///< è¿™æ˜¯ç¬¬ä¸€å±‚ PIDï¼Œè®¡ç®—è®¾å®šè§’åº¦ä¸Žå®žé™…è§’åº¦ä¹‹é—´çš„è¯¯å·®ï¼Œå¾—åˆ°ä¸‹ä¸€æ­¥è¦è®¾å®šçš„é€Ÿåº¦å€¼ï¼Œå¦‚æžœå·²ç»è¾¾åˆ°ç›®æ ‡å€¼ï¼Œåˆ™è¾“å‡ºä¸º 0
+	return Pid_Position_Calc(&motor_pitch_angle_pid, pitch_tar_angle, pitch_cur_angle); ///< ÕâÊÇµÚÒ»²ã PID£¬¼ÆËãÉè¶¨½Ç¶ÈÓëÊµ¼Ê½Ç¶ÈÖ®¼äµÄÎó²î£¬µÃµ½ÏÂÒ»²½ÒªÉè¶¨µÄËÙ¶ÈÖµ£¬Èç¹ûÒÑ¾­´ïµ½Ä¿±êÖµ£¬ÔòÊä³öÎª 0
 }
 
 float Calc_Wave_Motor_Angle8191_Pid(float tar_angle, float current_angle)
@@ -181,15 +181,15 @@ float Calc_Wave_Motor_Angle8191_Pid(float tar_angle, float current_angle)
 	float wave_motor_tar_angle = tar_angle;
 	float wave_motor_cur_angle = current_angle;
 	//Handle_Angle8191_PID_Over_Zero(&tar_angle, &current_angle);
-	return Pid_Position_Calc(&wave_motor_angle_pid, wave_motor_tar_angle, wave_motor_cur_angle); ///< è¿™æ˜¯ç¬¬ä¸€å±‚ PIDï¼Œè®¡ç®—è®¾å®šè§’åº¦ä¸Žå®žé™…è§’åº¦ä¹‹é—´çš„è¯¯å·®ï¼Œå¾—åˆ°ä¸‹ä¸€æ­¥è¦è®¾å®šçš„é€Ÿåº¦å€¼ï¼Œå¦‚æžœå·²ç»è¾¾åˆ°ç›®æ ‡å€¼ï¼Œåˆ™è¾“å‡ºä¸º 0
+	return Pid_Position_Calc(&wave_motor_angle_pid, wave_motor_tar_angle, wave_motor_cur_angle); ///< ÕâÊÇµÚÒ»²ã PID£¬¼ÆËãÉè¶¨½Ç¶ÈÓëÊµ¼Ê½Ç¶ÈÖ®¼äµÄÎó²î£¬µÃµ½ÏÂÒ»²½ÒªÉè¶¨µÄËÙ¶ÈÖµ£¬Èç¹ûÒÑ¾­´ïµ½Ä¿±êÖµ£¬ÔòÊä³öÎª 0
 }
 
 
 /**
- * @brief 								è®¾ç½®æ³¢è½®ç”µæœºçš„é€Ÿåº¦
- * @param speed_left 					å·¦è¾¹æ³¢è½®ç”µæœºçš„é€Ÿåº¦
- * @param speed_right 					å³è¾¹æ³¢è½®ç”µæœºçš„é€Ÿåº¦
- * @param wave_motor_feedback_data 		ä¸¤ä¸ªæ³¢è½®ç”µæœºè§£æžåŽçš„åé¦ˆæ•°æ®
+ * @brief 								ÉèÖÃ²¨ÂÖµç»úµÄËÙ¶È
+ * @param speed_left 					×ó±ß²¨ÂÖµç»úµÄËÙ¶È
+ * @param speed_right 					ÓÒ±ß²¨ÂÖµç»úµÄËÙ¶È
+ * @param wave_motor_feedback_data 		Á½¸ö²¨ÂÖµç»ú½âÎöºóµÄ·´À¡Êý¾Ý
  */
 void Set_Friction_Motor_Speed(float speed_left, float speed_right, Motor_Measure_t *friction_motor_feedback_data)
 {

@@ -1,6 +1,6 @@
 /**
  * @file gyroscope_task.c
- * @brief æ¿è½½é™€èºä»ªè§£æä»»åŠ¡
+ * @brief °åÔØÍÓÂİÒÇ½âÎöÈÎÎñ
  * TODO: Kalman Filter
  * @version 0.1
  * @date 2021-10-17 
@@ -20,11 +20,11 @@ void StartGyroscopeTask(void const * argument)
     
     for(;;)
     {
-        //åˆå§‹åŒ–åŠæ›´æ–°æ•°æ®
+        //³õÊ¼»¯¼°¸üĞÂÊı¾İ
         Mpu6050_Get_Data();
         Imu_AHRS_Update();
 
-        Imu_Attitude_Update();///<æ£€æŸ¥æ˜¯å¦éœ€è¦æ•°æ®æ£€æŸ¥å‡½æ•°
+        Imu_Attitude_Update();///<¼ì²éÊÇ·ñĞèÒªÊı¾İ¼ì²éº¯Êı
       //  imu_date = Get_imu_date_now;
         
         osDelay(1);
