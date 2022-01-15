@@ -45,14 +45,16 @@ void StartGimbalTask(void const *argument)
     for (;;)
     {
         Parse_Can2_Gimbal_Rxd_Data(can2_rx_header_pt, can2_rxd_data_buffer, gimbal_motor_parsed_feedback_data);
-        if (robot_mode_data_pt->mode.control_device == remote_controller_device_ENUM)///<选择机器人模式
+        if (robot_mode_data_pt->mode.control_device == remote_controller_device_ENUM)///<选择机器人模式 
         {
+           // 底盘云台模式 1底盘跟随 2小陀螺 3自瞄 底盘跟随 4自瞄小陀螺 5特殊
             switch (1)
             {
-            case 1:
+            case 1:     ///<底盘跟随
 
             {
-                pitch_angle_set = (rc_data_pt->rc.ch1) * 10.0;//步兵是106f
+                pitch_angle_set = (rc_data_pt->rc.ch1) * -10.0;//步兵是106f
+                //解析没有出错，但通道信息是反的，暂时添加负号
                 yaw_angle_set = (rc_data_pt->rc.ch0) / 12.0f;
 
                 //yaw轴设定值角度回环
