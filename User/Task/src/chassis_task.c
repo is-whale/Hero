@@ -7,8 +7,8 @@
  */
 #include "chassis_task.h"
 
-#define CHASSIS_SPEED_ZERO  0 ///<底盘速度关闭 1为开启
-//#define OUTPUT_LIMIT(data, limit) Float_Constrain(data, -limit, limit)
+#define CHASSIS_SPEED_ZERO  0 ///<关闭底盘速度 1为开启
+//#define OUTPUT_LIMIT(data, limit) Float_Constrain(data, -limit, limit)///<
 #define CHASSIS_MOTOR_DEFAULT_BASE_RATE 5.5f
 #define CHASSIS_MOTOR_GYRO_BASE_RATE 5.0f
 
@@ -40,10 +40,11 @@ void StartChassisTask(void const *argument)
     osDelay(1000); ///< 等待遥控器任务初始化完成
 
 for (;;)
-{///<键鼠操作
+{
+        ///<选择操作设备    键鼠&遥控器
     if (robot_mode_data_pt->mode.control_device == mouse_keyboard_device_ENUM) ///< 最好是使用枚举定义
     {
-
+            ///<选择底盘云台模式    1底盘跟随   2小陀螺   3特殊模式
         switch(robot_mode_data_pt->mode.mouse_keyboard_chassis_mode)
 			{
 					case mk_chassis_follow_mode_ENUM:///<底盘跟随

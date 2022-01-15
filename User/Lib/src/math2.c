@@ -63,7 +63,7 @@ void Float_Constraion(float *data, float min_value, float max_value)
 
 /* 角度Pid时，在获取tar和cur之后紧接着调用 
 
-原始数据过零处理	0~8191
+云台角度过零处理	0~8191
  */
 void Handle_Angle8191_PID_Over_Zero(float *tar, float *cur)
 {
@@ -76,21 +76,22 @@ void Handle_Angle8191_PID_Over_Zero(float *tar, float *cur)
 		*cur = *cur - 8192;
 	}
 }
-/*
-角度Pid时，在获取tar和cur之后紧接着调用 
-角度过零处理，防止疯转
+
+/* 角度Pid时，在获取tar和cur之后紧接着调用 
+
+*云台角度过零处理，防止疯转	0~360
 */
-//void Handle_Angle360_PID_Over_Zero(float *tar, float *cur)
-//{
-//	if(*tar - *cur > 180)   //4096 ：半圈机械角度
-//	{
-//		*cur += 360;
-//	}
-//	else if(*tar - *cur < -180)
-//	{
-//		*cur = *cur - 360;
-//	}
-//}
+void Handle_Angle360_PID_Over_Zero(float *tar, float *cur)
+{
+	if(*tar - *cur > 180)   //4096 ：半圈机械角度
+	{
+		*cur += 360;
+	}
+	else if(*tar - *cur < -180)
+	{
+		*cur = *cur - 360;
+	}
+}
 
 /**
   * @brief  fast inverse square-root, to calculate 1/Sqrt(x)

@@ -60,12 +60,14 @@ typedef struct
 
 #define BOARD_DOWN (1)  
 
-void Mpu6050_Get_Data(void);
 uint8_t Mpu_Set_Gyro_FSR(uint8_t fsr);
 uint8_t Mpu_Set_Accel_FSR(uint8_t fsr);
+
+void Mpu6050_Get_Data(void);
 void Mpu_Offset_Call(void);
 uint8_t Mpu_Device_Init(void);
-//添加调取IMU数据
 
+//外部调取IMU数据
+Imu_t *Get_Imu_Date_Now(void);
 
 #endif //__IMU_MPU_6050_H_

@@ -34,7 +34,9 @@ CAN_RxHeaderTypeDef *Get_CAN2_Rx_Header(void);
 uint8_t *Get_CAN2_Rxd_Buffer(void);
 void Set_Gimbal_Motors_Speed(float yaw_speed, float pitch_speed, Motor_Measure_t *yaw_motor_parsed_feedback_data, Motor_Measure_t *pitch_motor_parsed_feedback_data);
 void Pitch_Angle_Limit(float* angle, float down_angle, float up_angle);
+
 float Calc_Pitch_Angle8191_Pid(float tar_angle,Motor_Measure_t *pitch_motor_parsed_feedback_data);
+float Calc_Yaw_Angle360_Pid(float tar_angle, float cur_angle);
 void Set_Friction_Motor_Speed(float speed_left, float speed_right, Motor_Measure_t *friction_motor_feedback_data);
 void Set_Wave_Motor_Speed(float wave_motor_speed, Motor_Measure_t *wave_motor_feedback_data);
 Motor_Measure_t *Get_Wave_Motor_Paresed_Data(void);

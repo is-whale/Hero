@@ -1,7 +1,7 @@
 #include "can2_device.h"
 
-static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(12, 0, 2, 2000, 16000, 0, 1000, 500); ///< yaw电机速度PID
-// static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); ///< yaw电机角度PID
+static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); ///< yaw电机速度PID
+static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); ///< yaw电机角度PID
 static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(20, 0, 3, 2000, 40000, 0, 1000, 500);		///< pitch电机速度PID
 static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 1000, 0, 3000, 500); ///< pitch电机角度PID
 
@@ -38,6 +38,7 @@ static void Parse_Wave_Motor_Feedback_Data(void)
 	this_machine_angle = wave_motor_feedback_data.mechanical_angle;
 	this_ = this_machine_angle;
 	last_ = last_machine_angle;
+
 	Handle_Angle8191_PID_Over_Zero(&this_, &last_);
 	error_integral += (this_ - last_);
 	last_machine_angle = this_machine_angle;
@@ -143,6 +144,22 @@ void Pitch_Angle_Limit(float *angle, float down_angle, float up_angle)
 		else if (*angle > up_angle)
 			*angle = up_angle;
 	}
+}
+
+/**
+ * @brief 									计算云台Yaw电机的角度环输出
+ * @param tar_angle 						设定角度值(倍率后的通道值)
+ * @param tar_angle							实际角度值（脱落反馈角度值，空间坐标系下的绝对角度） 
+ * @param pitch_motor_parsed_feedback_data  指向 yaw 轴电机反馈结构体指针（实际值）
+ * @return float 							串级pid角度环输出
+ */
+float Calc_Yaw_Angle360_Pid(float tar_angle, float cur_angle)
+{
+	float yaw_tar_angle = tar_angle;///<ch0 通道值
+	float yaw_cur_angle = cur_angle;///<陀螺仪反馈值
+	
+	Handle_Angle360_PID_Over_Zero(&yaw_tar_angle, &yaw_cur_angle);
+	return Pid_Position_Calc(&motor_yaw_angle_pid, yaw_tar_angle, yaw_cur_angle);
 }
 
 /**

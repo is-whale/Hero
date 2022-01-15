@@ -27,6 +27,6 @@ void StartGyroscopeTask(void const * argument)
         Imu_Attitude_Update();///<检查是否需要数据检查函数
       //  imu_date = Get_imu_date_now;
         
-        osDelay(100);
+        osDelay(1);
     }
 }
