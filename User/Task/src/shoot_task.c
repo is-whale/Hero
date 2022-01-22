@@ -71,7 +71,7 @@ void StartShootTask(void const *argument)
         case fric_adaptive_speed_mode_ENUM: ///< 1
 
         {
-            fric_speed = 6500;
+            fric_speed = 10000;
             is_ok_fire = 1;
             break;
         }
@@ -79,7 +79,7 @@ void StartShootTask(void const *argument)
         case fric_high_speed_mode_ENUM: ///< 2
 
         {
-            fric_speed = 16000;
+            fric_speed = 30000;
             is_ok_fire = 1;
             break;
         }
@@ -87,7 +87,7 @@ void StartShootTask(void const *argument)
         case cover_on_ENUM: ///< 3
 
         {
-            fric_speed = 7000;
+            fric_speed = 8000;
             is_ok_fire = 1;
 
             break;

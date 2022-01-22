@@ -34,7 +34,7 @@ void StartGimbalTask(void const *argument)
     (void)yaw_speed;
 
     ///< ½ö²âÊÔ½×¶ÎÊ¹ÓÃ
-    robot_mode_data_pt->mode.control_device = 0;
+    robot_mode_data_pt->mode.control_device = 2;
     robot_mode_data_pt->mode.rc_motion_mode = 1;
 
     osDelay(1000);
@@ -83,11 +83,14 @@ void StartGimbalTask(void const *argument)
             }
             }
         }
-       // Console.print("%d,%d",pitch_speed,)
+        
         Set_Gimbal_Motors_Speed(0,
                                 pitch_speed,
                                 &gimbal_motor_parsed_feedback_data[yaw_motor_index],
                                 &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
+        float new_moter_date = 0;
+        new_moter_date =  gimbal_motor_parsed_feedback_data[yaw_motor_index].speed_rpm;
+        Console.print("%0.2f,%0.2f\r\n",pitch_speed, new_moter_date);
         osDelay(10);
     }
 }
