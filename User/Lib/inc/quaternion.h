@@ -6,7 +6,7 @@
 #include "math.h"
 #include "math2.h"
 #include "usart3.h"
-
+#include "console_print.h"
 //typedef struct
 //{
 //	float rol_angle = 0;
