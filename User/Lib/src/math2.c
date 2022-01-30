@@ -48,7 +48,11 @@ void Int16_Minus_Limit(int16_t *data, int16_t minus_value, int16_t min_value)
 		*data = min_value;
 	}
 }
-
+/**
+ * @brief			float数据上下限幅
+ * @param [in]		数据值；上下限幅
+ * @return			void	
+*/
 void Float_Constraion(float *data, float min_value, float max_value)
 {
 	if (*data > max_value)

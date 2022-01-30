@@ -1,25 +1,15 @@
 #include "can2_device.h"
 
-<<<<<<< HEAD
-static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(12, 0, 2, 2000, 16000, 0, 1000, 500); ///< yawç”µæœºé€Ÿåº¦PID
-// static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); ///< yawç”µæœºè§’åº¦PID
-
-//static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(20, 0, 3, 2000, 50000, 0, 1000, 500);		///< pitchç”µæœºé€Ÿåº¦PID  åŽŸæ¥çš„
-static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID( 10, 0, 3,220, 30000, 0, 1000, 500);		///< pitchç”µæœºé€Ÿåº¦PID
-
-//static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 1000, 0, 3000, 500); ///< pitchç”µæœºè§’åº¦PID
-static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.25,0.018,0.005,100, 300, 0, 3000, 500); ///< pitchç”µæœºè§’åº¦PID
-=======
 static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); ///< yawµç»úËÙ¶ÈPID
 static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); ///< yawµç»ú½Ç¶ÈPID
+
 static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(20, 0, 3, 2000, 40000, 0, 1000, 500);		///< pitchµç»úËÙ¶ÈPID
 static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 1000, 0, 3000, 500); ///< pitchµç»ú½Ç¶ÈPID
->>>>>>> 29a6636b20a8181e2d633db14557fb4204aafeaf
 
 static Pid_Position_t friction_motor_left_speed_pid = NEW_POSITION_PID(7, 0, 0.7, 2000, 16383, 0, 1000, 500);
 static Pid_Position_t friction_motor_right_speed_pid = NEW_POSITION_PID(7, 0, 0.7, 2000, 16383, 0, 1000, 500);
-static Pid_Position_t wave_motor_speed_pid = NEW_POSITION_PID(9, 0, 3, 2000, 16000, 0, 1000, 500);
 
+static Pid_Position_t wave_motor_speed_pid = NEW_POSITION_PID(9, 0, 3, 2000, 16000, 0, 1000, 500);
 static Pid_Position_t wave_motor_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 4500, 0, 3000, 500); ///<  ²¦ÂÖµç»ú½Ç¶ÈPID
 
 static int error_integral = 0;
@@ -29,7 +19,7 @@ static uint16_t this_machine_angle = 0;
 static uint8_t can2_rxd_data_buffer[8];	   ///< ¸¨Öú±äÁ¿£¬½ÓÊÜµç»ú·´À¡µÄÔ­Ê¼Êý¾Ý
 static CAN_RxHeaderTypeDef can2_rx_header; ///< ¸¨Öú±äÁ¿£¬ÓÃÓÚ HAL ¿âº¯Êý½ÓÊÜÊý¾Ý£¬´æ·Å¹ØÓÚ CAN ·´À¡Êý¾ÝµÄ ID ºÅµÈÐÅÏ¢
 
-static Motor_Measure_t wave_motor_feedback_data;
+static Motor_Measure_t wave_motor_feedback_data;///<²¦ÂÖµç»ú·´À¡Êý¾Ý
 
 /**
  * @brief 			½âÎö²¨ÂÖµç»úÊý¾Ý
@@ -176,7 +166,7 @@ float Calc_Yaw_Angle360_Pid(float tar_angle, float cur_angle)
 /**
  * @brief 									¼ÆËãÔÆÌ¨µç»úµÄ½Ç¶È pid
  * @param tar_angle 						Éè¶¨½Ç¶ÈÖµ
- * @param pitch_motor_parsed_feedback_data  Ö¸Ïò pitch Öáµç»ú·´À¡½á¹¹ÌåÖ¸Õë£¨Êµ¼ÊÖµ£©
+ * @param pitch_motor_parsed_feedback_data  Ö¸Ïò pitch Öáµç»ú·´À¡½á¹¹ÌåÖ¸Õë
  * @return float 							pid ¼ÆËã½á¹û
  */
 float Calc_Pitch_Angle8191_Pid(float tar_angle, Motor_Measure_t *pitch_motor_parsed_feedback_data)
