@@ -4,7 +4,7 @@ extern osThreadId parseCan1RxDataHandle;
 static const uint16_t can1_get_data_signal = 0x0001;
 static const uint8_t can1_motor_device_number = 4;
 static const uint8_t can1_rx_data_overtime = 100;
-static Motor_Measure_t m3508_feddback_data[can1_motor_device_number];
+static Motor_Measure_t m3508_feddback_data[can1_motor_device_number];///<类型为解析后的电机数据结构体，后标为CAN1电机编号1~4
 static uint8_t *can1_rxd_data;
 static CAN_RxHeaderTypeDef *can1_rx_header;
 
@@ -12,11 +12,11 @@ void StartParseCan1RxDataTask(void const *argument)
 {
     osEvent can1_get_data_event;
 
-    Can1_Filter_Init();
+    Can1_Filter_Init();///<CAN1底层初始化
     can1_rxd_data = Get_CAN1_Rxd_Data();
     can1_rx_header = Get_CAN1_Rx_Header();
 
-    osDelay(1000);
+    osDelay(1000);//初始化之后的延时都是确保初始化成功
 
     HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 
@@ -64,6 +64,7 @@ Motor_Measure_t *Get_Can1_Feedback_Data(void)
 {
     return m3508_feddback_data;
 }
+//不用加取地址，数组名就是指，而不是定义为结构体。与remote_task.c中不同。
 
 /**
  * @brief                     返回 CAN1 总线上电机的数量
