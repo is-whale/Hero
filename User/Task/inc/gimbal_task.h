@@ -7,9 +7,11 @@
 #include "remote_task.h"
 #include "imu_mpu6050.h"
 #include "console_print.h"
+#include "math2.h"
 
 /*yaw*/
 #define YAW_GM6020_HEAD_ANGLE 5450
+
 /*pitch*/
 #define PITCH_UP_LIMIT 6960///<pitch上限位
 #define PITCH_MID_ANGLE 7490///<pitch中间附近

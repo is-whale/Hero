@@ -92,6 +92,9 @@ typedef struct
 
 	float output;
 
+	float angle_output;
+	///<这里参照其他学校的PID结构体，看要不要做成包含双环所有参数，使用时各调用各的
+
 } Pid_Increment_t;
 
 float Pid_Position_Calc(Pid_Position_t *pid, float tar, float cur);

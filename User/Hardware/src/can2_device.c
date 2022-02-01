@@ -106,8 +106,7 @@ Motor_Measure_t *Get_Wave_Motor_Paresed_Data(void)
 }
 
 /**
- * @brief 									设置云台电机的速度，但是一般云台是通过角度进行控制，这里输入的速度值
- * 											其实是经过角度 pid 计算得到的速度值
+ * @brief 									云台串级PID的速度环计算以及向CAN2发送解析后的云台电机速度值
  * @param yaw_speed 						设置的 yaw 轴电机的速度值
  * @param pitch_speed 						设置的 pitch 轴电机的速度值
  * @param yaw_motor_parsed_feedback_data 	指向 yaw 轴电机解析后的结构体指针
@@ -125,7 +124,7 @@ void Set_Gimbal_Motors_Speed(float yaw_speed, float pitch_speed, Motor_Measure_t
 
 /**
  * @brief 				限制 pitch 轴电机的角度
- * @param angle 		当前将要设定的角度
+ * @param angle 		当前角度目标值
  * @param down_angle 	最低角度
  * @param up_angle 		最高角度
  */
@@ -187,7 +186,7 @@ float Calc_Wave_Motor_Angle8191_Pid(float tar_angle, float current_angle)
 
 
 /**
- * @brief 								设置波轮电机的速度
+ * @brief 								设置波轮电机的速度(包含速度环结算)
  * @param speed_left 					左边波轮电机的速度
  * @param speed_right 					右边波轮电机的速度
  * @param wave_motor_feedback_data 		两个波轮电机解析后的反馈数据

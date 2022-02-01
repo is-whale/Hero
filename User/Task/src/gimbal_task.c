@@ -1,5 +1,5 @@
 #include "gimbal_task.h"
-#include "math2.h"//包含在gimbal_task.h出现报错,暂时改到这里
+// #include "math2.h"//包含在gimbal_task.h出现报错,暂时改到这里
 
 static const uint8_t gimbal_motor_num = 2;           ///< 云台电机的数量
 static const uint8_t yaw_motor_index = 0;            ///< yaw 轴电机在电机数据结构体中的下标
@@ -18,16 +18,11 @@ static Robot_control_data_t *robot_mode_data_pt;     ///< 指向机器人模式的结构体
 //static Imu_t* imu_date_pt;                         ///<指向陀螺仪获取角度的结构体指针
 static Motor_Measure_t gimbal_motor_parsed_feedback_data[gimbal_motor_num]; ///< 解析后的云台电机数据数组
 
+void Gimbal_Init(void);///<云台初始化函数声明
+
 void StartGimbalTask(void const *argument)
 {
     float yaw_speed, pitch_speed;
-
-    Can2_Filter_Init();
-    can2_rx_header_pt = Get_CAN2_Rx_Header();
-    can2_rxd_data_buffer = Get_CAN2_Rxd_Buffer();
-    rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();
-    robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();
-//    imu_date_pt = Get_Imu_Date_Now();                           ///<获取陀螺仪角度
 
 //调试区域，调试结束删除或全部注释
     (void)pitch_down_angle_limit;   ///< 测试阶段，避免 warning
@@ -37,12 +32,13 @@ void StartGimbalTask(void const *argument)
     robot_mode_data_pt->mode.control_device = 2;
     robot_mode_data_pt->mode.rc_motion_mode = 1;
 //调试区域结束
-
+    Gimbal_Init();
     osDelay(1000);
+
     __OPEN_CAN2_RX_FIFO0_IT__;
     for (;;)
     {
-				//Console.print("yaw %.2f, pitch %.2f, rol %.2f \r\n", imu_date_pt->yaw, imu_date_pt->pit, imu_date_pt->rol);
+		//Console.print("yaw %.2f, pitch %.2f, rol %.2f \r\n", imu_date_pt->yaw, imu_date_pt->pit, imu_date_pt->rol);
         Parse_Can2_Gimbal_Rxd_Data(can2_rx_header_pt, can2_rxd_data_buffer, gimbal_motor_parsed_feedback_data);//解析任务，需要搬到接收中断里面
         //操作逻辑
         if (robot_mode_data_pt->mode.control_device == remote_controller_device_ENUM)///<选择机器人模式 
@@ -51,7 +47,10 @@ void StartGimbalTask(void const *argument)
             switch (robot_mode_data_pt->mode.rc_motion_mode)
             {
             case 1:     ///<底盘跟随    暂未添加陀螺仪数据
+            {}
+            
             case 2:     ///<底盘小陀螺云台自由运动
+
             /*
             底盘跟随模式和小陀螺模式在云台任务中逻辑共用，差别在底盘
             */
@@ -99,7 +98,7 @@ void StartGimbalTask(void const *argument)
             }
             }
         }
-       // Console.print("%d,%d",pitch_speed,)
+       // Console.print("%d,%d",pitch_speed,&gimbal_motor_parsed_feedback_data[pitch_motor_index])
        
         Set_Gimbal_Motors_Speed(yaw_speed,
                                 pitch_speed,
@@ -110,6 +109,21 @@ void StartGimbalTask(void const *argument)
         Console.print("%0.2f,%0.2f\r\n",pitch_speed, new_moter_date);
         osDelay(10);
     }
+}
+
+/**
+ * @brief               云台相关的所有初始化
+ * @param [in]          void
+ * @return              void
+*/
+void Gimbal_Init(void)
+{
+    Can2_Filter_Init();
+    can2_rx_header_pt = Get_CAN2_Rx_Header();
+    can2_rxd_data_buffer = Get_CAN2_Rxd_Buffer();
+    rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();
+    robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();
+    //imu_date_pt = Get_Imu_Date_Now();                           ///<获取陀螺仪角度
 }
 
 /**

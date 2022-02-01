@@ -29,7 +29,7 @@
 	#define debug_array1(name, data, len) { __printf("<DEBUG>%s : {",name); for(u16 __tmp_i=0; __tmp_i<len; __tmp_i++) __printf("%d ", data[__tmp_i]);  __printf("}\r\n"); }
     #define debug_array2(name, data, len) { __printf("<DEBUG>%s : {",name); for(u16 __tmp_i=0; __tmp_i<len; __tmp_i++) __printf("%.2f ", data[__tmp_i]);  __printf("}\r\n"); }
 #else
-	#define debug_print(format, ...)
+	#define debug_print(format, ...)	
 	#define debug_log(format, arg...)
 	#define debug_showdata1(name, data)
 	#define debug_showdata2(name, data)

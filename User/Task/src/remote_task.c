@@ -53,7 +53,7 @@ void StartRemoteTask(void const *argument)
                 }
                 else
                 {
-                    Usart1_Rx_DMA_Reset();
+                    Usart1_Rx_DMA_Reset();///<DMA重置
                     Rc_Data_Copy(&remote_controller, &last_time_remote_controller); ///< 校验出错保持遥控器数据不变
                 }
             }
@@ -61,6 +61,7 @@ void StartRemoteTask(void const *argument)
         else if (remote_get_data_event.status == osEventTimeout)
         {
             Rc_Data_Reset(&remote_controller);
+            
             Rc_Data_Reset(&last_time_remote_controller);
         }
     }
