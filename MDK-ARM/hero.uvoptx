@@ -1137,7 +1137,7 @@
 
   <Group>
     <GroupName>User/Task</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1160,8 +1160,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Task\src\shell_task.c</PathWithFileName>
-      <FilenameWithoutPath>shell_task.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Task\src\chassis_task.c</PathWithFileName>
+      <FilenameWithoutPath>chassis_task.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1172,8 +1172,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Task\src\monitor_task.c</PathWithFileName>
-      <FilenameWithoutPath>monitor_task.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Task\src\gimbal_task.c</PathWithFileName>
+      <FilenameWithoutPath>gimbal_task.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1184,8 +1184,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Task\src\default_task.c</PathWithFileName>
-      <FilenameWithoutPath>default_task.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Task\src\shoot_task.c</PathWithFileName>
+      <FilenameWithoutPath>shoot_task.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1196,8 +1196,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Task\src\can_send_task.c</PathWithFileName>
-      <FilenameWithoutPath>can_send_task.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Task\src\wave_wheel_task.c</PathWithFileName>
+      <FilenameWithoutPath>wave_wheel_task.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1208,8 +1208,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Task\src\chassis_task.c</PathWithFileName>
-      <FilenameWithoutPath>chassis_task.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Task\src\super_capacitor_task.c</PathWithFileName>
+      <FilenameWithoutPath>super_capacitor_task.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1232,8 +1232,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Task\src\gimbal_task.c</PathWithFileName>
-      <FilenameWithoutPath>gimbal_task.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Task\src\can_send_task.c</PathWithFileName>
+      <FilenameWithoutPath>can_send_task.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1244,26 +1244,14 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Task\src\buzzer_task.c</PathWithFileName>
-      <FilenameWithoutPath>buzzer_task.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Task\src\monitor_task.c</PathWithFileName>
+      <FilenameWithoutPath>monitor_task.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>10</GroupNumber>
       <FileNumber>80</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Task\src\shoot_task.c</PathWithFileName>
-      <FilenameWithoutPath>shoot_task.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>81</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1275,13 +1263,25 @@
     </File>
     <File>
       <GroupNumber>10</GroupNumber>
+      <FileNumber>81</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\User\Task\src\shell_task.c</PathWithFileName>
+      <FilenameWithoutPath>shell_task.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
       <FileNumber>82</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Task\src\wave_wheel_task.c</PathWithFileName>
-      <FilenameWithoutPath>wave_wheel_task.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Task\src\buzzer_task.c</PathWithFileName>
+      <FilenameWithoutPath>buzzer_task.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1292,8 +1292,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Task\src\super_capacitor_task.c</PathWithFileName>
-      <FilenameWithoutPath>super_capacitor_task.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Task\src\referee_system.c</PathWithFileName>
+      <FilenameWithoutPath>referee_system.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1304,8 +1304,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Task\src\referee_system.c</PathWithFileName>
-      <FilenameWithoutPath>referee_system.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Task\src\default_task.c</PathWithFileName>
+      <FilenameWithoutPath>default_task.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

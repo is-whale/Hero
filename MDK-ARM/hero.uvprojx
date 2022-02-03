@@ -3082,34 +3082,9 @@
               <FilePath>..\User\Task\src\remote_task.c</FilePath>
             </File>
             <File>
-              <FileName>shell_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Task\src\shell_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>monitor_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Task\src\monitor_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>default_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Task\src\default_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>can_send_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Task\src\can_send_task.c</FilePath>
-            </File>
-            <File>
               <FileName>chassis_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Task\src\chassis_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>parse_can1_rx_data_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Task\src\parse_can1_rx_data_task.c</FilePath>
             </File>
             <File>
               <FileName>gimbal_task.c</FileName>
@@ -3117,19 +3092,9 @@
               <FilePath>..\User\Task\src\gimbal_task.c</FilePath>
             </File>
             <File>
-              <FileName>buzzer_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Task\src\buzzer_task.c</FilePath>
-            </File>
-            <File>
               <FileName>shoot_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Task\src\shoot_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>gyroscope_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Task\src\gyroscope_task.c</FilePath>
             </File>
             <File>
               <FileName>wave_wheel_task.c</FileName>
@@ -3142,9 +3107,44 @@
               <FilePath>..\User\Task\src\super_capacitor_task.c</FilePath>
             </File>
             <File>
+              <FileName>parse_can1_rx_data_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Task\src\parse_can1_rx_data_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>can_send_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Task\src\can_send_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>monitor_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Task\src\monitor_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>gyroscope_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Task\src\gyroscope_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>shell_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Task\src\shell_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>buzzer_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Task\src\buzzer_task.c</FilePath>
+            </File>
+            <File>
               <FileName>referee_system.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Task\src\referee_system.c</FilePath>
+            </File>
+            <File>
+              <FileName>default_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Task\src\default_task.c</FilePath>
             </File>
           </Files>
         </Group>
