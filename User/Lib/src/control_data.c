@@ -126,9 +126,9 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 #define KEY_D            0x08
 #define RC_KEY           rc_data->key.value
 #define KEY_PRESSED(key) (RC_KEY & key)
-#define VIRTUAL_ROCKER_STEP robot_control_data->parameter.chassis_acceleration
-#define VIRTUAL_ROCKER_MIN  (-robot_control_data->parameter.chassis_max_speed)
-#define VIRTUAL_ROCKER_MAX  robot_control_data->parameter.chassis_max_speed
+#define VIRTUAL_ROCKER_STEP robot_control_data->parameter.chassis_acceleration///<底盘加速度
+#define VIRTUAL_ROCKER_MIN  (-robot_control_data->parameter.chassis_max_speed)///<底盘反向最大速度
+#define VIRTUAL_ROCKER_MAX  robot_control_data->parameter.chassis_max_speed///<底盘正向最大速度
 #define VIRTUAL_ROCKER    robot_control_data->virtual_rocker
 
 	/* ch3 min max限制 */
@@ -235,8 +235,13 @@ static void Wasd_Key_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t*
 #undef VIRTUAL_ROCKER_MIN
 #undef VIRTUAL_ROCKER_MAX
 #undef VIRTUAL_ROCKER
+/*相当于W,S,A,D,只是需要利用的中间值，利用他们生成虚拟摇杆数据，作为最终使用的数据*/
 }
-
+/** @brief								鼠标移动解析为虚拟摇杆通道值
+ *  @param [in] Rc_Ctrl_t				接收的遥控器数据结构体指针
+ *  @param [in] Robot_control_data_t	机器人控制数据结构体指针
+ * 
+*/
 static void Mouse_To_Virtual_Rocker(Rc_Ctrl_t* rc_data, Robot_control_data_t* robot_control_data)
 {
 	//鼠标上下限限制

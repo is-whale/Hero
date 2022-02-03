@@ -15,7 +15,7 @@ static CAN_RxHeaderTypeDef *can2_rx_header_pt;       ///< can2 ½ÓÊÕµÄÍ·Êý¾Ý½á¹¹Ì
 static uint8_t *can2_rxd_data_buffer;                ///< can2 ½ÓÊÕµÄÊý¾Ý´æ·ÅµÄÊý×éÊ×µØÖ·
 static Rc_Ctrl_t *rc_data_pt;                        ///< Ö¸ÏòÒ£¿ØÆ÷Êý¾ÝµÄ½á¹¹ÌåÖ¸Õë
 static Robot_control_data_t *robot_mode_data_pt;     ///< Ö¸Ïò»úÆ÷ÈËÄ£Ê½µÄ½á¹¹ÌåÖ¸Õë
-//static Imu_t* imu_date_pt;                         ///<Ö¸ÏòÍÓÂÝÒÇ»ñÈ¡½Ç¶ÈµÄ½á¹¹ÌåÖ¸Õë
+static Imu_t* imu_date_pt;                         ///<Ö¸ÏòÍÓÂÝÒÇ»ñÈ¡½Ç¶ÈµÄ½á¹¹ÌåÖ¸Õë
 static Motor_Measure_t gimbal_motor_parsed_feedback_data[gimbal_motor_num]; ///< ½âÎöºóµÄÔÆÌ¨µç»úÊý¾ÝÊý×é
 
 void Gimbal_Init(void);///<ÔÆÌ¨³õÊ¼»¯º¯ÊýÉùÃ÷
@@ -30,33 +30,39 @@ void StartGimbalTask(void const *argument)
 
     ///< ½ö²âÊÔ½×¶ÎÊ¹ÓÃ
     robot_mode_data_pt->mode.control_device = 2;
-    robot_mode_data_pt->mode.rc_motion_mode = 1;
+    robot_mode_data_pt->mode.rc_motion_mode = 5;
 //µ÷ÊÔÇøÓò½áÊø
+
     Gimbal_Init();
     osDelay(1000);
-
-    __OPEN_CAN2_RX_FIFO0_IT__;
+   // Console.print("%0.3f",imu_date_pt->pit);
+    __OPEN_CAN2_RX_FIFO0_IT__;///<´ò¿ªCAN½ÓÊÕÖÐ¶Ï
     for (;;)
     {
-		//Console.print("yaw %.2f, pitch %.2f, rol %.2f \r\n", imu_date_pt->yaw, imu_date_pt->pit, imu_date_pt->rol);
+		// debug_print("yaw %.2f, pitch %.2f, rol %.2f \r\n", imu_date_pt->yaw, imu_date_pt->pit, imu_date_pt->rol);
+        //ËùÓÐµÄµ÷ÊÔ´òÓ¡È«²¿²ÉÓÃdebug-printf£¬ÔÚusart3.hÖÐµÄºê¶¨Òå¿ØÖÆÌõ¼þ±àÒë£¬¹Ø±ÕºêÖ®ºódebug_printfÖ¸Ïò¿Õºê£¬ÎÞ¶¯×÷¡£¾Í²»ÓÃ°¤¸öÉ¾³ýËùÓÐ´òÓ¡Êä³ö
+
         Parse_Can2_Gimbal_Rxd_Data(can2_rx_header_pt, can2_rxd_data_buffer, gimbal_motor_parsed_feedback_data);//½âÎöÈÎÎñ£¬ÐèÒª°áµ½½ÓÊÕÖÐ¶ÏÀïÃæ
+        
         //²Ù×÷Âß¼­
-        if (robot_mode_data_pt->mode.control_device == remote_controller_device_ENUM)///<Ñ¡Ôñ»úÆ÷ÈËÄ£Ê½ 
+        if (robot_mode_data_pt -> mode.control_device == remote_controller_device_ENUM)///<Ò£¿ØÆ÷Ä£Ê½
         {
            // µ×ÅÌÔÆÌ¨Ä£Ê½ 1µ×ÅÌ¸úËæ 2Ð¡ÍÓÂÝ  3ÌØÊâ
             switch (robot_mode_data_pt->mode.rc_motion_mode)
             {
+
             case 1:     ///<µ×ÅÌ¸úËæ    ÔÝÎ´Ìí¼ÓÍÓÂÝÒÇÊý¾Ý
-            {}
+            {   
+                /*
+                µ×ÅÌ¸úËæÄ£Ê½ºÍÐ¡ÍÓÂÝÄ£Ê½ÔÚÔÆÌ¨ÈÎÎñÖÐÂß¼­¹²ÓÃ£¬²î±ðÔÚµ×ÅÌ
+                */
+            }
             
             case 2:     ///<µ×ÅÌÐ¡ÍÓÂÝÔÆÌ¨×ÔÓÉÔË¶¯
 
-            /*
-            µ×ÅÌ¸úËæÄ£Ê½ºÍÐ¡ÍÓÂÝÄ£Ê½ÔÚÔÆÌ¨ÈÎÎñÖÐÂß¼­¹²ÓÃ£¬²î±ðÔÚµ×ÅÌ
-            */
             {
-                                pitch_angle_set = (rc_data_pt->rc.ch1) * -10.0f;//²½±øÊÇ106f
-                //½âÎöÃ»ÓÐ³ö´í£¬µ«Í¨µÀÐÅÏ¢ÊÇ·´µÄ£¬ÔÝÊ±Ìí¼Ó¸ººÅ½â¾öÎÊÌâ¡£ºóÃæ¸ãÇå³þÊÇÓ²¼þÎÊÌâ»¹ÊÇÊý¾ÝÊ¹ÓÃ(°Ë³ÉÊÇÓÃ´íÁË)
+                pitch_angle_set = (rc_data_pt->rc.ch1) * -10.0f;//²½±øÊÇ106f
+                //½âÎöÃ»ÓÐ³ö´í£¬µ«Í¨µÀÐÅÏ¢ÊÇ·´µÄ£¬ÔÝÊ±Ìí¼Ó¸ººÅ½â¾öÎÊÌâ¡£ºóÃæ¸ãÇå³þÊÇÒ£¿ØÆ÷Í¨µÀ°²×°·´ÁË»¹ÊÇÊý¾ÝÊ¹ÓÃ(°Ë³ÉÊÇÓÃ´íÁË)
                 yaw_angle_set = (rc_data_pt->rc.ch0) / 12.0f;
 
                 //yawÖáÉè¶¨Öµ½Ç¶È»Ø»·
@@ -98,8 +104,29 @@ void StartGimbalTask(void const *argument)
             }
             }
         }
+        else if (robot_mode_data_pt->mode.control_device == mouse_keyboard_device_ENUM)///<¼üÊóÄ£Ê½
+        {
+            switch (robot_mode_data_pt->mode.mouse_keyboard_gimbal_mode)
+            {
+            case 1:///<ÊÖ¶¯Ä£Ê½
+                {
+                    // yaw_angle_set -= robot_mode_data_pt->;
+                }
+                break;
+            case 2:///<×ÔÃéÄ£Ê½(Ó¢ÐÛÃ»ÓÐ×ÔÃé£¬¿ÉÒÔÌí¼Ó½áºÏÍÓÂÝÒÇµÄ×ÔÎÈ¶¨Ä£Ê½)
+            {
+                break;
+            }
+            case 3 :///<ÌØÊâÄ£Ê½£¨ÒÔÔÆÌ¨×ø±êÏµÎªÕû³µÔË¶¯×ø±êÏµ£¬Ç°ºó×óÓÒµÄÔË¶¯¾ùÒÔÔÆÌ¨ÊÓ½ÇÎª×¼£¬ÔÚChassis_task.cÓÐ¾ßÌåµÄËµÃ÷£©
+            {
+                
+            }
+            default:
+                break;
+            }
+        }
        // Console.print("%d,%d",pitch_speed,&gimbal_motor_parsed_feedback_data[pitch_motor_index])
-       
+       ///<ÔÆÌ¨´®»·ËÙ¶È»·¼ÆËã¼°·¢ËÍµ×ÅÌµç»úËÙ¶È
         Set_Gimbal_Motors_Speed(yaw_speed,
                                 pitch_speed,
                                 &gimbal_motor_parsed_feedback_data[yaw_motor_index],
@@ -113,6 +140,7 @@ void StartGimbalTask(void const *argument)
 
 /**
  * @brief               ÔÆÌ¨Ïà¹ØµÄËùÓÐ³õÊ¼»¯
+ *                      CAN2³õÊ¼»¯£¬¿ØÖÆÊý¾Ý½ÓÊÕ³õÊ¼»¯£¬ÍÓÂÝÒÇÊý¾Ý½ÓÊÕ³õÊ¼»¯
  * @param [in]          void
  * @return              void
 */
@@ -123,7 +151,7 @@ void Gimbal_Init(void)
     can2_rxd_data_buffer = Get_CAN2_Rxd_Buffer();
     rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();
     robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();
-    //imu_date_pt = Get_Imu_Date_Now();                           ///<»ñÈ¡ÍÓÂÝÒÇ½Ç¶È
+    imu_date_pt = Get_Imu_Date_Now();                           ///<»ñÈ¡ÍÓÂÝÒÇ½Ç¶È
 }
 
 /**

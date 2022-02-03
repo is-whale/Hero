@@ -6,13 +6,13 @@
 #include "math2.h"
 #include "buzzer_task.h"
 
-enum controlDevice
+enum controlDevice///<操作设备选择
 {
 	mouse_keyboard_device_ENUM = 1u, ///< 操作设备为键鼠
 	remote_controller_device_ENUM	 ///< 操作设备为遥控器
 };
 
-enum rcMotionMode
+enum rcMotionMode///<遥控器模式的底盘云台模式
 {
 	rc_chassis_follow_mode_ENUM = 1u,		  ///< 底盘跟随+手动瞄准
 	rc_chassis_gyro_mode_ENUM,				  ///< 底盘小陀螺+手动瞄准
@@ -21,35 +21,35 @@ enum rcMotionMode
 	rc_special_mode_ENUM					  ///< 特殊模式
 };
 
-enum mouseKeyboardChassisMode
+enum mouseKeyboardChassisMode///<键鼠模式的底盘模式选择
 {
 	mk_chassis_follow_mode_ENUM = 1u, ///< 底盘跟随
 	mk_chassis_gyro_mode_ENUM,		  ///< 底盘小陀螺
 	mk_chassis_special_mode_ENUM	  ///< 底盘特殊模式
 };
 
-enum mouseKeyboardAimMode
+enum mouseKeyboardAimMode///<键鼠模式的射击模式选择
 {
 	mk_manual_aim_mode_ENUM = 1u, ///< 手动瞄准
 	mk_auto_aim_mode_ENUM,		  ///< 自动瞄准
 	mk_special_aim_mode_ENUM	  ///< 云台特殊模式
 };
 
-enum gyroDirection
+enum gyroDirection///<小陀螺选项
 {
 	gyro_positive_ENUM = 1, ///< 陀螺正向
 	gyro_negative_ENUM = -1 ///< 陀螺反向
 };
 
-enum fricCoverMode
+enum fricCoverMode///<摩擦轮选项
 {
-	fric_cover_off_mode_ENUM = 0u, ///< 摩擦轮关闭，弹舱盖关闭
-	fric_adaptive_speed_mode_ENUM, ///< 摩擦轮自适应速度，弹舱盖关闭
-	fric_high_speed_mode_ENUM,	   ///< 摩擦轮最高速度速度，弹舱盖关闭
-	cover_on_ENUM				   ///< 摩擦轮关闭，弹舱盖开启
+	fric_cover_off_mode_ENUM = 0u, ///< 摩擦轮关闭
+	fric_adaptive_speed_mode_ENUM, ///< 摩擦轮自适应速度
+	fric_high_speed_mode_ENUM,	   ///< 摩擦轮最高速度速度
+	cover_on_ENUM				   ///< 摩擦轮关闭
 };
 
-enum shooterMode
+enum shooterMode///<射击模式选择
 {
 	on_shoot_mode_ENUM = 1u, ///< 单发
 	rapid_fire_max_mode_ENUM ///< 高速连发
