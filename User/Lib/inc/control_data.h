@@ -62,7 +62,7 @@ typedef struct
 		uint8_t control_device;				 ///< 控制设备 1键鼠模式(rc) 2遥控器模式(mouse_key)
 		uint8_t rc_motion_mode;				 ///< 底盘云台模式 1底盘跟随 2小陀螺 3自瞄 底盘跟随 4自瞄小陀螺 5特殊
 		uint8_t mouse_keyboard_chassis_mode; ///< 1跟随 2小陀螺 3特殊
-		uint8_t mouse_keyboard_gimbal_mode;	 ///< 1手动 2自瞄 3特殊
+		uint8_t mouse_keyboard_gimbal_mode;	 ///< 1跟随 2自稳定云台模式 3特殊模式	后续需要将2的自瞄解析改一下
 		int8_t gyro_direction;				 ///< -1陀螺反向 1陀螺正向
 		uint8_t fric_cover_mode;			 ///< 摩擦轮模式 0关闭 1自适应 2最高速 3开舱盖
 		uint8_t shoot_mode;					 ///< 射击模式 1单发 2连发（最大速度）

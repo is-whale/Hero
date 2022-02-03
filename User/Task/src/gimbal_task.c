@@ -22,7 +22,7 @@ void Gimbal_Init(void);///<云台初始化函数声明
 
 void StartGimbalTask(void const *argument)
 {
-    float yaw_speed, pitch_speed;
+    float yaw_target_speed, pitch_target_speed;
 
 //调试区域，调试结束删除或全部注释
     (void)pitch_down_angle_limit;   ///< 测试阶段，避免 warning
@@ -44,7 +44,7 @@ void StartGimbalTask(void const *argument)
 
         Parse_Can2_Gimbal_Rxd_Data(can2_rx_header_pt, can2_rxd_data_buffer, gimbal_motor_parsed_feedback_data);//解析任务，需要搬到接收中断里面
         
-        //操作逻辑
+        /*选择操作设备*/
         if (robot_mode_data_pt -> mode.control_device == remote_controller_device_ENUM)///<遥控器模式
         {
            // 底盘云台模式 1底盘跟随 2小陀螺  3特殊
@@ -61,39 +61,35 @@ void StartGimbalTask(void const *argument)
             case 2:     ///<底盘小陀螺云台自由运动
 
             {
-                pitch_angle_set = (rc_data_pt->rc.ch1) * -10.0f;//步兵是106f
-                //解析没有出错，但通道信息是反的，暂时添加负号解决问题。后面搞清楚是遥控器通道安装反了还是数据使用(八成是用错了)
-                yaw_angle_set = (rc_data_pt->rc.ch0) / 12.0f;
+                pitch_angle_set -= (rc_data_pt->rc.ch1) * 10.0f;//步兵是106f
+                /*pitch轴机械角度限幅*/
+                Pitch_Angle_Limit(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit);//需要重新测量
 
+                yaw_angle_set = (rc_data_pt->rc.ch0) / 12.0f;
                 //yaw轴设定值角度回环
                 if(yaw_angle_set > 360)
                     {yaw_angle_set -= 360;}
 				if(yaw_angle_set < 0) 
                     {yaw_angle_set += 360;}
                     
-                (void)yaw_speed;
+                //(void)yaw_target_speed;
                 //还未添加陀螺仪数据，零漂太大（这句话我收回，在家测试了几次，板载陀螺仪的零漂其实不大，可能是磁力计被干扰了。看博客使用官方结算中不带磁力计矫正的程序可以解决这个问题）
-               // yaw_speed = Calc_Yaw_Angle360_Pid(yaw_angle_set,300);
+                yaw_target_speed = Calc_Yaw_Angle360_Pid(yaw_angle_set,imu_date_pt->yaw);
 
-                //pitch限幅机械角需要测量，限幅函数一直是隐式定义报错
-                // Float_Constraion(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit); ///< pitch 角度限幅
-                //Pitch_Angle_Limit(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit);//需要重新测量
+                pitch_target_speed = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[yaw_motor_index]);
 
-                pitch_speed = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[yaw_motor_index]);
-
-             // debug_print("%.2f \r\n",pitch_speed);
-             // Console.print("%0.2f ,%0.2f \r\n",pitch_speed,);
+             //debug_print("%.2f \r\n",pitch_target_speed);
+             //Console.print("%0.2f ,%0.2f \r\n",pitch_target_speed, &gimbal_motor_parsed_feedback_data[yaw_motor_index]);
                 break;
             }
+
             case 3:///<特殊模式
             {
                 pitch_angle_set -= (rc_data_pt->rc.ch1) / 12.0f;
+				Pitch_Angle_Limit(&pitch_angle_set, PITCH_UP_LIMIT, PITCH_DOWN_LIMIT);///<pitch角度限幅
 
-                /* Pitach角度限制 */
-				// Float_Constrain(&pitch_angle_set, PITCH_UP_LIMIT, PITCH_DOWN_LIMIT);
-
-                yaw_speed = - rc_data_pt->rc.ch0 / 5.5f;
-				pitch_speed = Calc_Pitch_Angle8191_Pid(pitch_angle_set,&gimbal_motor_parsed_feedback_data[pitch_motor_index]);
+                yaw_target_speed = - rc_data_pt->rc.ch0 / 5.5f;
+				pitch_target_speed = Calc_Pitch_Angle8191_Pid(pitch_angle_set,&gimbal_motor_parsed_feedback_data[pitch_motor_index]);
                 
                 break;
             }
@@ -110,7 +106,8 @@ void StartGimbalTask(void const *argument)
             {
             case 1:///<手动模式
                 {
-                    // yaw_angle_set -= robot_mode_data_pt->;
+                    yaw_angle_set -= robot_mode_data_pt->virtual_rocker.ch0 / 58.0f;///<倍率需要调整。这个数据是步兵的
+
                 }
                 break;
             case 2:///<自瞄模式(英雄没有自瞄，可以添加结合陀螺仪的自稳定模式)
@@ -125,15 +122,15 @@ void StartGimbalTask(void const *argument)
                 break;
             }
         }
-       // Console.print("%d,%d",pitch_speed,&gimbal_motor_parsed_feedback_data[pitch_motor_index])
+       // Console.print("%d,%d",pitch_target_speed,&gimbal_motor_parsed_feedback_data[pitch_motor_index])
        ///<云台串环速度环计算及发送底盘电机速度
-        Set_Gimbal_Motors_Speed(yaw_speed,
-                                pitch_speed,
+        Set_Gimbal_Motors_Speed(yaw_target_speed,
+                                pitch_target_speed,
                                 &gimbal_motor_parsed_feedback_data[yaw_motor_index],
                                 &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
         float new_moter_date = 0;
         new_moter_date =  gimbal_motor_parsed_feedback_data[yaw_motor_index].speed_rpm;
-        Console.print("%0.2f,%0.2f\r\n",pitch_speed, new_moter_date);
+        Console.print("%0.2f,%0.2f\r\n",pitch_target_speed, new_moter_date);
         osDelay(10);
     }
 }
