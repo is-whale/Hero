@@ -5,6 +5,7 @@
 #include "stm32f4xx.h"
 #include "console_print.h"
 #include "cmsis_os.h"
+#include "monitor_task.h"
 
 void Info_Referee_System_Task_Parse_Data(void);
 

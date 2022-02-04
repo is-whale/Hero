@@ -12,6 +12,8 @@
 #define CHASSIS_MOTOR_DEFAULT_BASE_RATE 5.5f                            //µ×ÅÌÄ¬ÈÏËÙ¶ÈµÄ±¶ÂÊ
 #define CHASSIS_MOTOR_GYRO_BASE_RATE 5.0f 
 
+#define POWER_LIMIT_FORM_SYSTEM 50.0f///<ÕâÀïºóÃæÒª»»³É²ÃÅÐÏµÍ³½âÎöµÄ¹¦ÂÊÏÞÖÆ£¬ÎªÁË±ÜÃâ¾¯¸æÔÝÊ±Ê¹ÓÃÊý×Ö´úÌæ
+
 static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500);         ///< µ×ÅÌ¸úËæPID
 static float chassis_motor_boost_rate = 1.0f;                                                               ///<µ÷ÓÃÏàÓ¦º¯Êý¸ü¸Ä£¨µ×ÅÌËÙ¶È±¶ÂÊ£©
 static const float motor_speed_multiple = 13.5;
@@ -22,7 +24,10 @@ static Motor_Measure_t *chassis_motor_feedback_parsed_data; ///< ½âÎöºóµÄµ×ÅÌµç»
 static Motor_Measure_t *gimbal_motor_feedback_parsed_data;  ///< ½âÎöºóµÄÔÆÌ¨µç»úÊý¾Ý
 static const uint8_t *yaw_motor_index;                      ///< yaw Öáµç»úÔÚÔÆÌ¨µç»úÊý¾ÝÖÐµÄÏÂ±ê
 static const uint8_t *pitch_motor_index;                    ///< pitch Öáµç»úÔÚÔÆÌ¨µç»úÊý¾ÝÖÐµÄÏÂ±ê
-void Chassis_Init(void);///<µ×ÅÌ³õÊ¼»¯º¯ÊýÉùÃ÷
+/*º¯ÊýÉùÃ÷*/
+void Chassis_Init(void);                                                ///<µ×ÅÌ³õÊ¼»¯º¯ÊýÉùÃ÷
+static uint16_t Calc_Gyro_Speed_By_Power_Limit(uint16_t power_limit);   ///<¼ÆËã¹¦ÂÊÏÞÖÆÏÂµÄÐ¡ÍÓÂÝ»òÕßµ×ÅÌ¸úËæÊ±µÄµç»úËÙ¶ÈÄ¿±êÖµ
+void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed,float move_direction, float x_move_speed, float y_move_speed);
 
 void StartChassisTask(void const *argument)
 {
@@ -36,7 +41,8 @@ void StartChassisTask(void const *argument)
 for (;;)
 {
         ///<Ñ¡Ôñ²Ù×÷Éè±¸    ¼üÊó&Ò£¿ØÆ÷
-    if (robot_mode_data_pt->mode.control_device == mouse_keyboard_device_ENUM) ///< ×îºÃÊÇÊ¹ÓÃÃ¶¾Ù¶¨Òå
+        /*¼üÊóÄ£Ê½*/
+    if (robot_mode_data_pt->mode.control_device == mouse_keyboard_device_ENUM) 
     {
             /**
              * @brief Ñ¡Ôñµ×ÅÌÔÆÌ¨Ä£Ê½    1µ×ÅÌ¸úËæ   2Ð¡ÍÓÂÝ   3ÌØÊâÄ£Ê½
@@ -49,11 +55,11 @@ for (;;)
                 {
                     //ºóÃæ¿´ÐèÒª·â×°³Éº¯Êý
 
-                        follow_pid_output = Calc_Chassis_Follow();
-              			chassis_motor_speed[0] = robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
-						chassis_motor_speed[1] = robot_mode_data_pt->virtual_rocker.ch2 - robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
-						chassis_motor_speed[2] = -robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
-						chassis_motor_speed[3] = -robot_mode_data_pt->virtual_rocker.ch2 - robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
+                    follow_pid_output = Calc_Chassis_Follow();
+              		chassis_motor_speed[0] = robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
+					chassis_motor_speed[1] = robot_mode_data_pt->virtual_rocker.ch2 - robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
+					chassis_motor_speed[2] = -robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
+					chassis_motor_speed[3] = -robot_mode_data_pt->virtual_rocker.ch2 - robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x/0.38f;
                     ///<³ËÒ»¸ö±¶ÂÊ
                     chassis_motor_speed[0] *= (float)(CHASSIS_MOTOR_DEFAULT_BASE_RATE * chassis_motor_boost_rate);
 					chassis_motor_speed[1] *= (float)(CHASSIS_MOTOR_DEFAULT_BASE_RATE * chassis_motor_boost_rate);
@@ -62,10 +68,11 @@ for (;;)
                 }
 
 					case mk_chassis_gyro_mode_ENUM:///<µ×ÅÌÐ¡ÍÓÂÝ
+
                 {
+                    ///<Ð¡ÍÓÂÝÊ±µÄµç»úËÙ¶È¼ÆËã
                     	Calc_Gyro_Motors_Speed(chassis_motor_speed, \
-					//Calc_Gyro_Speed_By_Power_Limit(judge_data->game_robot_status.chassis_power_limit), \\\\<½Ç¶ÈÔÝÊ±ÎªÁã£¬ºóÐøÐÞ¸ÄÉ¾³ýÒ»ÏÂÐÐ
-                    0,\
+					Calc_Gyro_Speed_By_Power_Limit(POWER_LIMIT_FORM_SYSTEM), \
 					 GM6020_YAW_Angle_To_360(gimbal_motor_feedback_parsed_data[*yaw_motor_index].mechanical_angle),\
 					(float)robot_mode_data_pt->virtual_rocker.ch3 * CHASSIS_MOTOR_GYRO_BASE_RATE * chassis_motor_boost_rate, \
 					(float)robot_mode_data_pt->virtual_rocker.ch2 * CHASSIS_MOTOR_GYRO_BASE_RATE * chassis_motor_boost_rate );
@@ -93,7 +100,7 @@ for (;;)
     }
 			
 
-    else if (robot_mode_data_pt-> mode.control_device == remote_controller_device_ENUM)///<Ò£¿ØÆ÷¿ØÖÆÂß¼­
+    else if (robot_mode_data_pt-> mode.control_device == remote_controller_device_ENUM)///<Ò£¿ØÆ÷¿ØÖÆ
         {
 
         switch (robot_mode_data_pt->mode.rc_motion_mode)///<Ñ¡Ôñµ×ÅÌÔÆÌ¨µÄ¹¤×÷Ä£Ê½
@@ -220,6 +227,30 @@ void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed, float move_
     motors_speed[1] += ((-x_x_speed - x_y_speed) + (-y_x_speed + y_y_speed));
     motors_speed[2] += ((x_x_speed + x_y_speed) + (y_x_speed - y_y_speed));
     motors_speed[3] += ((-x_x_speed + x_y_speed) + (-y_x_speed - y_y_speed));
+}
+/**
+ * @author          whale copy from bashpow
+ * @brief           Í¨¹ý¶ÁÈ¡²ÃÅÐÏµÍ³µÄÏÞÖÆ¹¦ÂÊ¼ÆËãÐ¡ÍÓÂÝÊ±¸÷¸öµç»ú£¨M3508£©µÄËÙ¶È£¨Ð¡ÍÓÂÝËÙ¶ÈÄ¿±êÖµ£©
+ * @details         ·µ»ØµÄÊÇ²»Í¬ÊµÊ±¹¦ÂÊÏÂµÄÐ¡ÍÓÂÝµ×ÅÌµç»úËÙ¶ÈÄ¿±êÖµ
+ * @note            ºóÃæÓë¹Ù·½¿ªÔ´¹¦ÂÊ¿ØÖÆ±È½ÏÖ®ºóÐÞ¸ÄÒ»ÏÂ£»»¹ÓÐ¾ÍÊÇ¹¦ÂÊ¼ÆËãÒª¸Ä³ÉÓ¢ÐÛµÄ
+ * @param [in]      Í¨¹ý²ÃÅÐÏµÍ³¶ÁÈ¡µÄ¹¦ÂÊ
+ * */
+static uint16_t Calc_Gyro_Speed_By_Power_Limit(uint16_t power_limit)
+{
+	if(power_limit < 50)
+	{
+		return 1800;
+	}
+	else if(power_limit > 300)
+	{
+		return 2000;
+	}
+	else if(power_limit > 120)
+	{
+		return 6000;
+	}
+
+	return power_limit*60;
 }
 
 /**
