@@ -5,6 +5,7 @@
 
 static const uint8_t gimbal_motor_num = 2;           ///< 云台电机的数量
 static const uint8_t yaw_motor_index = 0;            ///< yaw 轴电机在电机数据结构体中的下标
+
 static const uint8_t pitch_motor_index = 1;          ///< pitch 轴电机在电机数据结构体中的下标
 static const uint16_t pitch_up_angle_limit = 6960;   ///< pitch 轴云台最低角度
 static const uint16_t pitch_middle_angle = 7490;     ///< pitch 轴云台中间角度
@@ -106,19 +107,42 @@ void StartGimbalTask(void const *argument)
         {
             switch (robot_mode_data_pt->mode.mouse_keyboard_gimbal_mode)
             {
-            case 1:///<手动模式
+            case 1:///<手动模式（云台控制数据来自鼠标移动）
                 {
+                    /*目标角度设定*/
                     yaw_angle_set -= robot_mode_data_pt->virtual_rocker.ch0 / 58.0f;///<倍率需要调整。这个数据是步兵的
+                    pitch_angle_set -= robot_mode_data_pt->virtual_rocker.ch1 / 1.6f;
 
+                    //yaw角度回环
+					if(yaw_angle_set>360)
+						{ yaw_angle_set -= 360;}
+					if(yaw_angle_set<0) 
+						{yaw_angle_set += 360;}
+                    
+                    /*pitch轴角度限幅*/
+                    Pitch_Angle_Limit(&pitch_angle_set,PITCH_DOWN_LIMIT,PITCH_UP_LIMIT);
+                    /*两轴串级PID的角度环计算*/
+                    pitch_target_speed  = Calc_Pitch_Angle8191_Pid(pitch_angle_set,&gimbal_motor_parsed_feedback_data[pitch_motor_index]);
+                    yaw_target_speed    = Calc_Yaw_Angle360_Pid(yaw_angle_set,imu_date_pt->pit);
                 }
                 break;
-            case 2:///<自瞄模式(英雄没有自瞄，可以添加结合陀螺仪的自稳定模式)
+            case 2:///<自稳云台模式
             {
+                /**目前的打算是在pitch轴加九轴陀螺仪，角度环实际角度值为陀螺仪反馈的pitch数据，设定值是
+                 * 一个特殊值（只能被控制数据改变（如ch0））,ch0不变他便维持上一次值不变，这样就达到了自稳云台的效果，pitch角不被底盘晃干扰
+                 * 自稳模式个人感觉非常必要
+                 
+                 */
                 break;
             }
             case 3 :///<特殊模式（以云台坐标系为整车运动坐标系，前后左右的运动均以云台视角为准，在Chassis_task.c有具体的说明）
             {
-                
+                pitch_angle_set += robot_mode_data_pt->virtual_rocker.ch1 /3.0f;
+                /*没有yaw轴角度设置*/
+                /*pitch角度限制*/
+                Pitch_Angle_Limit(&pitch_angle_set,PITCH_DOWN_LIMIT,PITCH_UP_LIMIT);
+                yaw_target_speed    = robot_mode_data_pt->virtual_rocker.ch0 / 1.6f;
+                pitch_target_speed  = Calc_Pitch_Angle8191_Pid(pitch_angle_set,&gimbal_motor_parsed_feedback_data[pitch_motor_index]);
             }
             default:
                 break;

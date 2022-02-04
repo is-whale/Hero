@@ -87,8 +87,8 @@ typedef struct
 
 	struct
 	{
-		int16_t ch0; //鼠标
-		int16_t ch1; //鼠标
+		int16_t ch0; //对应鼠标x方向移动
+		int16_t ch1; //对应鼠标y方向移动
 		int16_t ch2; //左右 键盘WS
 		int16_t ch3; //前后 键盘AD
 	} virtual_rocker;
