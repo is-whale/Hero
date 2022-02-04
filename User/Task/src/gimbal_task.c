@@ -1,5 +1,7 @@
 #include "gimbal_task.h"
-// #include "math2.h"//包含在gimbal_task.h出现报错,暂时改到这里
+#include "math2.h"//包含在gimbal_task.h出现报错,暂时改到这里
+
+// void extern Float_Constraion(float *data, float min_value, float max_value);
 
 static const uint8_t gimbal_motor_num = 2;           ///< 云台电机的数量
 static const uint8_t yaw_motor_index = 0;            ///< yaw 轴电机在电机数据结构体中的下标
@@ -36,7 +38,7 @@ void StartGimbalTask(void const *argument)
     Gimbal_Init();
     osDelay(1000);
    // Console.print("%0.3f",imu_date_pt->pit);
-    __OPEN_CAN2_RX_FIFO0_IT__;///<打开CAN接收中断
+    __OPEN_CAN2_RX_FIFO0_IT__;///<打开CAN接收中断//上车测试之后移到gimbal_init中;
     for (;;)
     {
 		// debug_print("yaw %.2f, pitch %.2f, rol %.2f \r\n", imu_date_pt->yaw, imu_date_pt->pit, imu_date_pt->rol);
@@ -73,7 +75,7 @@ void StartGimbalTask(void const *argument)
                     {yaw_angle_set += 360;}
                     
                 //(void)yaw_target_speed;
-                //还未添加陀螺仪数据，零漂太大（这句话我收回，在家测试了几次，板载陀螺仪的零漂其实不大，可能是磁力计被干扰了。看博客使用官方结算中不带磁力计矫正的程序可以解决这个问题）
+                //陀螺仪数据，零漂太大（这句话我收回，在家测试了几次，板载陀螺仪的零漂其实不大，可能是磁力计被干扰了。看博客使用官方结算中不带磁力计矫正的程序可以解决这个问题）
                 yaw_target_speed = Calc_Yaw_Angle360_Pid(yaw_angle_set,imu_date_pt->yaw);
 
                 pitch_target_speed = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[yaw_motor_index]);
@@ -124,6 +126,8 @@ void StartGimbalTask(void const *argument)
         }
        // Console.print("%d,%d",pitch_target_speed,&gimbal_motor_parsed_feedback_data[pitch_motor_index])
        ///<云台串环速度环计算及发送底盘电机速度
+
+       YAW_SPEED_OUTPUT_LIMIT(&yaw_target_speed,YAW_LIMIT_SPEED);  //yaw轴速度限制
         Set_Gimbal_Motors_Speed(yaw_target_speed,
                                 pitch_target_speed,
                                 &gimbal_motor_parsed_feedback_data[yaw_motor_index],
@@ -191,7 +195,7 @@ void Parse_Can2_Gimbal_Rxd_Data(CAN_RxHeaderTypeDef *p_can_rx_header, uint8_t *d
 /**
  * @brief                       获取解析后的云台电机数据
  * @param[in]                   void
- * @return {Motor_Measure_t*}   解析后的云台电机数据
+ * @return {Motor_Measure_t*}   解析后的云台电机数据（数组首地址）
  */
 Motor_Measure_t *Get_Gimbal_Parsed_FeedBack_Data(void)
 {
