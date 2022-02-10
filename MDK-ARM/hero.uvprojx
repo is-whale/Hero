@@ -3137,14 +3137,14 @@
               <FilePath>..\User\Task\src\buzzer_task.c</FilePath>
             </File>
             <File>
-              <FileName>referee_system.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Task\src\referee_system.c</FilePath>
-            </File>
-            <File>
               <FileName>default_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Task\src\default_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>referee_system_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Task\src\referee_system_task.c</FilePath>
             </File>
           </Files>
         </Group>

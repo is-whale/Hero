@@ -92,8 +92,7 @@ static uint8_t Remoter_Data_Value_Check(Rc_Ctrl_t *rc)
  * @param[in] {volatile_const_uint8_t}   	遥控器数据缓冲区
  * @param[in] {Rc_Ctrl_t}   				遥控器数据指针结构体
  * @param[in] {uint16_t}					本次接收到的数据长度
- * @retval    {uint8_t}						遥控器模式（检验结果）
-	            					
+ * @retval    {uint8_t}						检验结果
  */
 uint8_t Rc_Data_Check_Parse(volatile const uint8_t *sbus_buf, Rc_Ctrl_t *rc_ctrl, uint16_t rc_data_len)
 {
@@ -129,6 +128,24 @@ void Rc_Data_Copy(Rc_Ctrl_t *rc1, Rc_Ctrl_t *rc2)
 	rc1->rc.s1 = rc2->rc.s1;
 	rc1->rc.s2 = rc2->rc.s2;
 }
+
+/**
+  * @brief          遥控器的死区判断，因为遥控器的拨杆在中位的时候，不一定为0，
+  * @param          输入的遥控器值
+  * @param          输出的死区处理后遥控器值
+  * @param          死区值
+  */
+#define rc_deadband_limit(input, dealine)        \
+    {                                                    \
+        if ((input) > (dealine) || (input) < -(dealine)) \
+        {                                                \
+                              \
+        }                                                \
+        else                                             \
+        {                                                \
+            (output) = 0;                                \
+        }                                                \
+    }
 
 /**
  * @brief               重置遥控器数据 

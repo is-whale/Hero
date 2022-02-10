@@ -49,7 +49,7 @@ void StartRemoteTask(void const *argument)
 
                     Rc_Data_Copy(&last_time_remote_controller, &remote_controller); ///< ±£´æ±¾´ÎÒ£¿ØÆ÷×´Ì¬
 
-                    Module_Reload(remote_control); ///< ¸üÐÂÒ£¿ØÆ÷×´Ì¬
+                    Module_Reload(remote_control); ///< ¸üÐÂÒ£¿ØÆ÷×´Ì¬ÓÃÓÚÀëÏßÅÐ¶Ï
                 }
                 else
                 {

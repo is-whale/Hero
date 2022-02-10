@@ -33,7 +33,9 @@ void StartRefereeSystemTask(void const *argument)
     referee_system_rx_buffer[0] = Get_Usart6_DMA_RxBuffer_One();
     referee_system_rx_buffer[1] = Get_Usart6_DMA_RxBuffer_Two();
     referee_system_rxd_len = Get_Usart6_DMA_Rxd_DataLen();
+	
     /*调试区域*/
+	
     (void)referee_system_rxd_len;///<避免warning
 
     /*调试区域结束*/
@@ -58,9 +60,9 @@ void StartRefereeSystemTask(void const *argument)
                     /*将接受的的原始数据拷贝为副本*/
 		            memcpy(judge_buf_copy, judge_buf, judge_buf_len);
                     
-                    Module_Reload(judge_sy stem); ///< 更新裁判系统状态
+                    Module_Reload(judge_system); ///< 更新裁判系统状态
 
-                   Parse_Refere_System_Data(judge_buf_copy, judge_buf_len);
+                //   Parse_Refere_System_Data(judge_buf_copy, judge_buf_len);
                 }
                 else
                 {
