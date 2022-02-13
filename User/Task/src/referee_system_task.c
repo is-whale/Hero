@@ -15,14 +15,14 @@ static uint32_t judge_buf_len = 0;
 后续添加system_device.c中
 */
 #if 0
-	#define JUDGE_LOG DEBUG_LOG
-	#define JUDGE_ERROR DEBUG_ERROR
+	#define DEBUG_LOG debug_log
+	#define DEBUG_ERROR debug_error
 #else
-	#define JUDGE_LOG(format, arg...) /* DEBUG OFF */
-	#define JUDGE_ERROR(err) /* DEBUG OFF */
+	#define DEBUG_LOG(format, arg) /* DEBUG OFF */
+	#define DEBUG_ERROR(err) /* DEBUG OFF */
 #endif
 /*函数声明*/
-//uint8_t Parse Referee System Data(u8 *get_data, u16 data_len);///<裁判系统串口解析函数声明
+//uint8_t Parse Referee System Data(uint8_t *get_data, uint16_t data_len);///<裁判系统串口解析函数声明
 
 
 void StartRefereeSystemTask(void const *argument)
@@ -62,7 +62,7 @@ void StartRefereeSystemTask(void const *argument)
                     
                     Module_Reload(judge_system); ///< 更新裁判系统状态
 
-                //   Parse_Refere_System_Data(judge_buf_copy, judge_buf_len);
+                  Parse_Refere_System_Data(judge_buf_copy, judge_buf_len);
                 }
                 else
                 {
@@ -87,50 +87,7 @@ void Info_Referee_System_Task_Parse_Data(void)
     osSignalSet(refereeSystemTaHandle, referee_system_get_data_signal);
 }
 
-/*
-  函数名：Analysis_Judge_System
-  描述  ：解析裁判系统数据
-  参数  ：get_data需要解析的帧头数据，data_len数据长度
-  返回值：0--解析失败 1--解析成功
-*/
-// uint8_t Parse Referee System Data(u8 *get_data, u16 data_len)
-// {
-// 	u8 a5_position[8]; //0xA5的位置
-// 	u8 a5_number = 0;  //0xA5的个数（数据包个数）
-// 	u16 data_length[8];  //每个data数据包的长度
-	
-// 	//寻找帧头
-// 	Find_All_A5(get_data, data_len, a5_position, &a5_number);
-	
-// 	//解析所有数据包
-// 	for(u8 i=0; i<a5_number; i++)
-// 	{
-// 		//解析帧头数据
-// 		if( Analysis_Frame_Header(&get_data[ (a5_position[i]) ], &data_length[i], NULL) == 0)
-// 		{
-// 			JUDGE_LOG("Analysis No.%d frame header error.", i);
-// 			continue;
-// 		}
-		
-// 		//整包CRC16校验
-// 		if( Check_Package_Crc16(&get_data[ (a5_position[i]) ], (data_length[i]+9)) == 0 )
-// 		{
-// 			JUDGE_LOG("CRC16 check No.%d fail.", i);
-// 			continue;
-// 		}
-		
-// 		//解析该数据包
-// 		if( Analysis_Data(&get_data[ (a5_position[i]) ], data_length[i]) == 0)
-// 		{
-// 			JUDGE_LOG("Analysis No.%d data fail.", i);
-// 			continue;
-// 		}
-		
-// 		// DEBUG_PRINT("x%d len:%d p:%d id:%d\r\n", i, data_length[i], a5_position[i], Analysis_Cmd_Id( &get_data[ (a5_position[i]) ] ) );
-		
-		
-// 	}
-	
-// 	return 1;
-// }
+
+
+
 

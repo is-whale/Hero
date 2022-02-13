@@ -2981,6 +2981,11 @@
               <FileType>1</FileType>
               <FilePath>..\User\Lib\src\console_print.c</FilePath>
             </File>
+            <File>
+              <FileName>crc_check.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Lib\src\crc_check.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3070,6 +3075,16 @@
               <FileName>imu_mpu6050.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Hardware\src\imu_mpu6050.c</FilePath>
+            </File>
+            <File>
+              <FileName>referee_system.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Hardware\src\referee_system.c</FilePath>
+            </File>
+            <File>
+              <FileName>sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Hardware\src\sys.c</FilePath>
             </File>
           </Files>
         </Group>

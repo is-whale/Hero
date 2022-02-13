@@ -6,6 +6,7 @@
 #include "console_print.h"
 #include "cmsis_os.h"
 #include "monitor_task.h"
+#include "referee_system.h"
 
 void Info_Referee_System_Task_Parse_Data(void);
 

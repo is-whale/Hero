@@ -114,3 +114,28 @@ float Inv_Sqrt(float x)
 	
 	return y;
 }
+
+//数组解析出float
+float Hex4_To_Float1(unsigned char *array)
+{
+	unsigned char array_copy[4];
+	float f;
+	
+	for(unsigned int i=0; i<4; i++)
+	{
+		array_copy[i]=array[i];
+	}
+	f = *((float *)((array_copy)));
+	return f;
+}
+/**
+ * @brief				数据类型转换
+ * @param [in] {uint8_t}
+ * @return	{uint16_t}
+ * 
+*/
+uint16_t Uint8_t_Array_To_Uint16_t(uint8_t *array)
+{	
+	return ( (array[1]<<8) | array[0] );
+}
+
