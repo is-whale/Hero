@@ -2,6 +2,10 @@
 #define __JUDGE_SYSTEM_H
 
 #include "sys.h"
+#include "crc_check.h"
+#include "math2.h"
+#include "usart3.h"
+#include "monitor_task.h"
 
 // uart 通信配置，波特率 115200, 数据位 8, 停止位 1，检验位无，流控制无。
 // --------------------------------------------------------------------------------
@@ -64,11 +68,9 @@ typedef  struct
 	}shoot_data;
 
 }Judge_data_t;
-/*函数声明*/
-const Judge_data_t* Get_Referee_Data(void);///<返回裁判系统数据结构体地址以供外部调用
-
+const Judge_data_t* Get_Referee_Data(void);
+// Judge_data_t* Get_Referee_Data(void);///<返回裁判系统数据结构体地址以供外部调用（有错误，声明被识别为定义）
 uint8_t Is_Id1_17mm_Excess_Heat(const Judge_data_t* judge_data);
-
-uint8_t Parse_Refere_System_Data(uint8_t *get_data, uint16_t data_len);///<解析裁判系统数据
+uint8_t Parse_Refere_System_Data(uint8_t *, uint16_t);///<解析裁判系统数据（有错误，声明被识别为定义）
 
 #endif

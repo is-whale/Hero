@@ -39,6 +39,7 @@ static uint8_t Analysis_Game_Robot_Status(uint8_t *data_package, uint16_t data_l
 //裁判系统数据定义
 static Judge_data_t judge_data;
 
+///<返回裁判系统数据结构体地址
 const Judge_data_t* Get_Referee_Data(void)
 {
 	return &judge_data;

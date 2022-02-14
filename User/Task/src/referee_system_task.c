@@ -1,5 +1,6 @@
 #include "referee_system_task.h"
 
+
 static uint8_t *referee_system_rx_buffer[2];
 static uint16_t *referee_system_rxd_len;
 static const uint32_t referee_system_get_data_signal = 0x0001; ///< 裁判系统接受到的任务信号
@@ -10,6 +11,7 @@ extern osThreadId refereeSystemTaHandle;
 static const uint8_t *judge_buf;
 static uint8_t judge_buf_copy[128];
 static uint32_t judge_buf_len = 0;
+
 
 /* 裁判系统调试宏定义 
 后续添加system_device.c中

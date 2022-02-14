@@ -24,6 +24,8 @@ static Motor_Measure_t *chassis_motor_feedback_parsed_data; ///< ½âÎöºóµÄµ×ÅÌµç»
 static Motor_Measure_t *gimbal_motor_feedback_parsed_data;  ///< ½âÎöºóµÄÔÆÌ¨µç»úÊý¾Ý
 static const uint8_t *yaw_motor_index;                      ///< yaw Öáµç»úÔÚÔÆÌ¨µç»úÊý¾ÝÖÐµÄÏÂ±ê
 static const uint8_t *pitch_motor_index;                    ///< pitch Öáµç»úÔÚÔÆÌ¨µç»úÊý¾ÝÖÐµÄÏÂ±ê
+static const Judge_data_t *referee_date_pt;                 ///<Ö¸Ïò½âÎöºóµÄ²ÃÅÐÏµÍ³Êý¾Ý
+
 /*º¯ÊýÉùÃ÷*/
 void Chassis_Init(void);                                                ///<µ×ÅÌ³õÊ¼»¯º¯ÊýÉùÃ÷
 static uint16_t Calc_Gyro_Speed_By_Power_Limit(uint16_t power_limit);   ///<¼ÆËã¹¦ÂÊÏÞÖÆÏÂµÄÐ¡ÍÓÂÝ»òÕßµ×ÅÌ¸úËæÊ±µÄµç»úËÙ¶ÈÄ¿±êÖµ
@@ -32,22 +34,26 @@ void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed,float move_d
 void StartChassisTask(void const *argument)
 {
     static float chassis_motor_speed[4] = {0.0, 0.0, 0.0, 0.0};                   ///<ÓÃÓÚÔÝÊ±´æ´¢µç»úËÙ¶È
-    float follow_pid_output;///<¸úËæ    PIDÊä³ö
-    
+    float follow_pid_output;///<¸úËæPIDÊä³ö
+    referee_date_pt = Get_Referee_Data();
     Chassis_Init();///<µ×ÅÌ³õÊ¼»¯
+
+    /* µ÷ÊÔÇøÓò */
+    (void)referee_date_pt;///<±ÜÃâ¾¯¸æ
+    /* µ÷ÊÔÇøÓò½áÊø */
 
     osDelay(1000); 
 
 for (;;)
 {
-        ///<Ñ¡Ôñ²Ù×÷Éè±¸    ¼üÊó&Ò£¿ØÆ÷
+    ///<Ñ¡Ôñ²Ù×÷Éè±¸    ¼üÊó&Ò£¿ØÆ÷
         /*¼üÊóÄ£Ê½*/
     if (robot_mode_data_pt->mode.control_device == mouse_keyboard_device_ENUM) 
     {
             /**
-             * @brief Ñ¡Ôñµ×ÅÌÔÆÌ¨Ä£Ê½    1µ×ÅÌ¸úËæ   2Ð¡ÍÓÂÝ   3ÌØÊâÄ£Ê½
-             *ÌØÊâÄ£Ê½¼´²»Ê¹ÓÃÍÓÂÝÒÇÊý¾Ý£¬ÒÔµ±Ç°ÔÆÌ¨×ø±êÏµ×÷Îªµ×ÅÌ×ø±êÏµ£¬¼´Ç°½øºóÍËÒÔÔÆÌ¨ÊÓ½ÇÎª×¼
-             *ÊÇÓÃÓÚÍÓÂÝÒÇ¹ÒµôÊ±±¸ÓÃµÄÄ£Ê½£¬²»ÖÁÓÚÍÓÂÝÒÇÃ»ÁËÕûÁ¾³µ¸ú×ÅÍêµ°
+             * Ñ¡Ôñµ×ÅÌÔÆÌ¨Ä£Ê½    1µ×ÅÌ¸úËæ   2Ð¡ÍÓÂÝ   3ÌØÊâÄ£Ê½
+             * ÌØÊâÄ£Ê½¼´²»Ê¹ÓÃÍÓÂÝÒÇÊý¾Ý£¬ÒÔµ±Ç°ÔÆÌ¨×ø±êÏµ×÷Îªµ×ÅÌ×ø±êÏµ£¬¼´Ç°½øºóÍËÒÔÔÆÌ¨ÊÓ½ÇÎª×¼
+             * ÊÇÓÃÓÚÍÓÂÝÒÇ¹ÒµôÊ±±¸ÓÃµÄÄ£Ê½£¬²»ÖÁÓÚÍÓÂÝÒÇÃ»ÁËÕûÁ¾³µ¸ú×ÅÍêµ°
             */
         switch(robot_mode_data_pt->mode.mouse_keyboard_chassis_mode)
 			{
