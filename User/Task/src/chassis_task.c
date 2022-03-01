@@ -25,6 +25,14 @@ static Motor_Measure_t *gimbal_motor_feedback_parsed_data;  ///< ½âÎöºóµÄÔÆÌ¨µç»
 static const uint8_t *yaw_motor_index;                      ///< yaw Öáµç»úÔÚÔÆÌ¨µç»úÊı¾İÖĞµÄÏÂ±ê
 static const uint8_t *pitch_motor_index;                    ///< pitch Öáµç»úÔÚÔÆÌ¨µç»úÊı¾İÖĞµÄÏÂ±ê
 static const Judge_data_t *referee_date_pt;                 ///<Ö¸Ïò½âÎöºóµÄ²ÃÅĞÏµÍ³Êı¾İ
+/* ÒÆÖ²×ÔCAN1½âÎö */
+// static const uint16_t can1_get_data_signal = 0x0001;
+static const uint8_t can1_motor_device_number = 4;
+// static const uint8_t can1_rx_data_overtime = 100;
+static uint8_t *can1_rxd_data;
+static CAN_RxHeaderTypeDef *can1_rx_header;
+static uint8_t *can1_rxd_data;
+static Motor_Measure_t m3508_feddback_data[can1_motor_device_number];///<ÀàĞÍÎª½âÎöºóµÄµç»úÊı¾İ½á¹¹Ìå£¬ºó±êÎªCAN1µç»ú±àºÅ1~4
 
 /*º¯ÊıÉùÃ÷*/
 void Chassis_Init(void);                                                ///<µ×ÅÌ³õÊ¼»¯º¯ÊıÉùÃ÷
@@ -38,6 +46,10 @@ void StartChassisTask(void const *argument)
     referee_date_pt = Get_Referee_Data();
     Chassis_Init();///<µ×ÅÌ³õÊ¼»¯
 
+    Can1_Filter_Init();///<CAN1µ×²ã³õÊ¼»¯
+       can1_rxd_data = Get_CAN1_Rxd_Data();
+    can1_rx_header = Get_CAN1_Rx_Header();
+
     /* µ÷ÊÔÇøÓò */
     (void)referee_date_pt;///<±ÜÃâ¾¯¸æ
     /* µ÷ÊÔÇøÓò½áÊø */
@@ -46,6 +58,8 @@ void StartChassisTask(void const *argument)
 
 for (;;)
 {
+        HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
+         Parse_Can1_Rxd_Data();
     ///<Ñ¡Ôñ²Ù×÷Éè±¸    ¼üÊó&Ò£¿ØÆ÷
         /*¼üÊóÄ£Ê½*/
     if (robot_mode_data_pt->mode.control_device == mouse_keyboard_device_ENUM) 
@@ -276,4 +290,46 @@ float Calc_Chassis_Follow(void)
     return Pid_Position_Calc(&chassis_follow_pid, follow_tar, follow_cur);
 
 #undef YAW_INIT_ANGLE
+}
+
+/**
+ * @brief           ½âÎö CAN1 ÉÏµÄ·´À¡Êı¾İ
+ * @param[in]       void
+ * @retval          void
+ */
+void Parse_Can1_Rxd_Data(void)
+{
+    static uint8_t i = 0;
+    i = can1_rx_header->StdId - CAN_3508_M1_ID;
+    Calculate_Motor_Data(&m3508_feddback_data[i], can1_rxd_data);
+}
+
+/**
+ * @brief                       ·µ»Ø CAN1 ×ÜÏßÉÏµç»úµÄ·´À¡Êı¾İ
+ * @param[in]                   void
+ * @return {Motor_Measure_t*}   ·´À¡µç»úÊı¾İ½á¹¹ÌåÖ¸Õë
+ */
+Motor_Measure_t *Get_Can1_Feedback_Data(void)
+{
+    return m3508_feddback_data;
+}
+//²»ÓÃ¼ÓÈ¡µØÖ·£¬Êı×éÃû¾ÍÊÇÖ¸£¬¶ø²»ÊÇ¶¨ÒåÎª½á¹¹Ìå¡£Óëremote_task.cÖĞ²»Í¬¡£
+/**
+ * @brief                     ·µ»Ø CAN1 ×ÜÏßÉÏµç»úµÄÊıÁ¿
+ * @param[in]                 void
+ * @return {const uint8_t*}   CAN1 ×ÜÏßÉÏµç»úÊıÁ¿
+ */
+const uint8_t *Get_Can1_Motor_DeviceNumber(void)
+{
+    return (&can1_motor_device_number);
+}
+/**
+ * @brief           Í¨Öª CAN1 Êı¾İ½âÎöÈÎÎñ½øĞĞÊı¾İ½âÎö
+ * @param[in]       void
+ * @retval          void
+ * @note            ÒÆÖ²¹ıÀ´¾Í²»ĞèÒªÁË
+ */
+void Info_Can1_ParseData_Task(void)
+{
+    // osSignalSet(parseCan1RxDataHandle, can1_get_data_signal);
 }

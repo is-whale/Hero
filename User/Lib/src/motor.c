@@ -7,3 +7,4 @@ void Calculate_Motor_Data(Motor_Measure_t* motor, uint8_t* can_message)
 	motor->actual_torque_current = (uint16_t)(can_message[4] << 8 | can_message[5]);
 	motor->temperate = can_message[6];
 }
+

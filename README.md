@@ -22,8 +22,8 @@
 - [ ] 卡尔曼滤波数据解析
 - [ ] 超级电容管理
 - [ ] 底盘完整的模式切换
-- [x ] 裁判系统数据读取解析
-- [ ] 自瞄任务
+- [ ] 裁判系统数据读取解析
+- [ ] 自瞄任务（英雄暂不需要）
 - [ ] ui 界面
 - [ ] 显示屏(优先级低)
 - [ ] 专门配合英雄或者步兵的 QT 上位机界面
@@ -77,18 +77,33 @@ pitch轴防止陀螺仪读取pitch俯仰角，作为串级PID实际值；
 #### 回校要做的
 测量Yaw轴机械角度；测量Pitch轴上下极限机械角度以及计算中值角度；
 添加一个陀螺仪驱动，放Pitch轴做自稳；
+
+底盘解析进中断；
+
+移植功率解读以及数据利用；
+
+#### 云台自稳定模式；
+
+pitch轴陀螺仪解析，程序设计；
+
+
+
 #### Hero数据结构设计
 
 float Motor[the number of motor in chassis/gimbal] [the number of All_Pid_Calc]
 
-Motor[CHASSIS] [MOTOR1_ANGLE]
 
-Motor[Gimbal] [PITCH_ANGLE]
 
-#define ALL PID 11//所有PID计算次数
-out[ALL_PID]
+Motor[CHASSIS] [MOTOR1_ANGLE]		motor.c中
 
-pid[ALL_PID]
+Motor[Gimbal] [PITCH_ANGLE]				motor.c中
+
+#define ALL PID 11//所有PID计算次数	PID.c中
+out[ALL_PID]			pid.c中或者单独task.c中
+
+pid[ALL_PID]			pid.c中或者单独task,c中
+
+
 
 
 

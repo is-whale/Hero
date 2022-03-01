@@ -1,6 +1,62 @@
 #include "pid.h"
-#include "math.h"
 
+/**
+ * @brief		所有pid初始化
+ * @author		whale
+ * @param [in]	pid参数
+ * @retval		void
+  */
+// static void pid_init(Pid_Position_t*pid,float kp,float ki,float kd,float limit_i,float limit_out,float is_i_spare,float begin_i,float stop_grow_i)
+// {
+// 	pid->kp = kp;
+// 	pid->ki = ki;
+// 	pid->kd = kd;
+// 	pid->tar = 0;
+// 	pid->cur = 0;
+// 	pid->err = 0;
+// 	pid->old_err = 0;
+// 	pid->is_integral_spare = is_i_spare;
+// 	pid->begin_integral = begin_i;
+// 	pid->stop_grow_integral = stop_grow_i;
+// 	pid->p_out = 0;
+// 	pid->i_out = 0;
+// 	pid->d_out = 0;
+// 	pid->output = 0;
+// 	pid->max_err_integral = limit_i;
+// 	pid->max_out = limit_out;
+// }
+// void All_Pid_Configuration(PID pid[])
+/* v0.1:原格式本来是这样，报错：存在正文时不允许未命名的原型参数。查询后得知由于C语言不能使用引用的原因，所以改成指针 */
+/* V0.2:argument of type "Pid_Position_t *" is incompatible with parameter of type "struct Pid_Position_t *" */
+/* V0.3:发现了形参命名不一致的错误但是还是报错 */
+/* V0.4:使用强制类型转换把形参从Pid_Position_t*转换为struact Pid_Parameter* */
+/* V0.5:发现形参命名空间不一样，修改结构体定义，报错消息，类型的警告还在 */
+/* V0.6：注释了用于初始化结构体函数指针，算是完成了 */
+/* 	v0.7:不使用函数指针 */
+
+/**
+ * @brief		PID参数初始化
+ * @note		暂时未使用，还未替代原来的参数以及初始化，因为使用new的办法初始化结构体的时候报错
+*/
+Pid_Position_t pid_parameter[Chassis_Follow_Pid];//初始化
+	//can1_device.c中
+	//can2_device.c中
+/**
+ * @brief			pid参数重置
+ * @param [in]		pid
+ * @retval			void
+ * @note			待完善
+ */
+// void pid_reset(Pid_Position_t *pid)
+// {
+// 	pid->kp = 0;
+// 	pid->ki = 0;
+// 	pid->kd = 0;
+// 	pid->p_out = 0;
+// 	pid->i_out = 0;
+// 	pid->d_out = 0;
+// 	pid->output = 0;
+// }
 /**
  * @brief			pid value limit
  * @param[in]		pid Pid_Position_t struct
