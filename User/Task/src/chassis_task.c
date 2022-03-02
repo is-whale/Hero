@@ -14,8 +14,8 @@
 
 #define POWER_LIMIT_FORM_SYSTEM 50.0f///<这里后面要换成裁判系统解析的功率限制，为了避免警告暂时使用数字代替
 
-static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500);         ///< 底盘跟随PID
-static float chassis_motor_boost_rate = 1.0f;                                                               ///<调用相应函数更改（底盘速度倍率）
+static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500);     ///< 底盘跟随PID
+static float chassis_motor_boost_rate = 1.0f;                                                           ///<调用相应函数更改（底盘速度倍率）
 static const float motor_speed_multiple = 13.5;
 
 static Rc_Ctrl_t *rc_data_pt;                               ///< 指向解析后的遥控器结构体指针

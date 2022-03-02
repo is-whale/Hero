@@ -144,7 +144,7 @@ uint8_t Analysis_Frame_Header(uint8_t *get_data, uint16_t *r_data_length, uint8_
 		*r_data_length = get_data[1] | (get_data[2] << 8);
 	}
 	
-	//解析seq
+	//解析seq(包序号)
 	if(r_seq != NULL)
 	{
 		*r_seq = get_data[3];
@@ -224,36 +224,43 @@ static uint8_t Analysis_Power_Heat_Data(uint8_t *data_package, uint16_t data_len
 /**
  * @note	unfinished
  * @brief	解析实时射击信息
+ * @return	解析结果：1成功解析；0解析失败（长度校验不通过）
  * */
 static uint8_t Analysis_Shoot_Data(uint8_t *data_package, uint16_t data_len)
 {
 	DATA_LEN_CHECK(data_len, 7, 504);
 	
 	memcpy(&judge_data.shoot_data, data_package, 7);
+
 	/**
 	 * @note	unfinished
 	*/
-	//  Shooter_Friction_Speed_Limit();///^限制子弹发射速度函数，待完善，待解析裁判系统数据
+	//  Shooter_Friction_Speed_Limit();///<限制子弹发射速度函数，待完善，待解析裁判系统数据
 	// DEBUG_SHOWDATA2("bullet_speed", judge_data.shoot_data.bullet_speed);
 	
 	return 1;
 }
 
-//解析比赛机器人状态
+/**
+ * @brief		解析比赛机器人状态
+ * @param[in]	数据包数组首地址（对应偏移量为0）
+ * @param[in]	数据长度
+ * @return		成功解析：1 &数据长度不符，返回0并且打印错误数据505
+ *  */
 static uint8_t Analysis_Game_Robot_Status(uint8_t *data_package, uint16_t data_len)
 {
 	DATA_LEN_CHECK(data_len, 27, 505);
 	
 	judge_data.game_robot_status.robot_id = data_package[0];
 
-	//机器人 1 号 17mm 枪口每秒冷却值
-	judge_data.game_robot_status.shooter_id1_17mm_cooling_rate = Uint8_t_Array_To_Uint16_t(&data_package[6]);
+	//机器人 42mm 枪口每秒冷却值
+	judge_data.game_robot_status.shooter_id1_42mm_cooling_rate = Uint8_t_Array_To_Uint16_t(&data_package[18]);
 
-	//机器人 1 号 17mm 枪口热量上限
-	judge_data.game_robot_status.shooter_id1_17mm_cooling_limit = Uint8_t_Array_To_Uint16_t(&data_package[8]);
+	//机器人 42mm 枪口热量上限
+	judge_data.game_robot_status.shooter_id1_42mm_cooling_limit = Uint8_t_Array_To_Uint16_t(&data_package[20]);
 
-	//机器人 1 号 17mm 枪口上限速度 单位 m/s
-	judge_data.game_robot_status.shooter_id1_17mm_speed_limit = Uint8_t_Array_To_Uint16_t(&data_package[10]);
+	//机器人 42mm 枪口上限速度 单位 m/s
+	judge_data.game_robot_status.shooter_id1_42mm_speed_limit = Uint8_t_Array_To_Uint16_t(&data_package[22]);
 	/**
 	 * @note	unfinished
 	*/
@@ -283,14 +290,14 @@ static uint8_t Analysis_Game_Robot_Status(uint8_t *data_package, uint16_t data_l
 	return 1;
 }
 
-//判断1号17mm发射机构是否超热量
+//判断42mm发射机构是否超热量
 uint8_t Is_Id1_17mm_Excess_Heat(const Judge_data_t* judge_data)
 {
-	if(judge_data->game_robot_status.shooter_id1_17mm_cooling_limit == 65535 || Get_Module_Online_State(5) == 0)
+	if(judge_data->power_heat_data.shooter_id1_42mm_cooling_heat == 65535 || Get_Module_Online_State(5) == 0)
 	{
 		return 0;
 	}
-	if(judge_data->game_robot_status.shooter_id1_17mm_cooling_limit <= (judge_data->power_heat_data.shooter_id1_17mm_cooling_heat + 12 ))
+	if(judge_data->power_heat_data.shooter_id1_42mm_cooling_heat <= (judge_data->power_heat_data.shooter_id1_42mm_cooling_heat + 12 ))
 	{
 		return 1;
 	}

@@ -129,7 +129,7 @@ float Hex4_To_Float1(unsigned char *array)
 	return f;
 }
 /**
- * @brief				数据类型转换
+ * @brief					数据类型转换(用于裁判系统2字节数据解析)
  * @param [in] {uint8_t}
  * @return	{uint16_t}
  * 

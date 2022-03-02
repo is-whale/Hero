@@ -1,9 +1,9 @@
 #include "can2_device.h"
 
-static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); ///< yaw电机速度PID
-static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); ///< yaw电机角度PID
+static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); 	///< yaw电机速度PID
+static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); 		///< yaw电机角度PID
 
-static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(20, 0, 3, 2000, 40000, 0, 1000, 500);		///< pitch电机速度PID
+static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(20, 0, 3, 2000, 40000, 0, 1000, 500);	  	///< pitch电机速度PID
 static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 1000, 0, 3000, 500); ///< pitch电机角度PID
 
 static Pid_Position_t friction_motor_left_speed_pid = NEW_POSITION_PID(7, 0, 0.7, 2000, 16383, 0, 1000, 500);

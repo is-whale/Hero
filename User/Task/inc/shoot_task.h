@@ -7,6 +7,7 @@
 #include "can2_device.h"
 #include "stdlib.h"
 #include "console_print.h"
+#include "referee_system.h"
 
 void Parse_Friction_Wave_Motor_Feedback_Data(CAN_RxHeaderTypeDef *p_can_rx_header,uint8_t *can2_rxd_data_buffer);
 int8_t Updata_Wave_Ch_Value(int16_t *last_wave_ch_value,int16_t *this_wave_ch_value);

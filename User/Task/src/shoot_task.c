@@ -14,7 +14,10 @@ extern osThreadId waveWheelTaskHandle;
 
 static Rc_Ctrl_t *rc_data_pt;
 static Robot_control_data_t *robot_control_data_pt;
+
 static float fric_speed = 0;
+#define FRICTION_SPEED_1 fric_speed
+
 static CAN_RxHeaderTypeDef *can2_rx_header_p;
 static uint8_t *can2_rxd_data_buffer;
 static const uint8_t friction_motor_num = 2;
@@ -32,6 +35,7 @@ static int16_t this_wave_ch_value = 1;
 static const int32_t fire_one_bullet = 0x00000001;
 static const int32_t fire_five_bullet = 0x00000101;
 static const uint32_t wave_once_machine_angle = 50000;
+const static Judge_data_t * judge_data;
 
 void StartShootTask(void const *argument)
 {
@@ -44,13 +48,17 @@ void StartShootTask(void const *argument)
     erroe_integral = Get_Error_Integral();
     last_machine_angle = Get_Last_Machine_Angle();
     this_machine_angle = Get_This_Machine_Angle();
-
+	judge_data = Get_Referee_Data();
+    
+/* 调试区域 */
     (void)rc_data_pt; ///< 避免 warning
+    (void)judge_data;
     (void)last_machine_angle;
     (void)this_machine_angle;
     (void)wave_motor_feedback_data;
     (void)erroe_integral;
     (void)wave_once_machine_angle;
+/* 调试区域结束 */
 
     osDelay(100);
 
@@ -196,3 +204,4 @@ const int32_t *Get_Fire_Five_Bullet_Signal(void)
 {
     return &fire_five_bullet;
 }
+
