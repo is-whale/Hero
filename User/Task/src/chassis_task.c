@@ -7,12 +7,12 @@
  */
 #include "chassis_task.h"
 
-#define CHASSIS_SPEED_ZERO  0                                           ///<关闭底盘速度 1为开启
+#define CHASSIS_SPEED_ZERO  1                                          ///<关闭底盘速度 1为开启
 #define OUTPUT_LIMIT(data, limit) Float_Constraion(data, -limit, limit) ///<输出限幅
 #define CHASSIS_MOTOR_DEFAULT_BASE_RATE 5.5f                            //底盘默认速度的倍率
 #define CHASSIS_MOTOR_GYRO_BASE_RATE 5.0f 
 
-#define POWER_LIMIT_FORM_SYSTEM 50.0f///<这里后面要换成裁判系统解析的功率限制，为了避免警告暂时使用数字代替
+#define POWER_LIMIT_FORM_SYSTEM 20.0f///<这里后面要换成裁判系统解析的功率限制，为了避免警告暂时使用数字代替
 
 static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500);     ///< 底盘跟随PID
 static float chassis_motor_boost_rate = 1.0f;                                                           ///<调用相应函数更改（底盘速度倍率）
@@ -181,18 +181,17 @@ for (;;)
 //        OUTPUT_LIMIT(&chassis_motor_speed[3], 8899);
 
 	#if CHASSIS_SPEED_ZERO
-			motor_speed[0] = 0;
-			motor_speed[1] = 0;
-			motor_speed[2] = 0;
-			motor_speed[3] = 0;
-		#endif
+			chassis_motor_speed[0] = 0;
+			chassis_motor_speed[1] = 0;
+			chassis_motor_speed[2] = 0;
+			chassis_motor_speed[3] = 0;
+            #endif
         ///< 设置底盘电机速度
         Set_ChassisMotor_Speed(chassis_motor_speed[0],
                                chassis_motor_speed[1],
                                chassis_motor_speed[2],
                                chassis_motor_speed[3],
                                chassis_motor_feedback_parsed_data);
-
         osDelay(10);
     }
 }

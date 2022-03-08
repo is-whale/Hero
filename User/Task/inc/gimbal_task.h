@@ -8,6 +8,7 @@
 #include "imu_mpu6050.h"
 #include "console_print.h"
 #include "math2.h"
+#include "pid.h"
 
 /*yaw*/
 #define YAW_GM6020_HEAD_ANGLE   5450    ///<读取云台与底盘对齐时的GM6020电机机械角

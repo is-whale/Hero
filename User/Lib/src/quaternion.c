@@ -287,5 +287,5 @@ void Imu_Attitude_Update(void)
     imu.pit = -asin(-2 * q1 * q3 + 2 * q0 * q2) * 57.3;
     ///< roll   -pi----pi  
     imu.rol = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2 * q2 + 1) * 57.3;
-    Console.print("yaw %.2f, pitch %.2f, rol %.2f \r\n", imu.yaw, imu.pit, imu.rol);
+    // Console.print("yaw %.2f, pitch %.2f, rol %.2f \r\n", imu.yaw, imu.pit, imu.rol);
 }
