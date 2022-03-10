@@ -5,6 +5,7 @@
 #include "monitor.h"
 #include "led.h"
 #include "usart3.h"
+#include "buzzer.h"
 
 enum moduleList
 {

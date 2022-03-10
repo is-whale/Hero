@@ -1,5 +1,6 @@
 #include "monitor_task.h"
 
+
 static Module_status_t module_status[8];
 
 static void Monitor_Task_Init(void);
@@ -9,6 +10,7 @@ void StartMonitorTask(void const *argument)
 {
 	Monitor_Task_Init();
 	Led_Flow_Flash();
+	Buzzer_Bsp_Init();
 
 	osDelay(50);
 
