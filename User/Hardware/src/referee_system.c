@@ -3,13 +3,15 @@
 #include "math2.h"
 #include "usart3.h"
 #include "monitor_task.h"
+/* 为使用printf引入下面头文件 */
+#include "console_print.h"
 // #include "remoter_task.h"
 // #include "shooter_task.h"
 // #include "power_output.h"
 // #include "detect_task.h"
 
 /* 裁判系统调试宏定义 */
-#if 0
+#if 1
 	#define DEBUG_LOG	debug_log
 	#define DEBUG_ERROR debug_error
 #else
@@ -84,7 +86,7 @@ uint8_t Parse_Refere_System_Data(uint8_t *get_data, uint16_t data_len)
 			continue;
 		}
 		
-		// DEBUG_PRINT("x%d len:%d p:%d id:%d\r\n", i, data_length[i], a5_position[i], Analysis_Cmd_Id( &get_data[ (a5_position[i]) ] ) );
+		// Console.print("x%d len:%d p:%d id:%d\r\n", i, data_length[i], a5_position[i], Analysis_Cmd_Id( &get_data[ (a5_position[i]) ] ) );
 		
 		
 	}

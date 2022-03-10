@@ -1,6 +1,7 @@
 #include "referee_system_task.h"
 #include "referee_system.h"
 
+
 static uint8_t *referee_system_rx_buffer[2];
 static uint16_t *referee_system_rxd_len;                            ///<裁判系统接收数据长度
 static const uint32_t referee_system_get_data_signal = 0x0001;      ///< 裁判系统接受到的任务信号
@@ -55,9 +56,6 @@ void StartRefereeSystemTask(void const *argument)
 
                 if (1)///<解析数据并检验
                 {
-                    /*输出接收到的裁判系统数据*/
-                    Console.print("%s\r\n", referee_system_rx_buffer[referee_system_rx_buffer_index]);
-
                     LL_USART_TransmitData8(USART6, 9);
                     /*将接受的的原始数据拷贝为副本*/
 		            memcpy(judge_buf_copy, judge_buf, judge_buf_len);
