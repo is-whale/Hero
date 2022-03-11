@@ -13,7 +13,7 @@ static const uint8_t yaw_motor_index = 0;            ///< yaw 轴电机在电机数据结
 static const uint8_t pitch_motor_index = 1;          ///< pitch 轴电机在电机数据结构体中的下标
 /* Pitch */
 static const uint16_t pitch_up_angle_limit = 700;   ///< pitch 轴云台最低角度
-static const uint16_t pitch_middle_angle = 600;     ///< pitch 轴云台中间角度 
+static const uint16_t pitch_middle_angle = 5000;     ///< pitch 轴云台中间角度 
 static const uint16_t pitch_down_angle_limit = 8000; ///< pitch 轴云台最高角度  /* 第一次测量角度90，后面使用8090正常 *
 /* Yaw */
 static float yaw_angle_set = 0 ;///< yaw 轴云台设置的角度（TODO:初始化时添加斜坡函数）
@@ -52,7 +52,7 @@ void StartGimbalTask(void const *argument)
     for (;;)
     {
 		// Console.print("yaw %.2f, pitch %.2f, rol %.2f \r\n", imu_date_pt->yaw, imu_date_pt->pit, imu_date_pt->rol);
-        ///< 板放置上云台数据稳定
+        ///< 板放置上云台除Yaw轴其他两轴数据稳定数据稳定
         //< 所有的调试打印全部采用debug-printf，在usart3.h中的宏定义控制条件编译，关闭宏之后debug_printf指向空宏
         /* 电机数据解析 */
         Parse_Can2_Gimbal_Rxd_Data(can2_rx_header_pt, can2_rxd_data_buffer, gimbal_motor_parsed_feedback_data);
@@ -74,11 +74,13 @@ void StartGimbalTask(void const *argument)
             case 2:     ///<底盘小陀螺+云台自由运动
 
             {
-                pitch_angle_set -= (rc_data_pt->rc.ch1) /12.0f;//改之前是*10.0f
+                // Console.print("%0.2f,%0.2f\r\n",rc_data_pt->rc.ch0,rc_data_pt->rc.ch1);
+                pitch_angle_set -= (rc_data_pt->rc.ch1) /6.0f;//改之前是*10.0f
                 /*pitch轴机械角度限幅*/
                 Pitch_Angle_Limit(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit);
 
-                yaw_angle_set = (rc_data_pt->rc.ch0) / 160.0f;
+                yaw_angle_set -= (rc_data_pt->rc.ch0) / 160.0f;
+                // Console.print("%0.2f\r\n",pitch_angle_set);
                 //yaw轴设定值角度回环
                 if(yaw_angle_set > 360)
                     {yaw_angle_set -= 360;}
@@ -92,7 +94,7 @@ void StartGimbalTask(void const *argument)
                 pid_out[Yaw_target_Angle] = Calc_Yaw_Angle360_Pid(yaw_angle_set,imu_date_pt->yaw);
 
                 // pitch_target_speed = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
-                pid_out[Pitch_target_Angle] = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
+                pid_out[Pitch_target_Speed] = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
 
              //debug_print("%.2f \r\n",pitch_target_speed);
             //     float new_moter_date1 = 0;
@@ -101,14 +103,14 @@ void StartGimbalTask(void const *argument)
                 break;
             }
 
-            case 5:///<特殊模式
+            case 3:///<特殊模式
             {
-                pitch_angle_set -= (rc_data_pt->rc.ch1) * 12.0f;
+                pitch_angle_set -= (rc_data_pt->rc.ch1) / 6.0f;///< 原来*12
                 /* bug,还未测量机械角 */
 				Pitch_Angle_Limit(&pitch_angle_set, pitch_up_angle_limit, pitch_down_angle_limit);///<pitch角度限幅
 
                 // yaw_target_speed = - rc_data_pt->rc.ch0 / 5.5f;
-                pid_out[Yaw_target_Speed] = - rc_data_pt->rc.ch0 / 5.5f;
+                pid_out[Yaw_target_Speed] = - (rc_data_pt->rc.ch0) / 5.5f;
 
 				// pitch_target_speed = Calc_Pitch_Angle8191_Pid(pitch_angle_set,&gimbal_motor_parsed_feedback_data[pitch_motor_index]);
 				pid_out[Pitch_target_Speed] = Calc_Pitch_Angle8191_Pid(pitch_angle_set,&gimbal_motor_parsed_feedback_data[pitch_motor_index]);

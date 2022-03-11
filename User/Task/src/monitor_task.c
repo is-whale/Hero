@@ -8,9 +8,9 @@ static void Monitor_All_Modules(void);
 
 void StartMonitorTask(void const *argument)
 {
-	Monitor_Task_Init();
-	Led_Flow_Flash();
-	Buzzer_Bsp_Init();
+	Monitor_Task_Init();	///< 监听任务初始化
+	Led_Flow_Flash();		///< 初始化流水灯
+	Buzzer_Bsp_Init();		///< 初始化时蜂鸣
 
 	osDelay(50);
 
