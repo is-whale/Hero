@@ -72,10 +72,8 @@ void StartGimbalTask(void const *argument)
             }
             
             case 2:     ///<底盘小陀螺+云台自由运动
-
             {
-                // Console.print("%0.2f,%0.2f\r\n",rc_data_pt->rc.ch0,rc_data_pt->rc.ch1);
-                pitch_angle_set -= (rc_data_pt->rc.ch1) /6.0f;//改之前是*10.0f
+                pitch_angle_set -= (rc_data_pt->rc.ch1)/2.0f;    //改之前是*10.0f
                 /*pitch轴机械角度限幅*/
                 Pitch_Angle_Limit(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit);
 
@@ -181,7 +179,7 @@ void StartGimbalTask(void const *argument)
        ///<云台串环速度环计算及发送底盘电机速度
 
     //    YAW_SPEED_OUTPUT_LIMIT(&yaw_target_speed,YAW_LIMIT_SPEED);  //yaw轴速度限制(移植前)
-        YAW_SPEED_OUTPUT_LIMIT(&pid_out[Yaw_target_Speed],YAW_LIMIT_SPEED);  //yaw轴速度限制
+        // YAW_SPEED_OUTPUT_LIMIT(&pid_out[Yaw_target_Speed],YAW_LIMIT_SPEED);  //yaw轴速度限制
        /* 之前的速度设置函数 */
         // Set_Gimbal_Motors_Speed(yaw_target_speed,
         //                         pitch_target_speed,

@@ -20,7 +20,7 @@ typedef enum
 	
 	CAN_GIMBAL_ALL_ID = 0x2FF,
 	CAN_YAW_MOTOR_ID = 0x209,	///< x  5
-	CAN_PITCH_MOTOR_ID = 0x20A, ///< y  从步兵抄过来，原来是（7）
+	CAN_PITCH_MOTOR_ID = 0x20A, ///< y  
 } Can2_RxMsg_ID;
 
 void Can2_Rx_FIFO0_IT_Callback(void);
