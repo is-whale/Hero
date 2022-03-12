@@ -60,18 +60,12 @@ osStaticThreadDef_t remoteTaskControlBlock;
 osThreadId monitorTaskHandle;
 uint32_t monitorTaskBuffer[ 512 ];
 osStaticThreadDef_t monitorTaskControlBlock;
-osThreadId canSendTaskHandle;
-uint32_t canSendTaskBuffer[ 512 ];
-osStaticThreadDef_t canSendTaskControlBlock;
 osThreadId chassisTaskHandle;
 uint32_t chassisTaskBuffer[ 512 ];
 osStaticThreadDef_t chassisTaskControlBlock;
 osThreadId parseCan1RxDataHandle;
 uint32_t parseCanRxDataTBuffer[ 512 ];
 osStaticThreadDef_t parseCanRxDataTControlBlock;
-osThreadId parseCan2RxDataHandle;
-uint32_t parseCan2RxDataBuffer[ 512 ];
-osStaticThreadDef_t parseCan2RxDataControlBlock;
 osThreadId gimbalTaskHandle;
 uint32_t gimbalTaskBuffer[ 512 ];
 osStaticThreadDef_t gimbalTaskControlBlock;
@@ -111,10 +105,8 @@ void StartDefaultTask(void const * argument);
 void StartShellTask(void const * argument);
 void StartRemoteTask(void const * argument);
 void StartMonitorTask(void const * argument);
-void StartCanSendTask(void const * argument);
 void StartChassisTask(void const * argument);
 void StartParseCan1RxDataTask(void const * argument);
-void StartParseCan2RxDataTask(void const * argument);
 void StartGimbalTask(void const * argument);
 void StartBuzzerTask(void const * argument);
 void StartShootTask(void const * argument);
@@ -202,10 +194,6 @@ void MX_FREERTOS_Init(void) {
   osThreadStaticDef(monitorTask, StartMonitorTask, osPriorityLow, 0, 512, monitorTaskBuffer, &monitorTaskControlBlock);
   monitorTaskHandle = osThreadCreate(osThread(monitorTask), NULL);
 
-  /* definition and creation of canSendTask */
-  osThreadStaticDef(canSendTask, StartCanSendTask, osPriorityAboveNormal, 0, 512, canSendTaskBuffer, &canSendTaskControlBlock);
-  canSendTaskHandle = osThreadCreate(osThread(canSendTask), NULL);
-
   /* definition and creation of chassisTask */
   osThreadStaticDef(chassisTask, StartChassisTask, osPriorityAboveNormal, 0, 512, chassisTaskBuffer, &chassisTaskControlBlock);
   chassisTaskHandle = osThreadCreate(osThread(chassisTask), NULL);
@@ -213,10 +201,6 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of parseCan1RxData */
   osThreadStaticDef(parseCan1RxData, StartParseCan1RxDataTask, osPriorityAboveNormal, 0, 512, parseCanRxDataTBuffer, &parseCanRxDataTControlBlock);
   parseCan1RxDataHandle = osThreadCreate(osThread(parseCan1RxData), NULL);
-
-  /* definition and creation of parseCan2RxData */
-  osThreadStaticDef(parseCan2RxData, StartParseCan2RxDataTask, osPriorityIdle, 0, 512, parseCan2RxDataBuffer, &parseCan2RxDataControlBlock);
-  parseCan2RxDataHandle = osThreadCreate(osThread(parseCan2RxData), NULL);
 
   /* definition and creation of gimbalTask */
   osThreadStaticDef(gimbalTask, StartGimbalTask, osPriorityAboveNormal, 0, 512, gimbalTaskBuffer, &gimbalTaskControlBlock);
@@ -324,24 +308,6 @@ __weak void StartMonitorTask(void const * argument)
   /* USER CODE END StartMonitorTask */
 }
 
-/* USER CODE BEGIN Header_StartCanSendTask */
-/**
-* @brief Function implementing the canSendTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartCanSendTask */
-__weak void StartCanSendTask(void const * argument)
-{
-  /* USER CODE BEGIN StartCanSendTask */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END StartCanSendTask */
-}
-
 /* USER CODE BEGIN Header_StartChassisTask */
 /**
 * @brief Function implementing the chassisTask thread.
@@ -376,24 +342,6 @@ __weak void StartParseCan1RxDataTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartParseCan1RxDataTask */
-}
-
-/* USER CODE BEGIN Header_StartParseCan2RxDataTask */
-/**
-* @brief Function implementing the parseCan2RxData thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartParseCan2RxDataTask */
-__weak void StartParseCan2RxDataTask(void const * argument)
-{
-  /* USER CODE BEGIN StartParseCan2RxDataTask */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END StartParseCan2RxDataTask */
 }
 
 /* USER CODE BEGIN Header_StartGimbalTask */
@@ -526,5 +474,3 @@ __weak void StartRefereeSystemTask(void const * argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
