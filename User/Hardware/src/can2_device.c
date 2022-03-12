@@ -1,6 +1,7 @@
 #include "can2_device.h"
 
 static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); 	///< yaw电机速度PID
+// static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(600, 1, 0.2, 5000, 30000, 0, 1000, 500); 	///< yaw电机速度PID(单电机调试)
 static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); 		///< yaw电机角度PID
 
 static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(20, 0, 3, 2000, 40000, 0, 1000, 500);	  	///< pitch电机速度PID
@@ -11,6 +12,8 @@ static Pid_Position_t friction_motor_right_speed_pid = NEW_POSITION_PID(7, 0, 0.
 
 static Pid_Position_t wave_motor_speed_pid = NEW_POSITION_PID(9, 0, 3, 2000, 16000, 0, 1000, 500);
 static Pid_Position_t wave_motor_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 4500, 0, 3000, 500); ///<  拨轮电机角度PID
+/* 自稳云台pitch角度PID参数 */
+static Pid_Position_t motor_pitch_angle_pid_imu = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 1000, 0, 3000, 500);
 
 static int error_integral = 0;
 static uint16_t last_machine_angle = 0;
@@ -213,3 +216,18 @@ void Set_Wave_Motor_Speed(float wave_motor_speed, Motor_Measure_t *wave_motor_fe
 		0,
 		0);
 }
+
+/**
+ * @brief 								计算自稳云台模式的角度环PID
+ * @param tar_angle 					目标角度
+ * @param imu_on_broad 					反馈角度（陀螺仪pit）
+ * @retval 								角度环输出
+ */
+float Calc_Pitch_Angle8191_Imu_Pid(float tar_angle, Imu_t *imu_on_broad)
+{
+    float pitch_tar_angle = tar_angle;
+    float pitch_cur_angle = imu_on_broad->pit * 500.0f;
+    Handle_Angle8191_PID_Over_Zero(&pitch_tar_angle, &pitch_cur_angle);
+    return Pid_Position_Calc(&motor_pitch_angle_pid_imu, pitch_tar_angle, pitch_cur_angle); ///< 这是第一层 PID，计算设定角度与实际角度之间的误差，得到下一步要设定的速度值，如果已经达到目标值，则输出为 0
+}
+

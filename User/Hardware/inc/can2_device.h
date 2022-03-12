@@ -8,6 +8,7 @@
 #include "math.h"
 #include "stdio.h"
 #include "usart3.h"
+#include "imu_mpu6050.h"
 
 #define WAVE_ONCE_BULLET 20000
 
@@ -20,14 +21,14 @@ typedef enum
 	
 	CAN_GIMBAL_ALL_ID = 0x2FF,
 	CAN_YAW_MOTOR_ID = 0x209,	///< x  5
-	CAN_PITCH_MOTOR_ID = 0x20A, ///< y  
+	CAN_PITCH_MOTOR_ID = 0x20A, ///< y  6
 } Can2_RxMsg_ID;
 
 void Can2_Rx_FIFO0_IT_Callback(void);
-Motor_Measure_t *Get_Pitch_Motor_Feedback_Data(void);
-Motor_Measure_t *Get_Yaw_Motor_Feedback_Data(void);
-const uint8_t *Get_Pitch_Motor_Index(void);
-const uint8_t *Get_Yaw_Motor_Index(void);
+Motor_Measure_t *Get_Pitch_Motor_Feedback_Data(void);		///< 获取Pit电机反馈值
+Motor_Measure_t *Get_Yaw_Motor_Feedback_Data(void);			///< 获取Yaw电机反馈值	
+const uint8_t *Get_Pitch_Motor_Index(void);					///< 获取 pitch 轴电机在数组中的下标
+const uint8_t *Get_Yaw_Motor_Index(void);					///< 获取 Yaw 轴电机在数组中的下标
 Motor_Measure_t *Get_Gimbal_Motor_Feedback_Data(void);
 CAN_RxHeaderTypeDef *Get_CAN2_Rx_Header(void);
 CAN_RxHeaderTypeDef *Get_CAN2_Rx_Header(void);
@@ -44,5 +45,6 @@ float Calc_Wave_Motor_Angle8191_Pid(float tar_angle, float current_angle);
 int *Get_Error_Integral(void);
 uint16_t *Get_Last_Machine_Angle(void);
 uint16_t *Get_This_Machine_Angle(void);
+float Calc_Pitch_Angle8191_Imu_Pid(float tar_angle, Imu_t *imu_on_broad);
 
 #endif //__CAN2_DEVICE_H_
