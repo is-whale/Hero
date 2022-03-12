@@ -6,7 +6,7 @@ void StartDefaultTask(void const *argument)
 	LED_GREEN_OFF();
 	LED_RED_OFF();
 
-	Laser_ON();///<打开激光
+	Laser_ON(); ///<打开激光
 	for (;;)
 	{
 		LED_GREEN_TOGGLE();

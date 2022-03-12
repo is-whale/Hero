@@ -43,7 +43,7 @@ void StartRemoteTask(void const *argument)
             {
                 rx_available_buffer_index = Get_Rc_Available_Bufferx();
 
-                if (Rc_Data_Check_Parse(rc_rx_buffer[rx_available_buffer_index], &remote_controller, *sbus_rxd_len))///<解析数据并检验
+                if (Rc_Data_Check_Parse(rc_rx_buffer[rx_available_buffer_index], &remote_controller, *sbus_rxd_len)) ///<解析数据并检验
                 {
                     Parse_Robot_Control_Data(&remote_controller, &last_time_remote_controller, &robot_control_data); ///< 解析出遥控器模式
 
@@ -53,7 +53,7 @@ void StartRemoteTask(void const *argument)
                 }
                 else
                 {
-                    Usart1_Rx_DMA_Reset();///<DMA重置
+                    Usart1_Rx_DMA_Reset();                                          ///< DMA重置
                     Rc_Data_Copy(&remote_controller, &last_time_remote_controller); ///< 校验出错保持遥控器数据不变
                 }
             }
@@ -61,7 +61,7 @@ void StartRemoteTask(void const *argument)
         else if (remote_get_data_event.status == osEventTimeout)
         {
             Rc_Data_Reset(&remote_controller);
-            
+
             Rc_Data_Reset(&last_time_remote_controller);
         }
     }

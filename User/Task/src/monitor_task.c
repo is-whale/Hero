@@ -1,6 +1,5 @@
 #include "monitor_task.h"
 
-
 static Module_status_t module_status[8];
 
 static void Monitor_Task_Init(void);
@@ -8,9 +7,9 @@ static void Monitor_All_Modules(void);
 
 void StartMonitorTask(void const *argument)
 {
-	Monitor_Task_Init();	///< 监听任务初始化
-	Led_Flow_Flash();		///< 初始化流水灯
-	Buzzer_Bsp_Init();		///< 初始化时蜂鸣
+	Monitor_Task_Init(); ///< 监听任务初始化
+	Led_Flow_Flash();	 ///< 初始化流水灯
+	Buzzer_Bsp_Init();	 ///< 初始化时蜂鸣
 
 	osDelay(50);
 
@@ -49,17 +48,17 @@ void Module_Reload(uint8_t index)
  */
 void Classis_Reload(int8_t motor_index)
 {
-	//bit0代表电机1 bit1代表电机2 bit2代表电机3 bit3代表电机4
+	// bit0代表电机1 bit1代表电机2 bit2代表电机3 bit3代表电机4
 	static uint8_t chassis_motor_state = 0;
-	if(motor_index>=1 && motor_index<=4)
+	if (motor_index >= 1 && motor_index <= 4)
 	{
-		chassis_motor_state |= (0x01 << (motor_index-1));
+		chassis_motor_state |= (0x01 << (motor_index - 1));
 	}
 	else
 	{
 		return;
 	}
-	if((chassis_motor_state & 0x0F) == 0x0F)
+	if ((chassis_motor_state & 0x0F) == 0x0F)
 	{
 		chassis_motor_state = 0;
 		Module_Status_Reload(&module_status[chassis_motor]);
@@ -73,18 +72,18 @@ void Classis_Reload(int8_t motor_index)
  */
 void Gimbal_Reload(int8_t motor_index)
 {
-	//bit0代表电机yaw bit1代表电机pitch
+	// bit0代表电机yaw bit1代表电机pitch
 	static uint8_t gimbal_motor_state = 0;
-	
-	if(motor_index>=1 && motor_index<=2)
+
+	if (motor_index >= 1 && motor_index <= 2)
 	{
-		gimbal_motor_state |= (0x01 << (motor_index-1));
+		gimbal_motor_state |= (0x01 << (motor_index - 1));
 	}
 	else
 	{
 		return;
 	}
-	if((gimbal_motor_state & 0x03) == 0x03)
+	if ((gimbal_motor_state & 0x03) == 0x03)
 	{
 		gimbal_motor_state = 0;
 		Module_Status_Reload(&module_status[gimbal_motor]);
@@ -98,7 +97,7 @@ void Gimbal_Reload(int8_t motor_index)
  */
 static void Monitor_Task_Init(void)
 {
-	for(uint8_t i=0; i<8; i++)
+	for (uint8_t i = 0; i < 8; i++)
 	{
 		Module_Status_Init(&module_status[i], 5, NULL, NULL);
 	}
@@ -134,5 +133,3 @@ static void Monitor_All_Modules(void)
 #undef MODULE_OFFLINE
 #undef MODULE_REONLINE
 }
-
-

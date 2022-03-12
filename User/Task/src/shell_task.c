@@ -1,6 +1,6 @@
 #include "shell_task.h"
 
-static uint8_t *shell_rx_buffer;				
+static uint8_t *shell_rx_buffer;
 const uint16_t *shell_rx_max_buffer_len;
 static uint16_t shell_rxd_data_len;
 extern osSemaphoreId shellGetDataBinarySemHandle;
@@ -23,7 +23,7 @@ void StartShellTask(void const *argument)
 
 	for (;;)
 	{
-		shell_get_data_event = osSignalWait(shell_get_data_signal,osWaitForever);
+		shell_get_data_event = osSignalWait(shell_get_data_signal, osWaitForever);
 		if (shell_get_data_event.status == osEventSignal)
 		{
 			if (shell_get_data_event.value.signals == shell_get_data_signal)
@@ -43,7 +43,7 @@ void StartShellTask(void const *argument)
  */
 static void Inform_ShellTask_Get_Data(void)
 {
-	osSignalSet(shellTaskHandle,shell_get_data_signal);
+	osSignalSet(shellTaskHandle, shell_get_data_signal);
 }
 
 /**
