@@ -75,3 +75,4 @@ void Module_Status_Reload(Module_status_t* module)
 {
 	module->count = module->reload_cnt;
 }
+

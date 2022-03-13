@@ -8,6 +8,8 @@
 #include "parse_can1_rx_data_task.h"
 #include "super_capacitor_task.h"
 #include "console_print.h"
+#include "can1_device.h"
+
 
 void Can1_Send_4Msg(uint32_t id, int16_t data1, int16_t data2, int16_t data3, int16_t data4);
 void Can1_Filter_Init(void);

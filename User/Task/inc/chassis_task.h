@@ -6,7 +6,6 @@
 #include "gimbal_task.h"
 #include "math.h"
 #include "math2.h"
-// #include "referee_system_task.h"
 #include "referee_system.h"
 
 #define OUTPUT_LIMIT(data, limit) Float_Constraion(data, -limit, limit)

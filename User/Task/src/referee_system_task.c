@@ -37,7 +37,8 @@ void StartRefereeSystemTask(void const *argument)
     /*调试区域*/
 
     (void)referee_system_rxd_len; ///<避免warning
-
+    (void)referee_system_rx_buffer;
+    (void)referee_system_rx_buffer_index;
     /*调试区域结束*/
     osDelay(10);
 

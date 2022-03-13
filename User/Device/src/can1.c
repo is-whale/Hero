@@ -1,5 +1,4 @@
 #include "can1.h"
-
 static const uint16_t can1_rx_data_len = 8;
 static uint8_t can1_rxd_data[can1_rx_data_len];
 static CAN_RxHeaderTypeDef can1_rx_header;
@@ -31,25 +30,17 @@ void Can1_Rx_FIFO0_IT_Callback(void)
 	// TODO 添加标志位判断
 	///< 接收数据
 	HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &can1_rx_header, can1_rxd_data);
-
-	if (can1_rx_header.StdId == SUPER_CAPACITOR_ID)
-	{
-		Info_Super_Capacitor_Parse_Data();
-	}
-	else
-	{
-		Info_Can1_ParseData_Task();
-	}
+	Can1_Process(&can1_rx_header);
 }
 
 /**
  * @brief                             CAN1 发送数据函数
- * @param[in] {uint32_t}_id           发送目标在 CAN 总线上的 ID            
+ * @param[in] {uint32_t}_id           发送目标在 CAN 总线上的 ID
  * @param[in] {int16_t}_data1         数据 1
  * @param[in] {int16_t}_data1         数据 1
  * @param[in] {int16_t}_data1         数据 1
  * @param[in] {int16_t}_data1         数据 1
- * @retval                            void  
+ * @retval                            void
  */
 void Can1_Send_4Msg(uint32_t id, int16_t data1, int16_t data2, int16_t data3, int16_t data4)
 {
@@ -76,7 +67,7 @@ void Can1_Send_4Msg(uint32_t id, int16_t data1, int16_t data2, int16_t data3, in
 /**
  * @brief               返回 CAN1 接收到的原始数据
  * @param[in]           void
- * @retval {uint8_t*}   存储接受到的 CAN1 数据的数组首地址 
+ * @retval {uint8_t*}   存储接受到的 CAN1 数据的数组首地址
  */
 uint8_t *Get_CAN1_Rxd_Data(void)
 {
