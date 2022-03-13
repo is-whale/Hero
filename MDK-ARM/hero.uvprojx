@@ -2957,11 +2957,6 @@
               <FilePath>..\User\Lib\src\monitor.c</FilePath>
             </File>
             <File>
-              <FileName>motor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Lib\src\motor.c</FilePath>
-            </File>
-            <File>
               <FileName>pid.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Lib\src\pid.c</FilePath>
@@ -2970,6 +2965,11 @@
               <FileName>control_data.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Lib\src\control_data.c</FilePath>
+            </File>
+            <File>
+              <FileName>motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Lib\src\motor.c</FilePath>
             </File>
             <File>
               <FileName>quaternion.c</FileName>
@@ -3012,16 +3012,6 @@
           <GroupName>User/Device</GroupName>
           <Files>
             <File>
-              <FileName>usart3.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Device\src\usart3.c</FilePath>
-            </File>
-            <File>
-              <FileName>usart1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Device\src\usart1.c</FilePath>
-            </File>
-            <File>
               <FileName>can1.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Device\src\can1.c</FilePath>
@@ -3032,14 +3022,24 @@
               <FilePath>..\User\Device\src\can2.c</FilePath>
             </File>
             <File>
-              <FileName>spi5.c</FileName>
+              <FileName>usart1.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\Device\src\spi5.c</FilePath>
+              <FilePath>..\User\Device\src\usart1.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Device\src\usart3.c</FilePath>
             </File>
             <File>
               <FileName>usart6.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Device\src\usart6.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Device\src\spi5.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3047,14 +3047,19 @@
           <GroupName>User/Hardware</GroupName>
           <Files>
             <File>
+              <FileName>Hero_Config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\User\Hardware\inc\Hero_Config.h</FilePath>
+            </File>
+            <File>
               <FileName>can1_device.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Hardware\src\can1_device.c</FilePath>
             </File>
             <File>
-              <FileName>led.c</FileName>
+              <FileName>can2_device.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\Hardware\src\led.c</FilePath>
+              <FilePath>..\User\Hardware\src\can2_device.c</FilePath>
             </File>
             <File>
               <FileName>remote.c</FileName>
@@ -3062,9 +3067,9 @@
               <FilePath>..\User\Hardware\src\remote.c</FilePath>
             </File>
             <File>
-              <FileName>can2_device.c</FileName>
+              <FileName>led.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\Hardware\src\can2_device.c</FilePath>
+              <FilePath>..\User\Hardware\src\led.c</FilePath>
             </File>
             <File>
               <FileName>buzzer.c</FileName>
@@ -3112,6 +3117,11 @@
               <FilePath>..\User\Task\src\shoot_task.c</FilePath>
             </File>
             <File>
+              <FileName>monitor_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Task\src\monitor_task.c</FilePath>
+            </File>
+            <File>
               <FileName>wave_wheel_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Task\src\wave_wheel_task.c</FilePath>
@@ -3127,14 +3137,9 @@
               <FilePath>..\User\Task\src\parse_can1_rx_data_task.c</FilePath>
             </File>
             <File>
-              <FileName>can_send_task.c</FileName>
+              <FileName>referee_system_task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\Task\src\can_send_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>monitor_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Task\src\monitor_task.c</FilePath>
+              <FilePath>..\User\Task\src\referee_system_task.c</FilePath>
             </File>
             <File>
               <FileName>gyroscope_task.c</FileName>
@@ -3142,24 +3147,19 @@
               <FilePath>..\User\Task\src\gyroscope_task.c</FilePath>
             </File>
             <File>
-              <FileName>shell_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Task\src\shell_task.c</FilePath>
-            </File>
-            <File>
               <FileName>buzzer_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Task\src\buzzer_task.c</FilePath>
             </File>
             <File>
+              <FileName>shell_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Task\src\shell_task.c</FilePath>
+            </File>
+            <File>
               <FileName>default_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Task\src\default_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>referee_system_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Task\src\referee_system_task.c</FilePath>
             </File>
           </Files>
         </Group>
