@@ -7,6 +7,7 @@
  */
 /* 注意上下限位反的情况 */
 
+
 static const uint8_t gimbal_motor_num = 2; ///< 云台电机的数量
 /* Yaw&Pitch电机下标 */
 static const uint8_t yaw_motor_index = 0;   ///< yaw 轴电机在电机数据结构体中的下标
@@ -33,16 +34,13 @@ void Gimbal_Init(void);
 
 void StartGimbalTask(void const *argument)
 {
-    // //调试区域，调试结束删除或全部注释
+    //调试区域，调试结束删除或全部注释
     // robot_mode_data_pt->mode.control_device = 2;
     // robot_mode_data_pt->mode.rc_motion_mode = 4;///< 结构体内遥控器的特殊模式依然是5
     //调试区域结束
-
     Gimbal_Init();
-    __OPEN_CAN2_RX_FIFO0_IT__; ///<打开CAN接收中断
-    /* 原本在延时之后，上车测试之后发现解析数据有不定长的延时，所以移植到这里，测试之后延时消失 */
     osDelay(1000);
-    /*bug_note 串口打印电机反馈值时，有长短不一定的延时，有可能与此有关 */
+
     for (;;)
     {
         // Console.print("yaw %.2f, pitch %.2f, rol %.2f \r\n", imu_date_pt->yaw, imu_date_pt->pit, imu_date_pt->rol);
@@ -51,9 +49,9 @@ void StartGimbalTask(void const *argument)
 
         /* 电机数据解析 */
         Parse_Can2_Gimbal_Rxd_Data(can2_rx_header_pt, can2_rxd_data_buffer, gimbal_motor_parsed_feedback_data);
-
-        /*选择操作设备*/
-        if (robot_mode_data_pt->mode.control_device == remote_controller_device_ENUM) ///<遥控器模式
+        //  if (!(imu_date_pt->pit) > (2) || (imu_date_pt->pit) < -(2)) {imu_date_pt->pit = 0}
+            /*选择操作设备*/
+            if (robot_mode_data_pt->mode.control_device == remote_controller_device_ENUM) ///<遥控器模式
         {
             // 底盘云台模式 1底盘跟随 2小陀螺  3垂稳云台 4垂稳+小陀螺 5特殊模式
             switch (robot_mode_data_pt->mode.rc_motion_mode)
@@ -83,7 +81,7 @@ void StartGimbalTask(void const *argument)
                 //陀螺仪数据，零漂太大，使用官方结算中不带磁力计矫正的程序可能可以解决这个问题
                 pid_out[Yaw_target_Angle] = Calc_Yaw_Angle360_Pid(yaw_angle_set, imu_date_pt->yaw);
                 pid_out[Pitch_target_Speed] = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
-
+                /* 用于输出不支持的指针类型数据 */
                 //     float new_moter_date1 = 0;
                 //     new_moter_date1 =  gimbal_motor_parsed_feedback_data[pitch_motor_index].speed_rpm;
                 //  Console.print("%0.2f ,%0.2f \r\n",pid_out[Yaw_target_Angle], new_moter_date1);
@@ -96,10 +94,10 @@ void StartGimbalTask(void const *argument)
             case 4:
             {
 
-                pitch_angle_set = rc_data_pt->rc.ch1 / 2.0f;
+                pitch_angle_set -= rc_data_pt->rc.ch1 / 2.0f;
                 yaw_angle_set -= (rc_data_pt->rc.ch0); ///< 倍率待调整
                 /* 用陀螺仪做角度闭环，用机械角做限位 */
-                Pitch_Angle_Limit(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit);
+                // Pitch_Angle_Limit(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit);
                 if (yaw_angle_set > 360)
                 {
                     yaw_angle_set -= 360;
@@ -108,10 +106,12 @@ void StartGimbalTask(void const *argument)
                 {
                     yaw_angle_set += 360;
                 }
+
                 pid_out[Yaw_target_Angle] = Calc_Yaw_Angle360_Pid(yaw_angle_set, imu_date_pt->yaw);
                 pid_out[Pitch_target_Speed] = Calc_Pitch_Angle8191_Imu_Pid(pitch_angle_set, imu_date_pt);
                 // Console.print("%0.2f,%0.2f,%0.2f\r\n", imu_date_pt->pit, pitch_angle_set, pid_out[Pitch_target_Speed]);
-                /* bug_log:上车测试之后发现自稳模式没有角度限制，机械角限制对陀螺仪反馈没有用，再研究 */
+                /* bug_log:自稳模式下程序限位只对遥控器控制的响应有限制，而陀螺仪导致的漂移并不能被限制 */
+                /* 目前想到的方法：将板装车之后测量出对应的陀螺仪角度值，做两个死区。即0点附近的微小零漂以及超过云台的漂浮 */
                 break;
             }
 
@@ -181,7 +181,7 @@ void StartGimbalTask(void const *argument)
                 break;
             }
         }
-
+        Console.print("%0.2f,%0.2f,%0.2f\r\n", imu_date_pt->pit, pitch_angle_set, pid_out[Pitch_target_Speed]);
         // Console.print("%d,%d",pitch_target_speed,&gimbal_motor_parsed_feedback_data[pitch_motor_index])
         ///<云台串环速度环计算及发送底盘电机速度
         YAW_SPEED_OUTPUT_LIMIT(&pid_out[Yaw_target_Speed], YAW_LIMIT_SPEED); // yaw轴速度限制
@@ -219,6 +219,13 @@ void Gimbal_Init(void)
     rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();
     robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();
     imu_date_pt = Get_Imu_Date_Now(); ///<获取陀螺仪角度
+    __OPEN_CAN2_RX_FIFO0_IT__;        ///<打开CAN接收中断
+    /* 原本在延时之后，上车测试之后发现CAN2解析数据有不定长的延迟，所以移植到这里，测试之后延时消失 */
+    /* 两轴初始化 */
+    // Set_Gimbal_Motors_Speed(pid_out[Yaw_target_Speed],
+    //                             pid_out[Pitch_target_Speed],
+    //                             &gimbal_motor_parsed_feedback_data[yaw_motor_index],
+    //                             &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
 }
 
 /**

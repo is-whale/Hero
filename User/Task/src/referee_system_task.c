@@ -11,6 +11,7 @@ extern osThreadId refereeSystemTaHandle;
 static const uint8_t *judge_buf;
 static uint8_t judge_buf_copy[128];
 static uint32_t judge_buf_len = 0;
+static Judge_data_t *judage_date_text;
 
 void Referee_Init(void);                                                       ///<裁判系统初始化函数声明
 extern uint8_t Parse_Refere_System_Data(uint8_t *get_data, uint16_t data_len); ///< bug_log：声明始终被识别为定义
@@ -37,8 +38,8 @@ void StartRefereeSystemTask(void const *argument)
     /*调试区域*/
 
     (void)referee_system_rxd_len; ///<避免warning
-    (void)referee_system_rx_buffer;
-    (void)referee_system_rx_buffer_index;
+    referee_system_rx_buffer;
+    referee_system_rx_buffer_index;
     /*调试区域结束*/
     osDelay(10);
 
@@ -61,6 +62,7 @@ void StartRefereeSystemTask(void const *argument)
                     Module_Reload(judge_system); ///< 更新裁判系统状态
 
                     Parse_Refere_System_Data(judge_buf_copy, judge_buf_len); ///<解析裁判系统数据
+                    // Console.print("%0.2f\r\n",Judge_data_t->);
                 }
                 else
                 {

@@ -52,6 +52,8 @@ void StartChassisTask(void const *argument)
 
     /* 调试区域 */
     (void)referee_date_pt; ///<避免警告
+    // *referee_date_pt->power_heat_data.chassis_power = 50;
+    // *referee_date_pt->power_heat_data.shooter_id1_42mm_cooling_heat = 50;
     /* 调试区域结束 */
 
     osDelay(1000);
@@ -124,8 +126,8 @@ void StartChassisTask(void const *argument)
 
             switch (robot_mode_data_pt->mode.rc_motion_mode) ///<选择底盘云台的工作模式
             {
-
-            case rc_chassis_follow_mode_ENUM: ///< 1；底盘跟随+手动瞄准
+            case rc_stable_chassis_follow_mode_ENUM: ///< 3:底盘跟随+自稳云台
+            case rc_chassis_follow_mode_ENUM:        ///< 1；底盘跟随+手动瞄准
             {
                 follow_pid_output = Calc_Chassis_Follow(); ///< 底盘跟随 pid,计算出 yaw 轴当前角度和 yaw 轴头之间的角度差，当作速度值加入各个轮子中
 
@@ -141,10 +143,11 @@ void StartChassisTask(void const *argument)
                 break;
             }
 
-            case rc_chassis_gyro_mode_ENUM: ///< 2；底盘小陀螺+手动瞄准
+            case rc_chassis_gyro_mode_ENUM:        ///< 2；底盘小陀螺+手动瞄准
+            case rc_stable_chassis_gyro_mode_ENUM: ///< 4：底盘小陀螺+自稳云台
             {
                 Calc_Gyro_Motors_Speed(chassis_motor_speed,
-                                       0,
+                                       Calc_Gyro_Speed_By_Power_Limit(referee_date_pt->power_heat_data.chassis_power),
                                        GM6020_YAW_Angle_To_360(gimbal_motor_feedback_parsed_data[*yaw_motor_index].mechanical_angle),
                                        rc_data_pt->rc.ch3 * 8.0f,
                                        rc_data_pt->rc.ch2 * 8.0f);
@@ -191,6 +194,7 @@ void StartChassisTask(void const *argument)
                                chassis_motor_speed[2],
                                chassis_motor_speed[3],
                                chassis_motor_feedback_parsed_data);
+        // Console.print("%0.2f,%0.2f\r\n",referee_date_pt->power_heat_data.chassis_power,referee_date_pt->power_heat_data.shooter_id1_42mm_cooling_heat);
         osDelay(10);
     }
 }

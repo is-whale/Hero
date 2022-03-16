@@ -219,7 +219,7 @@ static uint8_t Analysis_Power_Heat_Data(uint8_t *data_package, uint16_t data_len
 	judge_data.power_heat_data.shooter_id1_17mm_cooling_heat = Uint8_t_Array_To_Uint16_t(&data_package[10]);
 	
 	// DEBUG_SHOWDATA2("chassis_power", judge_data.power_heat_data.chassis_power);
-
+	// Console.print("chassis_power", judge_data.power_heat_data.shooter_id1_17mm_cooling_heat);
 	return 1;
 }
 

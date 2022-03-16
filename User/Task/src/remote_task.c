@@ -27,9 +27,9 @@ void StartRemoteTask(void const *argument)
     sbus_rxd_len = Get_Usart1_DMA_Rxd_DataLen();
 
     Usart1_RxDMA_Init();
-    Rc_Data_Reset(&remote_controller);
-    Rc_Data_Reset(&last_time_remote_controller);
-    Control_Data_Init(&robot_control_data);
+    Rc_Data_Reset(&remote_controller);           ///< 本次数据重置
+    Rc_Data_Reset(&last_time_remote_controller); ///< 上次数据重置
+    Control_Data_Init(&robot_control_data);      ///< 初始化时的机器人模式设置
 
     osDelay(100);
 
