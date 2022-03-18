@@ -6,18 +6,18 @@
  * @copyright Copyright (c) 2021
  */
 #include "chassis_task.h"
-
+/* 宏定义 */
 #define CHASSIS_SPEED_ZERO 1                                            ///<关闭底盘速度 1为开启
 #define OUTPUT_LIMIT(data, limit) Float_Constraion(data, -limit, limit) ///<输出限幅
 #define CHASSIS_MOTOR_DEFAULT_BASE_RATE 5.5f                            //底盘默认速度的倍率
 #define CHASSIS_MOTOR_GYRO_BASE_RATE 5.0f
 
-#define POWER_LIMIT_FORM_SYSTEM 20.0f ///<这里后面要换成裁判系统解析的功率限制，为了避免警告暂时使用数字代替
+#define POWER_LIMIT_FORM_SYSTEM 10.0f ///<这里后面要换成裁判系统解析的功率限制，为了避免警告暂时使用数字代替
 
 static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500); ///< 底盘跟随PID
 static float chassis_motor_boost_rate = 1.0f;                                                       ///<调用相应函数更改（底盘速度倍率）
 static const float motor_speed_multiple = 13.5;
-
+/* 变量 */
 static Rc_Ctrl_t *rc_data_pt;                               ///< 指向解析后的遥控器结构体指针
 static Robot_control_data_t *robot_mode_data_pt;            ///< 指向解析后的机器人模式结构体指针(也包括了虚拟键鼠通道的值)
 static Motor_Measure_t *chassis_motor_feedback_parsed_data; ///< 解析后的底盘电机数据
@@ -63,8 +63,7 @@ void StartChassisTask(void const *argument)
         HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
         Parse_Can1_Rxd_Data();
         ///<选择操作设备    键鼠&遥控器
-        /*键鼠模式*/
-        if (robot_mode_data_pt->mode.control_device == mouse_keyboard_device_ENUM)
+        if (robot_mode_data_pt->mode.control_device == mouse_keyboard_device_ENUM) ///< 键鼠模式
         {
             /**
              * 选择底盘云台模式    1底盘跟随   2小陀螺   3特殊模式
@@ -82,7 +81,7 @@ void StartChassisTask(void const *argument)
                 chassis_motor_speed[1] = robot_mode_data_pt->virtual_rocker.ch2 - robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x / 0.38f;
                 chassis_motor_speed[2] = -robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x / 0.38f;
                 chassis_motor_speed[3] = -robot_mode_data_pt->virtual_rocker.ch2 - robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x / 0.38f;
-                ///<乘一个倍率
+                ///< 乘一个倍率
                 chassis_motor_speed[0] *= (float)(CHASSIS_MOTOR_DEFAULT_BASE_RATE * chassis_motor_boost_rate);
                 chassis_motor_speed[1] *= (float)(CHASSIS_MOTOR_DEFAULT_BASE_RATE * chassis_motor_boost_rate);
                 chassis_motor_speed[2] *= (float)(CHASSIS_MOTOR_DEFAULT_BASE_RATE * chassis_motor_boost_rate);
@@ -251,8 +250,8 @@ void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed, float move_
     motors_speed[3] += ((-x_x_speed + x_y_speed) + (-y_x_speed - y_y_speed));
 }
 /**
- * @author          whale copy from bashpow
- * @brief           通过读取裁判系统的限制功率计算小陀螺时各个电机（M3508）的速度（小陀螺速度目标值）
+ * @author          bashpow
+ * @brief           小陀螺底盘限制功率
  * @details         返回的是不同实时功率下的小陀螺底盘电机速度目标值
  * @note            后面与官方开源功率控制比较之后修改一下；还有就是功率计算要改成英雄的
  * @param [in]      通过裁判系统读取的功率
