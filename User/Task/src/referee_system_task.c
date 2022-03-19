@@ -39,7 +39,7 @@ void StartRefereeSystemTask(void const *argument)
     referee_system_rx_buffer[1] = Get_Usart6_DMA_RxBuffer_Two();
     referee_system_rxd_len = Get_Usart6_DMA_Rxd_DataLen();
     juder_date_after_parse = Get_Referee_Data();
-    referee_system_rx_buffer_index = Get_USART6_DMA_Available_Bufferx();///< 可用的DMA区域
+    referee_system_rx_buffer_index = Get_USART6_DMA_Available_Bufferx(); ///< 可用的DMA区域
     /*调试区域*/
 
     // (void)referee_system_rxd_len; ///<避免warning
@@ -68,9 +68,10 @@ void StartRefereeSystemTask(void const *argument)
                 debug_print("%d ", judge_buf_copy[i]);
             }
             debug_print("\r\n");
-            Module_Reload(judge_system);                             ///< 更新裁判系统状态
-            Parse_Refere_System_Data(judge_buf_copy, judge_buf_len); ///<解析裁判系统数据
-            Console.print("%0.2f\r\n", juder_date_after_parse->game_robot_status.chassis_power_limit);
+            Module_Reload(judge_system);                                       ///< 更新裁判系统状态
+            Parse_Refere_System_Data(judge_buf_copy, *referee_system_rxd_len); ///<解析裁判系统数据
+            // Console.print("%0.2f\r\n", juder_date_after_parse->game_robot_status.chassis_power_limit);
+            // Console.print("%0.2f,0.2f\r\n", referee_system_rxd_len, juder_date_after_parse);
         }
         else
         {

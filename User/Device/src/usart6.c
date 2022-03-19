@@ -41,7 +41,7 @@ void Usart6_DMA_RxCp_Callback(void)
 		///< 关闭 DMA
 		LL_DMA_DisableStream(DMA2, LL_DMA_STREAM_1);
 
-		///< 清楚 IDLE 中断、DMA TC2 标志位
+		///< 清除 IDLE 中断、DMA TC2 标志位
 		LL_USART_ClearFlag_IDLE(USART6);
 		LL_DMA_ClearFlag_TC2(DMA2);
 
@@ -96,7 +96,7 @@ const uint16_t *Get_Usart6_DMA_RxMaxLen(void)
  */
 uint16_t *Get_Usart6_DMA_Rxd_DataLen(void)
 {
-	return (uint16_t *)&usart6_dma_rxd_data_len;
+	return &usart6_dma_rxd_data_len;
 }
 
 /**
