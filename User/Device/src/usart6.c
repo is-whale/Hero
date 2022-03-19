@@ -3,10 +3,10 @@
 static const uint16_t usart6_dma_rx_max_len = 128;					  ///< usart6 DMA 最大接收长度
 static volatile uint8_t usart6_dma_rx_buffer0[usart6_dma_rx_max_len]; ///< usart6 DMA 接受缓冲区 1
 static volatile uint8_t usart6_dma_rx_buffer1[usart6_dma_rx_max_len]; ///< usart6 DMA 接受缓冲区 2
-static volatile uint16_t usart6_dma_rxd_data_len;					  ///< usart6 DMA 已经接收到的数据长度
+static volatile uint16_t usart6_dma_rxd_data_len = 0;					  ///< usart6 DMA 已经接收到的数据长度
 
 /**
- * @brief       初始化串口 6 的接收 DMA 
+ * @brief       初始化串口 6 的接收 DMA
  * @param[in]   none
  * @retval      void
  */
@@ -30,7 +30,7 @@ void Usart6_RxDMA_Init(void)
 }
 
 /**
- * @brief           串口 6 的接收中断函数 
+ * @brief           串口 6 的接收中断函数
  * @param[in]       none
  * @retval          void
  */
@@ -61,7 +61,8 @@ void Usart6_DMA_RxCp_Callback(void)
 		LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_1, usart6_dma_rx_max_len);
 
 		///< 通知任务进行解析
-		Info_Referee_System_Task_Parse_Data();
+		// Info_Referee_System_Task_Parse_Data();
+		Inform_Referee_System_Task_With_len(usart6_dma_rxd_data_len);
 
 		///< 重新开启 DMA
 		LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_1);

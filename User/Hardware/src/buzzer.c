@@ -31,7 +31,7 @@ void Buzzer_Bsp_Init(void)
   */
 void Music_Play(uint8_t flag)
 {
-if(flag==1)            //???
+if(flag==1)           
     {
             BUZZER_ON(NOTE_D1);
                 osDelay(300);
@@ -61,7 +61,7 @@ if(flag==1)            //???
                 osDelay(300);
                 BUZZER_ON(NOTE_D2);
                 osDelay(300);
-               
+
                 BUZZER_ON(NOTE_D1);
                 osDelay(300);
                 BUZZER_ON(NOTE_D1);

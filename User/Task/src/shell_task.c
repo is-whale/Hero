@@ -132,7 +132,7 @@ static void Shell_Str_Process(void)
 static void Print_At_First(void)
 {
 	__printf("\r\n");
-	Print_Dragon();
+	// Print_Dragon();
 	__printf("\r\n");
 	Print_Logo();
 	__printf("\r\n");

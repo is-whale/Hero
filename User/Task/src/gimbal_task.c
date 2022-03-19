@@ -7,13 +7,12 @@
  */
 /* 注意上下限位反的情况 */
 
-
 static const uint8_t gimbal_motor_num = 2; ///< 云台电机的数量
 /* Yaw&Pitch电机下标 */
 static const uint8_t yaw_motor_index = 0;   ///< yaw 轴电机在电机数据结构体中的下标
 static const uint8_t pitch_motor_index = 1; ///< pitch 轴电机在电机数据结构体中的下标
 /* Pitch */
-static const uint16_t pitch_up_angle_limit = 700;    ///< pitch 轴云台最低角度
+static const uint16_t pitch_up_angle_limit = 0;    ///< pitch 轴云台最低角度
 static const uint16_t pitch_middle_angle = 5000;     ///< pitch 轴云台中间角度
 static const uint16_t pitch_down_angle_limit = 8000; ///< pitch 轴云台最高角度  第一次测量角度90，后面使用8090正常
 /* Yaw */
@@ -40,7 +39,6 @@ void StartGimbalTask(void const *argument)
     //调试区域结束
     Gimbal_Init();
     osDelay(1000);
-
     for (;;)
     {
         // Console.print("yaw %.2f, pitch %.2f, rol %.2f \r\n", imu_date_pt->yaw, imu_date_pt->pit, imu_date_pt->rol);
@@ -49,9 +47,8 @@ void StartGimbalTask(void const *argument)
 
         /* 电机数据解析 */
         Parse_Can2_Gimbal_Rxd_Data(can2_rx_header_pt, can2_rxd_data_buffer, gimbal_motor_parsed_feedback_data);
-        //  if (!(imu_date_pt->pit) > (2) || (imu_date_pt->pit) < -(2)) {imu_date_pt->pit = 0}
-            /*选择操作设备*/
-            if (robot_mode_data_pt->mode.control_device == remote_controller_device_ENUM) ///<遥控器模式
+        /*选择操作设备*/
+        if (robot_mode_data_pt->mode.control_device == remote_controller_device_ENUM) ///<遥控器模式
         {
             // 底盘云台模式 1底盘跟随 2小陀螺  3垂稳云台 4垂稳+小陀螺 5特殊模式
             switch (robot_mode_data_pt->mode.rc_motion_mode)
@@ -82,9 +79,9 @@ void StartGimbalTask(void const *argument)
                 pid_out[Yaw_target_Angle] = Calc_Yaw_Angle360_Pid(yaw_angle_set, imu_date_pt->yaw);
                 pid_out[Pitch_target_Speed] = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
                 /* 用于输出不支持的指针类型数据 */
-                //     float new_moter_date1 = 0;
-                //     new_moter_date1 =  gimbal_motor_parsed_feedback_data[pitch_motor_index].speed_rpm;
-                //  Console.print("%0.2f ,%0.2f \r\n",pid_out[Yaw_target_Angle], new_moter_date1);
+                // float new_moter_date1 = 0;
+                // new_moter_date1 = gimbal_motor_parsed_feedback_data[pitch_motor_index].speed_rpm;
+                // Console.print("%0.2f ,%0.2f \r\n", pid_out[Yaw_target_Angle], new_moter_date1);
                 break;
             }
             case 3:
@@ -182,10 +179,9 @@ void StartGimbalTask(void const *argument)
             }
         }
         // Console.print("%0.2f,%0.2f,%0.2f\r\n", imu_date_pt->pit, pitch_angle_set, pid_out[Pitch_target_Speed]);
-        // Console.print("%d,%d",pitch_target_speed,&gimbal_motor_parsed_feedback_data[pitch_motor_index])
         ///<云台串环速度环计算及发送底盘电机速度
         YAW_SPEED_OUTPUT_LIMIT(&pid_out[Yaw_target_Speed], YAW_LIMIT_SPEED); // yaw轴速度限制
-        /* 数组形式的速度设置函数 */
+        /* 速度设置函数 */
         Set_Gimbal_Motors_Speed(pid_out[Yaw_target_Speed],
                                 pid_out[Pitch_target_Speed],
                                 &gimbal_motor_parsed_feedback_data[yaw_motor_index],
@@ -199,8 +195,8 @@ void StartGimbalTask(void const *argument)
 
         /* 直接输出会有参数类型错误，所以使用新变量存储电机返回值 */
         // float new_moter_date = 0;
-        // new_moter_date =  gimbal_motor_parsed_feedback_data[yaw_motor_index].speed_rpm;
-        // Console.print("%0.2f,%0.2f\r\n", new_moter_date,rc_data_pt->rc.ch1/100.0f);
+        // new_moter_date = gimbal_motor_parsed_feedback_data[yaw_motor_index].mechanical_angle;
+        // Console.print("%0.2f\r\n", new_moter_date);
         osDelay(10);
     }
 }
@@ -221,11 +217,6 @@ void Gimbal_Init(void)
     imu_date_pt = Get_Imu_Date_Now(); ///<获取陀螺仪角度
     __OPEN_CAN2_RX_FIFO0_IT__;        ///<打开CAN接收中断
     /* 原本在延时之后，上车测试之后发现CAN2解析数据有不定长的延迟，所以移植到这里，测试之后延时消失 */
-    /* 两轴初始化 */
-    // Set_Gimbal_Motors_Speed(pid_out[Yaw_target_Speed],
-    //                             pid_out[Pitch_target_Speed],
-    //                             &gimbal_motor_parsed_feedback_data[yaw_motor_index],
-    //                             &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
 }
 
 /**
