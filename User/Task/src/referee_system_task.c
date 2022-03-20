@@ -31,7 +31,6 @@ const Judge_data_t *juder_date_after_parse;                                    /
 void StartRefereeSystemTask(void const *argument)
 {
     // osEvent referee_system_get_data_event;
-
     // Referee_Init();
     Usart6_RxDMA_Init();
 
@@ -41,7 +40,6 @@ void StartRefereeSystemTask(void const *argument)
     juder_date_after_parse = Get_Referee_Data();
     referee_system_rx_buffer_index = Get_USART6_DMA_Available_Bufferx(); ///< 可用的DMA区域
     /*调试区域*/
-
     // (void)referee_system_rxd_len; ///<避免warning
     /*调试区域结束*/
     osDelay(10);
@@ -62,15 +60,16 @@ void StartRefereeSystemTask(void const *argument)
             LL_USART_TransmitData8(USART6, 9);
             /*将接受的的原始数据拷贝为副本*/
             memcpy(judge_buf_copy, referee_system_rx_buffer[referee_system_rx_buffer_index], judge_buf_len);
-            debug_showdata1("judge_buf_len", judge_buf_len);
-            for (uint8_t i = 0; i < judge_buf_len; i++)
-            {
-                debug_print("%d ", judge_buf_copy[i]);
-            }
-            debug_print("\r\n");
-            Module_Reload(judge_system);                                       ///< 更新裁判系统状态
-            Parse_Refere_System_Data(judge_buf_copy, *referee_system_rxd_len); ///<解析裁判系统数据
-            // Console.print("%0.2f\r\n", juder_date_after_parse->game_robot_status.chassis_power_limit);
+            // debug_showdata1("judge_buf_len", judge_buf_len);
+            // for (uint8_t i = 0; i < judge_buf_len; i++)
+            // {
+            //     debug_print("%d ", judge_buf_copy[i]);
+            // }
+            // debug_print("\r\n");
+            Module_Reload(judge_system);                             ///< 更新裁判系统状态
+            // Parse_Refere_System_Data(judge_buf_copy, judge_buf_len); ///<解析裁判系统数据
+
+            // Console.print("%0.2f\r\n", juder_date_after_parse ->power_heat_data.shooter_id1_17mm_cooling_heat);
             // Console.print("%0.2f,0.2f\r\n", referee_system_rxd_len, juder_date_after_parse);
         }
         else

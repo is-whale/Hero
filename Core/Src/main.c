@@ -100,6 +100,7 @@ int main(void)
   MX_TIM12_Init();
   MX_SPI5_Init();
   MX_USART6_UART_Init();
+  MX_UART8_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */

@@ -15,7 +15,6 @@
 #define YAW_LIMIT_SPEED         150     ///<YAW轴速度限幅
 #define YAW_SPEED_OUTPUT_LIMIT(data, limit)     Float_Constraion(data, -limit, limit)
 
-
 /*pitch*/
 /*测量极限位置的电机角度返回值得到这些数据。如云台最高&最低能到达的位置*/
 
@@ -24,7 +23,7 @@
 #define PITCH_DOWN_LIMIT    pitch_down_angle_limit    ///<pitch下限位
 
 
-#define __OPEN_CAN2_RX_FIFO0_IT__ HAL_CAN_ActivateNotification(&hcan2, CAN_IT_RX_FIFO0_MSG_PENDING); 
+#define __OPEN_CAN2_RX_FIFO0_IT__ HAL_CAN_ActivateNotification(&hcan2, CAN_IT_RX_FIFO0_MSG_PENDING);
 /*对外函数声明*/
 void Parse_Can2_Gimbal_Rxd_Data(CAN_RxHeaderTypeDef *p_can_rx_header, uint8_t data[], Motor_Measure_t *motor);
 Motor_Measure_t *Get_Gimbal_Parsed_FeedBack_Data(void);

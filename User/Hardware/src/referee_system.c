@@ -1,10 +1,9 @@
 #include "referee_system.h"
+#include "console_print.h"
 #include "crc_check.h"
 #include "math2.h"
 #include "monitor_task.h"
 #include "usart3.h"
-/* 为使用printf引入下面头文件 */
-#include "console_print.h"
 
 /* 裁判系统调试宏定义 */
 #if 1
@@ -62,7 +61,6 @@ uint8_t Parse_Refere_System_Data(uint8_t *get_data, uint16_t data_len)
 
 	//寻找帧头
 	Find_All_A5(get_data, data_len, a5_position, &a5_number);
-	// Console.print("a5::%f,%f\r\n", a5_number, a5_position);
 	//解析所有数据包
 	for (uint8_t i = 0; i < a5_number; i++)
 	{
@@ -70,7 +68,7 @@ uint8_t Parse_Refere_System_Data(uint8_t *get_data, uint16_t data_len)
 		if (Analysis_Frame_Header(&get_data[(a5_position[i])], &data_length[i], NULL) == 0)
 		{
 			// debug_log("Analysis No.%d frame header error.", i);
-			Console.print("head%f\r\n", i);
+			Console.print("head_done%f\r\n", i);
 			continue;
 		}
 
@@ -78,7 +76,7 @@ uint8_t Parse_Refere_System_Data(uint8_t *get_data, uint16_t data_len)
 		if (Check_Package_Crc16(&get_data[(a5_position[i])], (data_length[i] + 9)) == 0)
 		{
 			// debug_log("CRC16 check No.%d fail.", i);
-			Console.print("CRC\r\n");
+			Console.print("CRC_done\r\n");
 
 			continue;
 		}
@@ -194,18 +192,32 @@ uint8_t Analysis_Data(uint8_t *get_data, uint16_t data_len)
 	{
 	//实时功率热量数据
 	case Power_Heat_Data:
+	{
 		return Analysis_Power_Heat_Data(&get_data[7], data_len);
 		// break;
-
+	}
 	//实时射击信息
 	case Shoot_Data:
+	{
 		return Analysis_Shoot_Data(&get_data[7], data_len);
 		// break;
-
+	}
 	//实时比赛机器人状态
 	case Game_Robot_Status:
+	{
 		return Analysis_Game_Robot_Status(&get_data[7], data_len);
 		// break;
+	}
+
+	case BUFF_MUSK_CMD_ID:
+	{
+		memcpy(&judge_data.ext_buff_musk_t,&get_data[7], data_len);
+	}
+	case BULLET_REMAINING_CMD_ID:
+	{
+		// memcpy(&judge_data.ext_bullet_remaining_t.bullet_remaining_num,&get_data[7], sizeof(judge_data.ext_bullet_remaining_t));
+		memcpy(&judge_data.ext_bullet_remaining_t.bullet_remaining_num, &get_data[7], data_len);
+	}
 	}
 
 	return 0x0A;
@@ -219,8 +231,7 @@ static uint8_t Analysis_Power_Heat_Data(uint8_t *data_package, uint16_t data_len
 	judge_data.power_heat_data.chassis_power = Hex4_To_Float1(&data_package[4]);
 	judge_data.power_heat_data.chassis_power_buffer = Uint8_t_Array_To_Uint16_t(&data_package[8]);
 	judge_data.power_heat_data.shooter_id1_17mm_cooling_heat = Uint8_t_Array_To_Uint16_t(&data_package[10]);
-
-	// DEBUG_SHOWDATA2("chassis_power", judge_data.power_heat_data.chassis_power);
+	// debug_showdata2("chassis_power", judge_data.power_heat_data.chassis_power);
 	// Console.print("chassis_power", judge_data.power_heat_data.shooter_id1_17mm_cooling_heat);
 	return 1;
 }
@@ -240,7 +251,7 @@ static uint8_t Analysis_Shoot_Data(uint8_t *data_package, uint16_t data_len)
 	 * @note	unfinished
 	 */
 	//  Shooter_Friction_Speed_Limit();///<限制子弹发射速度函数，待完善，待解析裁判系统数据
-	// DEBUG_SHOWDATA2("bullet_speed", judge_data.shoot_data.bullet_speed);
+	debug_showdata2("bullet_speed", judge_data.shoot_data.bullet_speed);
 
 	return 1;
 }
@@ -288,8 +299,8 @@ static uint8_t Analysis_Game_Robot_Status(uint8_t *data_package, uint16_t data_l
 	// 	Fric_Reset(); //重置摩擦轮
 	// }
 
-	// DEBUG_SHOWDATA1("sout", judge_data.game_robot_status.mains_power_shooter_output);
-	// DEBUG_SHOWDATA1("gggglllll", judge_data.game_robot_status.chassis_power_limit);
+	debug_showdata1("sout", judge_data.game_robot_status.mains_power_shooter_output);
+	debug_showdata1("gggglllll", judge_data.game_robot_status.chassis_power_limit);
 
 	return 1;
 }
