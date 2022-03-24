@@ -26,6 +26,7 @@
 #include "usart3.h"
 #include "usart1.h"
 #include "usart6.h"
+#include "uart8.h"
 #include "shell_task.h"
 #include "can2_device.h"
 #include "parse_can1_rx_data_task.h"

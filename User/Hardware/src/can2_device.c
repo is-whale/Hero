@@ -1,10 +1,11 @@
 #include "can2_device.h"
+#include "monitor_task.h"
 
-static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); 	///< yaw电机速度PID
+static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); ///< yaw电机速度PID
 // static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(600, 1, 0.2, 5000, 30000, 0, 1000, 500); 	///< yaw电机速度PID(单电机调试)
-static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); 		///< yaw电机角度PID
+static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); ///< yaw电机角度PID
 
-static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(20, 0, 3, 2000, 40000, 0, 1000, 500);	  	///< pitch电机速度PID
+static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(20, 0, 3, 2000, 40000, 0, 1000, 500);		 ///< pitch电机速度PID
 static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 1000, 0, 3000, 500); ///< pitch电机角度PID
 
 static Pid_Position_t friction_motor_left_speed_pid = NEW_POSITION_PID(7, 0, 0.7, 2000, 16383, 0, 1000, 500);
@@ -22,10 +23,10 @@ static uint16_t this_machine_angle = 0;
 static uint8_t can2_rxd_data_buffer[8];	   ///< 辅助变量，接受电机反馈的原始数据
 static CAN_RxHeaderTypeDef can2_rx_header; ///< 辅助变量，用于 HAL 库函数接受数据，存放关于 CAN 反馈数据的 ID 号等信息
 
-static Motor_Measure_t wave_motor_feedback_data;///<拨轮电机反馈数据
+static Motor_Measure_t wave_motor_feedback_data; ///<拨轮电机反馈数据
 
 /**
- * @brief 			解析波轮电机数据
+ * @brief 			解析拨轮电机数据
  * @param[in]		void
  * @retval			void
  */
@@ -71,11 +72,27 @@ uint16_t *Get_This_Machine_Angle(void)
 void Can2_Rx_FIFO0_IT_Callback(void)
 {
 	HAL_CAN_GetRxMessage(&hcan2, CAN_RX_FIFO0, &can2_rx_header, can2_rxd_data_buffer);
-	///< 所有 can 数据，只有波轮电机的数据是直接在中断中进行解析的，因为要实时获取电机的绝对角度
-	if (can2_rx_header.StdId == CAN_3508_WAVE_ID)
+	///< 所有 can 数据，只有拨轮电机的数据是直接在中断中进行解析的，因为要实时获取电机的绝对角度
+	switch (can2_rx_header.StdId)
+	{
+	case CAN_3508_WAVE_ID:
 	{
 		Parse_Wave_Motor_Feedback_Data();
 	}
+	case CAN_YAW_MOTOR_ID:
+	case CAN_PITCH_MOTOR_ID:
+	{
+		uint8_t i = 0;
+		//处理电机ID号
+		i = can2_rx_header.StdId - CAN_YAW_MOTOR_ID;
+		//通知解析
+		Gimbal_Reload(i);
+	}
+	}
+	// if (can2_rx_header.StdId == CAN_3508_WAVE_ID)
+	// {
+	// 	Parse_Wave_Motor_Feedback_Data();
+	// }
 }
 
 /**
@@ -99,9 +116,9 @@ uint8_t *Get_CAN2_Rxd_Buffer(void)
 }
 
 /**
- * @brief 		返回中断解析后的波轮电机结构体指针
+ * @brief 		返回中断解析后的拨轮电机结构体指针
  * @param[in]	void
- * @return 		Motor_Measure_t* 解析后的波轮电机结构体指针
+ * @return 		Motor_Measure_t* 解析后的拨轮电机结构体指针
  */
 Motor_Measure_t *Get_Wave_Motor_Paresed_Data(void)
 {
@@ -152,15 +169,15 @@ void Pitch_Angle_Limit(float *angle, float down_angle, float up_angle)
 /**
  * @brief 									计算云台Yaw电机的角度环输出
  * @param tar_angle 						设定角度值(倍率后的通道值)
- * @param tar_angle							实际角度值（脱落反馈角度值，空间坐标系下的绝对角度） 
+ * @param tar_angle							实际角度值（脱落反馈角度值，空间坐标系下的绝对角度）
  * @param pitch_motor_parsed_feedback_data  指向 yaw 轴电机反馈结构体指针（实际值）
  * @return float 							串级pid角度环输出
  */
 float Calc_Yaw_Angle360_Pid(float tar_angle, float cur_angle)
 {
-	float yaw_tar_angle = tar_angle;///<ch0 通道值
-	float yaw_cur_angle = cur_angle;///<陀螺仪反馈值
-	
+	float yaw_tar_angle = tar_angle; ///< ch0 通道值
+	float yaw_cur_angle = cur_angle; ///<陀螺仪反馈值
+
 	Handle_Angle360_PID_Over_Zero(&yaw_tar_angle, &yaw_cur_angle);
 	return Pid_Position_Calc(&motor_yaw_angle_pid, yaw_tar_angle, yaw_cur_angle);
 }
@@ -183,16 +200,15 @@ float Calc_Wave_Motor_Angle8191_Pid(float tar_angle, float current_angle)
 {
 	float wave_motor_tar_angle = tar_angle;
 	float wave_motor_cur_angle = current_angle;
-	//Handle_Angle8191_PID_Over_Zero(&tar_angle, &current_angle);
+	// Handle_Angle8191_PID_Over_Zero(&tar_angle, &current_angle);
 	return Pid_Position_Calc(&wave_motor_angle_pid, wave_motor_tar_angle, wave_motor_cur_angle); ///< 这是第一层 PID，计算设定角度与实际角度之间的误差，得到下一步要设定的速度值，如果已经达到目标值，则输出为 0
 }
 
-
 /**
- * @brief 								设置波轮电机的速度(包含速度环结算)
- * @param speed_left 					左边波轮电机的速度
- * @param speed_right 					右边波轮电机的速度
- * @param wave_motor_feedback_data 		两个波轮电机解析后的反馈数据
+ * @brief 								设置拨轮电机的速度(包含速度环结算)
+ * @param speed_left 					左边拨轮电机的速度
+ * @param speed_right 					右边拨轮电机的速度
+ * @param wave_motor_feedback_data 		两个拨轮电机解析后的反馈数据
  */
 void Set_Friction_Motor_Speed(float speed_left, float speed_right, Motor_Measure_t *friction_motor_feedback_data)
 {
@@ -225,9 +241,8 @@ void Set_Wave_Motor_Speed(float wave_motor_speed, Motor_Measure_t *wave_motor_fe
  */
 float Calc_Pitch_Angle8191_Imu_Pid(float tar_angle, Imu_t *imu_on_broad)
 {
-    float pitch_tar_angle = tar_angle;
-    float pitch_cur_angle = imu_on_broad->pit * 500.0f;
-    Handle_Angle8191_PID_Over_Zero(&pitch_tar_angle, &pitch_cur_angle);
-    return Pid_Position_Calc(&motor_pitch_angle_pid_imu, pitch_tar_angle, pitch_cur_angle); ///< 这是第一层 PID，计算设定角度与实际角度之间的误差，得到下一步要设定的速度值，如果已经达到目标值，则输出为 0
+	float pitch_tar_angle = tar_angle;
+	float pitch_cur_angle = imu_on_broad->pit * 500.0f;
+	Handle_Angle8191_PID_Over_Zero(&pitch_tar_angle, &pitch_cur_angle);
+	return Pid_Position_Calc(&motor_pitch_angle_pid_imu, pitch_tar_angle, pitch_cur_angle); ///< 这是第一层 PID，计算设定角度与实际角度之间的误差，得到下一步要设定的速度值，如果已经达到目标值，则输出为 0
 }
-

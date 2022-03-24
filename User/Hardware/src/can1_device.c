@@ -8,17 +8,17 @@ static Pid_Position_t motor_br_speed_pid = NEW_POSITION_PID(11, 0, 4.5, 2000, 16
 
 void Set_ChassisMotor_Speed(float speed_fl, float speed_fr, float speed_bl, float speed_br, Motor_Measure_t *chassis_motor_feedback_data)
 {
-    int16_t a = Pid_Position_Calc(&motor_fl_speed_pid, speed_fl, chassis_motor_feedback_data[0].speed_rpm);
-    int16_t b = Pid_Position_Calc(&motor_fr_speed_pid, speed_fr, chassis_motor_feedback_data[1].speed_rpm);
-    int16_t c = Pid_Position_Calc(&motor_bl_speed_pid, speed_bl, chassis_motor_feedback_data[2].speed_rpm);
-    int16_t d = Pid_Position_Calc(&motor_br_speed_pid, speed_br, chassis_motor_feedback_data[3].speed_rpm);
+    int16_t speed1 = Pid_Position_Calc(&motor_fl_speed_pid, speed_fl, chassis_motor_feedback_data[0].speed_rpm);
+    int16_t speed2 = Pid_Position_Calc(&motor_fr_speed_pid, speed_fr, chassis_motor_feedback_data[1].speed_rpm);
+    int16_t speed3 = Pid_Position_Calc(&motor_bl_speed_pid, speed_bl, chassis_motor_feedback_data[2].speed_rpm);
+    int16_t speed4 = Pid_Position_Calc(&motor_br_speed_pid, speed_br, chassis_motor_feedback_data[3].speed_rpm);
 
     Can1_Send_4Msg(
         CAN_CHASSIS_ALL_ID,
-        a,
-        b,
-        c,
-        d);
+        speed1,
+        speed2,
+        speed3,
+        speed4);
 }
 /**
  * @brief	解析以及通知解析，底盘电机离线检测
@@ -33,19 +33,18 @@ void Can1_Process(CAN_RxHeaderTypeDef *can1_rx_message)
     case CAN_3508_M3_ID:
     case CAN_3508_M4_ID:
     {
-        Info_Can1_ParseData_Task();
+        Info_Can1_ParseData_Task();///< 通知CAN1解析
         uint8_t i = 0;
         //处理电机ID号
         i = can1_rx_message->StdId - CAN_3508_M1_ID;
         //处理电机数据宏函数
-        /* 底盘解析 */
-        //记录时间
+        /* 重载底盘离线检测 */
         Classis_Reload(i);
         break;
     }
     case SUPER_CAPACITOR_ID:
     {
-        /* 解析超级电容 */
+        /* 通知超级电容解析 */
         Info_Super_Capacitor_Parse_Data();
         break;
     }

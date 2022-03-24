@@ -13,5 +13,4 @@ void Uart8_Rx_DMA_Reset(void);
 uint16_t *Get_Uart8_DMA_Rxd_DataLen(void);
 uint8_t *Get_Uart8_DMA_RxBuffer_Two(void);
 uint8_t *Get_Uart8_DMA_RxBuffer_One(void);
-
 #endif // __UART8_H_

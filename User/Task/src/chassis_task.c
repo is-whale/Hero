@@ -6,25 +6,26 @@
  * @copyright Copyright (c) 2021
  */
 #include "chassis_task.h"
+#include "config.h"
 /* 宏定义 */
-#define CHASSIS_SPEED_ZERO 1                                            ///<关闭底盘速度 1为开启
-#define OUTPUT_LIMIT(data, limit) Float_Constraion(data, -limit, limit) ///<输出限幅
-#define CHASSIS_MOTOR_DEFAULT_BASE_RATE 5.5f                            //底盘默认速度的倍率
-#define CHASSIS_MOTOR_GYRO_BASE_RATE 5.0f
-
-#define POWER_LIMIT_FORM_SYSTEM 10.0f ///<这里后面要换成裁判系统解析的功率限制，为了避免警告暂时使用数字代替
-
+#define OUTPUT_LIMIT(data, limit) Float_Constraion(data, -limit, limit) ///< 输出限幅
+/* 速度倍率 */
+#define CHASSIS_MOTOR_DEFAULT_BASE_RATE 5.5f    ///< 底盘默认速度的倍率
+#define CHASSIS_MOTOR_GYRO_BASE_RATE 5.0f       ///< 小陀螺的速度倍率
+static const float motor_speed_multiple = 13.5; ///< 电机速度倍率
+/* 限幅 */
+#define POWER_LIMIT_FORM_SYSTEM 5.0f           ///<这里后面要换成裁判系统解析的功率限制，为了避免警告暂时使用数字代替
+static float chassis_motor_boost_rate = 10.0f; ///< 测试后替换为裁判系统读取的底盘功率限制
+/* PID参数实例化 */
 static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500); ///< 底盘跟随PID
-static float chassis_motor_boost_rate = 1.0f;                                                       ///<调用相应函数更改（底盘速度倍率）
-static const float motor_speed_multiple = 13.5;
-/* 变量 */
+/* 数据指针 */
 static Rc_Ctrl_t *rc_data_pt;                               ///< 指向解析后的遥控器结构体指针
 static Robot_control_data_t *robot_mode_data_pt;            ///< 指向解析后的机器人模式结构体指针(也包括了虚拟键鼠通道的值)
-static Motor_Measure_t *chassis_motor_feedback_parsed_data; ///< 解析后的底盘电机数据
-static Motor_Measure_t *gimbal_motor_feedback_parsed_data;  ///< 解析后的云台电机数据
-static const uint8_t *yaw_motor_index;                      ///< yaw 轴电机在云台电机数据中的下标
-static const uint8_t *pitch_motor_index;                    ///< pitch 轴电机在云台电机数据中的下标
+static Motor_Measure_t *chassis_motor_feedback_parsed_data; ///< 指向解析后的底盘电机数据
+static Motor_Measure_t *gimbal_motor_feedback_parsed_data;  ///< 指向解析后的云台电机数据
+static const uint8_t *yaw_motor_index;                      ///< 指向yaw 轴电机在云台电机数据中的下标
 static const Judge_data_t *referee_date_pt;                 ///<指向解析后的裁判系统数据
+
 /* 移植自CAN1解析 */
 // static const uint16_t can1_get_data_signal = 0x0001;
 static const uint8_t can1_motor_device_number = 4;
@@ -37,23 +38,18 @@ static Motor_Measure_t m3508_feddback_data[can1_motor_device_number]; ///<类型为
 /*函数声明*/
 void Chassis_Init(void);                                              ///<底盘初始化函数声明
 static uint16_t Calc_Gyro_Speed_By_Power_Limit(uint16_t power_limit); ///<计算功率限制下的小陀螺或者底盘跟随时的电机速度目标值
-void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed, float move_direction, float x_move_speed, float y_move_speed);
+void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed,
+                            float move_direction, float x_move_speed, float y_move_speed); ///< 计算小陀螺时的电机速度
 
 void StartChassisTask(void const *argument)
 {
-    static float chassis_motor_speed[4] = {0.0, 0.0, 0.0, 0.0}; ///<用于暂时存储电机速度
-    float follow_pid_output;                                    ///<跟随PID输出
-    referee_date_pt = Get_Referee_Data();
-    Chassis_Init(); ///<底盘初始化
+    static float chassis_motor_speed[4] = {0.0, 0.0, 0.0, 0.0}; ///< 待发送的电机速度值
+    float follow_pid_output;                                    ///< 跟随PID输出
 
-    Can1_Filter_Init(); ///< CAN1底层初始化
-    can1_rxd_data = Get_CAN1_Rxd_Data();
-    can1_rx_header = Get_CAN1_Rx_Header();
+    Chassis_Init(); ///<底盘初始化
 
     /* 调试区域 */
     (void)referee_date_pt; ///<避免警告
-    // *referee_date_pt->power_heat_data.chassis_power = 50;
-    // *referee_date_pt->power_heat_data.shooter_id1_42mm_cooling_heat = 50;
     /* 调试区域结束 */
 
     osDelay(1000);
@@ -61,14 +57,14 @@ void StartChassisTask(void const *argument)
     for (;;)
     {
         HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
-        Parse_Can1_Rxd_Data();
         ///<选择操作设备    键鼠&遥控器
         if (robot_mode_data_pt->mode.control_device == mouse_keyboard_device_ENUM) ///< 键鼠模式
         {
             /**
-             * 选择底盘云台模式    1底盘跟随   2小陀螺   3特殊模式
+             * 选择底盘云台模式:    1底盘跟随   2小陀螺   3特殊模式
+             *
              * 特殊模式即不使用陀螺仪数据，以当前云台坐标系作为底盘坐标系，即前进后退以云台视角为准
-             * 是用于陀螺仪挂掉时备用的模式，不至于陀螺仪没了整辆车跟着完蛋
+             * 特殊模式是用于陀螺仪失效时备用的模式，也是上电之后的初始模式
              */
             switch (robot_mode_data_pt->mode.mouse_keyboard_chassis_mode)
             {
@@ -76,7 +72,8 @@ void StartChassisTask(void const *argument)
             {
                 //后面看需要封装成函数
 
-                follow_pid_output = Calc_Chassis_Follow();
+                follow_pid_output = Calc_Chassis_Follow(); ///< 计算跟随PID输出
+
                 chassis_motor_speed[0] = robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x / 0.38f;
                 chassis_motor_speed[1] = robot_mode_data_pt->virtual_rocker.ch2 - robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x / 0.38f;
                 chassis_motor_speed[2] = -robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x / 0.38f;
@@ -91,7 +88,7 @@ void StartChassisTask(void const *argument)
             case mk_chassis_gyro_mode_ENUM: ///<底盘小陀螺
 
             {
-                ///<小陀螺时的电机速度计算
+                ///< 计算小陀螺时的电机速度
                 Calc_Gyro_Motors_Speed(chassis_motor_speed,
                                        Calc_Gyro_Speed_By_Power_Limit(POWER_LIMIT_FORM_SYSTEM),
                                        GM6020_YAW_Angle_To_360(gimbal_motor_feedback_parsed_data[*yaw_motor_index].mechanical_angle),
@@ -123,12 +120,15 @@ void StartChassisTask(void const *argument)
         else if (robot_mode_data_pt->mode.control_device == remote_controller_device_ENUM) ///<遥控器控制
         {
 
-            switch (robot_mode_data_pt->mode.rc_motion_mode) ///<选择底盘云台的工作模式
+            switch (robot_mode_data_pt->mode.rc_motion_mode) ///<选择底盘云台模式
             {
             case rc_stable_chassis_follow_mode_ENUM: ///< 3:底盘跟随+自稳云台
-            case rc_chassis_follow_mode_ENUM:        ///< 1；底盘跟随+手动瞄准
             {
-                follow_pid_output = Calc_Chassis_Follow(); ///< 底盘跟随 pid,计算出 yaw 轴当前角度和 yaw 轴头之间的角度差，当作速度值加入各个轮子中
+                /* 底盘跟随逻辑共用 */
+            }
+            case rc_chassis_follow_mode_ENUM: ///< 1：底盘跟随+手动云台
+            {
+                follow_pid_output = Calc_Chassis_Follow(); ///< 底盘跟随pid
 
                 chassis_motor_speed[0] = -rc_data_pt->rc.ch3 + rc_data_pt->rc.ch2 + follow_pid_output + rc_data_pt->rc.ch0 / 2.9f;
                 chassis_motor_speed[1] = rc_data_pt->rc.ch3 + rc_data_pt->rc.ch2 + follow_pid_output + rc_data_pt->rc.ch0 / 2.9f;
@@ -142,29 +142,29 @@ void StartChassisTask(void const *argument)
                 break;
             }
 
-            case rc_chassis_gyro_mode_ENUM:        ///< 2；底盘小陀螺+手动瞄准
+            case rc_chassis_gyro_mode_ENUM: ///< 2；底盘小陀螺+手动瞄准
+            {
+                /* 小陀螺底盘逻辑共用 */
+            }
             case rc_stable_chassis_gyro_mode_ENUM: ///< 4：底盘小陀螺+自稳云台
             {
                 Calc_Gyro_Motors_Speed(chassis_motor_speed,
-                                       Calc_Gyro_Speed_By_Power_Limit(referee_date_pt->power_heat_data.chassis_power),
+                                       // Calc_Gyro_Speed_By_Power_Limit(referee_date_pt->power_heat_data.chassis_power),整车使用裁判系统之后使用
+                                       Calc_Gyro_Speed_By_Power_Limit(chassis_motor_boost_rate),
                                        GM6020_YAW_Angle_To_360(gimbal_motor_feedback_parsed_data[*yaw_motor_index].mechanical_angle),
                                        rc_data_pt->rc.ch3 * 8.0f,
                                        rc_data_pt->rc.ch2 * 8.0f);
                 break;
             }
 
-            case rc_special_mode_ENUM: ///< 3；特殊模式
+            case rc_special_mode_ENUM: ///< 5：特殊模式
 
             {
-                chassis_motor_speed[0] = rc_data_pt->rc.ch3 - rc_data_pt->rc.ch2 + rc_data_pt->rc.ch0;
-                chassis_motor_speed[1] = -rc_data_pt->rc.ch3 - rc_data_pt->rc.ch2 + rc_data_pt->rc.ch0;
-                chassis_motor_speed[2] = rc_data_pt->rc.ch3 + rc_data_pt->rc.ch2 + rc_data_pt->rc.ch0;
-                chassis_motor_speed[3] = -rc_data_pt->rc.ch3 + rc_data_pt->rc.ch2 + rc_data_pt->rc.ch0;
-
-                chassis_motor_speed[0] *= motor_speed_multiple;
-                chassis_motor_speed[1] *= motor_speed_multiple;
-                chassis_motor_speed[2] *= motor_speed_multiple;
-                chassis_motor_speed[3] *= motor_speed_multiple;
+                Calc_Gyro_Motors_Speed(chassis_motor_speed,
+                                       0,
+                                       GM6020_YAW_Angle_To_360(gimbal_motor_feedback_parsed_data[*yaw_motor_index].mechanical_angle),
+                                       rc_data_pt->rc.ch3 * 10.0f,
+                                       rc_data_pt->rc.ch2 * 10.0f);
 
                 break;
             }
@@ -175,11 +175,11 @@ void StartChassisTask(void const *argument)
             }
             }
         }
-
-        //        OUTPUT_LIMIT(&chassis_motor_speed[0], 8899);
-        //        OUTPUT_LIMIT(&chassis_motor_speed[1], 8899);
-        //        OUTPUT_LIMIT(&chassis_motor_speed[2], 8899);
-        //        OUTPUT_LIMIT(&chassis_motor_speed[3], 8899);
+        /* 额定转速 469rpm,减速箱减速比约为19:1 */
+        OUTPUT_LIMIT(&chassis_motor_speed[0], 8899);
+        OUTPUT_LIMIT(&chassis_motor_speed[1], 8899);
+        OUTPUT_LIMIT(&chassis_motor_speed[2], 8899);
+        OUTPUT_LIMIT(&chassis_motor_speed[3], 8899);
 
 #if CHASSIS_SPEED_ZERO
         chassis_motor_speed[0] = 0;
@@ -193,19 +193,23 @@ void StartChassisTask(void const *argument)
                                chassis_motor_speed[2],
                                chassis_motor_speed[3],
                                chassis_motor_feedback_parsed_data);
-        // Console.print("%0.2f,%0.2f\r\n",referee_date_pt->power_heat_data.chassis_power,referee_date_pt->power_heat_data.shooter_id1_42mm_cooling_heat);
+        debug_print("%0.2f,%0.2f\r\n", referee_date_pt->power_heat_data.chassis_power, referee_date_pt->power_heat_data.shooter_id1_42mm_cooling_heat);
         osDelay(10);
     }
 }
 void Chassis_Init(void)
 {
+    /* 解析 */
+    can1_rxd_data = Get_CAN1_Rxd_Data();   ///< 返回CAN1收到的原始数据
+    can1_rx_header = Get_CAN1_Rx_Header(); ///< 返回 CAN1 接收数据头结构体指针
+
+    Can1_Filter_Init();                                                    ///< CAN1底层初始化
+    referee_date_pt = Get_Referee_Data();                                  ///< 解析后的裁判系统数据
     rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();                       // 获取解析后的遥控器数据
     robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();                   //机器人模式结构体指针
     chassis_motor_feedback_parsed_data = Get_Can1_Feedback_Data();         // CAN1 总线上电机的反馈数据
     gimbal_motor_feedback_parsed_data = Get_Gimbal_Parsed_FeedBack_Data(); // CAN2总线上电机的反馈数据
     yaw_motor_index = Get_Yaw_Motor_Index();                               // 获取 yaw 轴电机在数组中的下标
-    pitch_motor_index = Get_Pitch_Motor_Index();                           //获取pitch轴电机在数据中的下标
-    (void)pitch_motor_index;
 }
 
 /**
@@ -326,11 +330,13 @@ const uint8_t *Get_Can1_Motor_DeviceNumber(void)
 }
 /**
  * @brief           通知 CAN1 数据解析任务进行数据解析
+ * 目前是解析CAN1四个底盘电机数据
  * @param[in]       void
  * @retval          void
  * @note            移植过来就不需要了
  */
 void Info_Can1_ParseData_Task(void)
 {
+    Parse_Can1_Rxd_Data();
     // osSignalSet(parseCan1RxDataHandle, can1_get_data_signal);
 }

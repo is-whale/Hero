@@ -8,9 +8,7 @@
 #include "led.h"
 #include "stdlib.h"
 #include "string.h"
-
-#define INFORMATION 0
-#define DEBUG 1
+#include "config.h"
 
 #if INFORMATION
 	#define info_print(format, ...) __printf(format, ##__VA_ARGS__)
@@ -20,7 +18,7 @@
 	#define info_log(format, arg...)
 #endif
 
-#if DEBUG
+#if DEBUG //定义在Config.h
 	#define debug_print(format, ...) __printf(format, ##__VA_ARGS__)
 	#define debug_log(format, arg...) __printf("<DEBUG> " format "\r\n", ##arg)
 	#define debug_showdata1(name, data) __printf("<DEBUG> %s = %d\r\n",name,data)

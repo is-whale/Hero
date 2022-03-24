@@ -17,3 +17,4 @@
 /MDK-ARM/hero
 /MDK-ARM/RTE
 
+*.pch
