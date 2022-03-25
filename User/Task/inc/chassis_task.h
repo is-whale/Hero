@@ -7,6 +7,8 @@
 #include "math.h"
 #include "math2.h"
 #include "referee_system.h"
+#include "config.h"
+
 
 #define OUTPUT_LIMIT(data, limit) Float_Constraion(data, -limit, limit)
 

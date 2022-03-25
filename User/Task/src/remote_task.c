@@ -72,6 +72,7 @@ void StartRemoteTask(void const *argument)
  * @param[in]       none
  * @retval          void
  */
+
 void Info_RemoteTask_Parse_Data(void)
 {
     osSignalSet(remoteTaskHandle, remote_get_data_signal);

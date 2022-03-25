@@ -1,16 +1,16 @@
 #include "gimbal_task.h"
 #include "can2_device.h"
-/* 注意上下限位反的情况 */
 
+
+/* 云台电机下标 */
 static const uint8_t gimbal_motor_num = 2; ///< 云台电机的数量
-/* Yaw&Pitch电机下标 */
 static const uint8_t yaw_motor_index = 0;   ///< yaw 轴电机在电机数据结构体中的下标
 static const uint8_t pitch_motor_index = 1; ///< pitch 轴电机在电机数据结构体中的下标
-/* Pitch */
+/* Pitch角度限幅 */
 static const uint16_t pitch_up_angle_limit = 0;      ///< pitch 轴云台最低角度
 static const uint16_t pitch_middle_angle = 5000;     ///< pitch 轴云台中间角度
 static const uint16_t pitch_down_angle_limit = 8000; ///< pitch 轴云台最高角度  第一次测量角度90，后面使用8090正常
-/* Yaw */
+/* 初始角 */
 static float yaw_angle_set = 7000;                 ///< yaw 轴云台设置的角度（TODO:初始化时添加斜坡函数）
 static float pitch_angle_set = pitch_middle_angle; ///< pitch 轴云台设置的角度
 
@@ -32,6 +32,7 @@ void StartGimbalTask(void const *argument)
     // robot_mode_data_pt->mode.control_device = 2;
     // robot_mode_data_pt->mode.rc_motion_mode = 4;///< 结构体内遥控器的特殊模式依然是5
     //调试区域结束
+    
     Gimbal_Init();
     osDelay(1000);
     for (;;)

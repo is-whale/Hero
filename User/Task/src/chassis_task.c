@@ -6,7 +6,6 @@
  * @copyright Copyright (c) 2021
  */
 #include "chassis_task.h"
-#include "config.h"
 /* 宏定义 */
 #define OUTPUT_LIMIT(data, limit) Float_Constraion(data, -limit, limit) ///< 输出限幅
 /* 速度倍率 */
@@ -193,7 +192,7 @@ void StartChassisTask(void const *argument)
                                chassis_motor_speed[2],
                                chassis_motor_speed[3],
                                chassis_motor_feedback_parsed_data);
-        debug_print("%0.2f,%0.2f\r\n", referee_date_pt->power_heat_data.chassis_power, referee_date_pt->power_heat_data.shooter_id1_42mm_cooling_heat);
+        // debug_print("%0.2f,%0.2f\r\n", referee_date_pt->power_heat_data.chassis_power, referee_date_pt->power_heat_data.shooter_id1_42mm_cooling_heat);
         osDelay(10);
     }
 }
