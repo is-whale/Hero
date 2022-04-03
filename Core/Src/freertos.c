@@ -90,6 +90,12 @@ osStaticThreadDef_t refereeSystemTaControlBlock;
 osThreadId ReferenceTaskHandle;
 uint32_t ReferenceTaskBuffer[ 512 ];
 osStaticThreadDef_t ReferenceTaskControlBlock;
+osThreadId referenceGyroscHandle;
+uint32_t referenceGyroscBuffer[ 512 ];
+osStaticThreadDef_t referenceGyroscControlBlock;
+osThreadId clientUiTaskHandle;
+uint32_t clientUiTaskBuffer[ 512 ];
+osStaticThreadDef_t clientUiTaskControlBlock;
 osMessageQId buzzerQueueHandle;
 uint8_t buzzerQueueBuffer[ 5 * 5 ];
 osStaticMessageQDef_t buzzerQueueControlBlock;
@@ -118,6 +124,8 @@ void StartWaveWheelTask(void const * argument);
 void StartSuperCapacitorTask(void const * argument);
 void StartRefereeSystemTask(void const * argument);
 void StartReferenceTaskTask(void const * argument);
+void StartextErnalGyroscopeParseTask(void const * argument);
+void StartClientUiTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -237,6 +245,14 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of ReferenceTask */
   osThreadStaticDef(ReferenceTask, StartReferenceTaskTask, osPriorityIdle, 0, 512, ReferenceTaskBuffer, &ReferenceTaskControlBlock);
   ReferenceTaskHandle = osThreadCreate(osThread(ReferenceTask), NULL);
+
+  /* definition and creation of referenceGyrosc */
+  osThreadStaticDef(referenceGyrosc, StartextErnalGyroscopeParseTask, osPriorityNormal, 0, 512, referenceGyroscBuffer, &referenceGyroscControlBlock);
+  referenceGyroscHandle = osThreadCreate(osThread(referenceGyrosc), NULL);
+
+  /* definition and creation of clientUiTask */
+  osThreadStaticDef(clientUiTask, StartClientUiTask, osPriorityNormal, 0, 512, clientUiTaskBuffer, &clientUiTaskControlBlock);
+  clientUiTaskHandle = osThreadCreate(osThread(clientUiTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -494,6 +510,42 @@ __weak void StartReferenceTaskTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartReferenceTaskTask */
+}
+
+/* USER CODE BEGIN Header_StartextErnalGyroscopeParseTask */
+/**
+* @brief Function implementing the referenceGyrosc thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartextErnalGyroscopeParseTask */
+__weak void StartextErnalGyroscopeParseTask(void const * argument)
+{
+  /* USER CODE BEGIN StartextErnalGyroscopeParseTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartextErnalGyroscopeParseTask */
+}
+
+/* USER CODE BEGIN Header_StartClientUiTask */
+/**
+* @brief Function implementing the clientUiTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartClientUiTask */
+__weak void StartClientUiTask(void const * argument)
+{
+  /* USER CODE BEGIN StartClientUiTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartClientUiTask */
 }
 
 /* Private application code --------------------------------------------------*/

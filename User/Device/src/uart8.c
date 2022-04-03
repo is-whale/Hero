@@ -1,9 +1,50 @@
 #include "uart8.h"
 
-static const uint16_t uart8_dma_rx_max_len = 128;                    //! UART8 DMA 最大接收长度
-static volatile uint8_t uart8_dma_rx_buffer0[128]; //! UART8 DMA 接受缓冲区 1
-static volatile uint8_t uart8_dma_rx_buffer1[128]; //! UART8 DMA 接受缓冲区 2
+static const uint16_t uart8_dma_rx_max_len = 256;                   //! UART8 DMA 最大接收长度
+static volatile uint8_t uart8_dma_rx_buffer0[uart8_dma_rx_max_len]; //! UART8 DMA 接受缓冲区 1
+static volatile uint8_t uart8_dma_rx_buffer1[uart8_dma_rx_max_len]; //! UART8 DMA 接受缓冲区 2
 static volatile uint16_t uart8_dma_rxd_data_len;                    //! UART8 DMA 已经接收到的数据长度
+
+static volatile char uart8_dma_transmit_buf[256];
+
+void Uart8_Dma_Tx_Init(void)
+{
+	LL_DMA_SetPeriphAddress(DMA1, LL_DMA_STREAM_0, LL_USART_DMA_GetRegAddr(UART8));
+	LL_USART_EnableDMAReq_TX(UART8);
+}
+
+void Uart8_Transmit_Dma(uint32_t data_address, uint32_t len)
+{
+	LL_DMA_SetMemoryAddress(DMA1, LL_DMA_STREAM_0, data_address);
+	LL_DMA_SetDataLength(DMA1, LL_DMA_STREAM_0, len);
+	LL_USART_ClearFlag_TC(UART8);
+	LL_DMA_ClearFlag_TC0(DMA1);
+	LL_USART_EnableIT_TC(UART8);
+	LL_DMA_EnableStream(DMA1, LL_DMA_STREAM_0);
+}
+
+void Uart8_It_Tc_Callback(void)
+{
+	LL_USART_DisableIT_TC(UART8);
+	LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_0);
+}
+
+int printf_ui(const char *format, ...)
+{
+	uint32_t len;
+	va_list args;
+	va_start(args, format);
+	len = vsnprintf((char *)uart8_dma_transmit_buf, sizeof(uart8_dma_transmit_buf), (const char *)format, args);
+	va_end(args);
+	Uart8_Transmit_Dma((uint32_t)uart8_dma_transmit_buf, len);
+	while (!((UART8->SR) & USART_SR_TC))
+	{
+
+	}
+	///< 关闭 DMA
+	LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_0);
+	return -1;
+}
 
 void Uart8_Rx_Dma_Init(void)
 {

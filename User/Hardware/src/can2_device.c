@@ -2,8 +2,8 @@
 #include "monitor_task.h"
 #include "user_commands.h"
 
-static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); ///< yaw电机速度PID
-// static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(600, 1, 0.2, 5000, 30000, 0, 1000, 500); 	///< yaw电机速度PID(单电机调试)
+// static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); ///< yaw电机速度PID
+static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(600, 1, 0.2, 5000, 30000, 0, 1000, 500); 	///< yaw电机速度PID(单电机调试)
 static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); ///< yaw电机角度PID
 
 static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(380, 27, 0, 220, 15000, 0, 1000, 500);		 ///< pitch电机速度PID
@@ -151,6 +151,7 @@ void Set_Gimbal_Motors_Speed(float yaw_speed, float pitch_speed, Motor_Measure_t
 		Pid_Position_Calc(&motor_pitch_speed_pid, pitch_speed, pitch_motor_parsed_feedback_data->speed_rpm),
 		0,
 		0);
+	__printf("%0.2f\r\n",Pid_Position_Calc(&motor_yaw_speed_pid, yaw_speed, yaw_motor_parsed_feedback_data->speed_rpm));
 }
 
 /**
