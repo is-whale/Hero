@@ -1,10 +1,12 @@
 #include "gimbal_task.h"
 #include "can2_device.h"
+#include "externel_gyroscope_task.h"
 /*
 pitch   µÍÍ·    2520
         ¸´Î»    3000
         Ì§Í·    3590
  */
+/* shooter send id change to 0X1FF form 0x200 */
 
 /* ÔÆÌ¨»úĞµÏŞÎ»ÕæÊµÖµ£¬¹©µ÷ÊÔ */
 // static float const pitch_tree_up_limit = 3580;
@@ -18,16 +20,17 @@ static const uint8_t pitch_motor_index = 1; ///< pitch Öáµç»úÔÚµç»úÊı¾İ½á¹¹ÌåÖĞµ
 static const uint16_t pitch_up_angle_limit = 3460;      ///< pitch ÖáÔÆÌ¨×îµÍ½Ç¶È
 static const uint16_t pitch_middle_angle = 3000;     ///< pitch ÖáÔÆÌ¨ÖĞ¼ä½Ç¶È
 static const uint16_t pitch_down_angle_limit = 2600; ///< pitch ÖáÔÆÌ¨×î¸ß½Ç¶È  µÚÒ»´Î²âÁ¿½Ç¶È90£¬ºóÃæÊ¹ÓÃ8090Õı³£
-/* ³õÊ¼½Ç */
+/* Restart½Ç¶È */
 static float yaw_angle_set = 7000;                 ///< yaw ÖáÔÆÌ¨ÉèÖÃµÄ½Ç¶È£¨TODO:³õÊ¼»¯Ê±Ìí¼ÓĞ±ÆÂº¯Êı£©
 static float pitch_angle_set = pitch_middle_angle; ///< pitch ÖáÔÆÌ¨ÉèÖÃµÄ½Ç¶È
-
+/* Ö¸Ïò½ÓÊÕÊı¾İ */
 static CAN_RxHeaderTypeDef *can2_rx_header_pt;                              ///< can2 ½ÓÊÕµÄÍ·Êı¾İ½á¹¹ÌåÖ¸Õë
 static uint8_t *can2_rxd_data_buffer;                                       ///< can2 ½ÓÊÕµÄÊı¾İ´æ·ÅµÄÊı×éÊ×µØÖ·
 static Rc_Ctrl_t *rc_data_pt;                                               ///< Ö¸ÏòÒ£¿ØÆ÷Êı¾İµÄ½á¹¹ÌåÖ¸Õë
 static Robot_control_data_t *robot_mode_data_pt;                            ///< Ö¸Ïò»úÆ÷ÈËÄ£Ê½µÄ½á¹¹ÌåÖ¸Õë
 static Imu_t *imu_date_pt;                                                  ///< Ö¸ÏòÍÓÂİÒÇ»ñÈ¡½Ç¶ÈµÄ½á¹¹ÌåÖ¸Õë
 static Motor_Measure_t gimbal_motor_parsed_feedback_data[gimbal_motor_num]; ///< ½âÎöºóµÄÔÆÌ¨µç»úÊı¾İÊı×é(Yaw:0;Pitch:1)
+static Wt61c_Data_t* imu_date_usart6;///< Ö¸Ïò½âÎöºóµÄ´®¿ÚÍÓÂİÒÇÊı¾İ
 
 /* pid¼ÆËãÖ®ºóµÄÊä³ö */
 float pid_out[ALL_PID] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; ///< Õâ¸ö²ÎÊıÒ²¿É·ÅÔÚÃ¿¸ötask.cÖĞ£¬¶¨ÒåÎª¾²Ì¬±äÁ¿
@@ -82,7 +85,7 @@ void StartGimbalTask(void const *argument)
                 }
                 // Console.print("%0.2f,%0.2f\r\n", rc_data_pt->rc.ch0 * 1.0f, rc_data_pt->rc.ch1 * 1.0f);
                 //ÍÓÂİÒÇÊı¾İ£¬ÁãÆ¯Ì«´ó£¬Ê¹ÓÃ¹Ù·½½áËãÖĞ²»´ø´ÅÁ¦¼Æ½ÃÕıµÄ³ÌĞò¿ÉÄÜ¿ÉÒÔ½â¾öÕâ¸öÎÊÌâ
-                pid_out[Yaw_target_Angle] = Calc_Yaw_Angle360_Pid(yaw_angle_set, imu_date_pt->yaw);
+                pid_out[Yaw_target_Angle] = Calc_Yaw_Angle360_Pid(yaw_angle_set, imu_date_usart6->angle.yaw_z);
                 pid_out[Pitch_target_Speed] = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
                 /* ÓÃÓÚÊä³ö²»Ö§³ÖµÄÖ¸ÕëÀàĞÍÊı¾İ */
                 // float new_moter_date1 = 0;
@@ -90,12 +93,11 @@ void StartGimbalTask(void const *argument)
                 // Console.print("%0.2f ,%0.2f \r\n", pid_out[Yaw_target_Angle], new_moter_date1);
                 break;
             }
-            case 3:
+            case 3:///< ×ÔÎÈ+ÔÆÌ¨×ÔÓÉÒÆ¶¯
             {
                 /* ¸úËæÓëĞ¡ÍÓÂİÔÚÔÆÌ¨¹²ÓÃÂß¼­ */
             }
-            case 4:
-            {
+            case 4:///< ×ÔÎÈ+Ğ¡ÍÓÂİ            {
 
                 pitch_angle_set -= rc_data_pt->rc.ch1 / 2.0f;
                 yaw_angle_set -= (rc_data_pt->rc.ch0); ///< ±¶ÂÊ´ıµ÷Õû
@@ -110,20 +112,19 @@ void StartGimbalTask(void const *argument)
                     yaw_angle_set += 360;
                 }
 
-                pid_out[Yaw_target_Angle] = Calc_Yaw_Angle360_Pid(yaw_angle_set, imu_date_pt->yaw);
+                pid_out[Yaw_target_Angle] = Calc_Yaw_Angle360_Pid(yaw_angle_set, imu_date_usart6->angle.yaw_z);
                 pid_out[Pitch_target_Speed] = Calc_Pitch_Angle8191_Imu_Pid(pitch_angle_set, imu_date_pt);
                 // Console.print("%0.2f,%0.2f,%0.2f\r\n", imu_date_pt->pit, pitch_angle_set, pid_out[Pitch_target_Speed]);
                 /* bug_log:×ÔÎÈÄ£Ê½ÏÂ³ÌĞòÏŞÎ»Ö»¶ÔÒ£¿ØÆ÷¿ØÖÆµÄÏìÓ¦ÓĞÏŞÖÆ£¬¶øÍÓÂİÒÇµ¼ÖÂµÄÆ¯ÒÆ²¢²»ÄÜ±»ÏŞÖÆ */
                 /* Ä¿Ç°Ïëµ½µÄ·½·¨£º½«°å×°³µÖ®ºó²âÁ¿³ö¶ÔÓ¦µÄÍÓÂİÒÇ½Ç¶ÈÖµ£¬×öÁ½¸öËÀÇø¡£¼´0µã¸½½üµÄÎ¢Ğ¡ÁãÆ¯ÒÔ¼°³¬¹ıÔÆÌ¨µÄÆ¯¸¡ */
                 break;
-            }
+
             case 5: ///<ÌØÊâÄ£Ê½
             {
                 pitch_angle_set -= (rc_data_pt->rc.ch1) /100.0f; ///< Ô­À´ *12
-                // pitch_angle_set = 3000.0; ///< Ô­À´ *12
-                // pid_out[Pitch_target_Speed] = rc_data_pt->rc.ch1/10.0f;
+                // pid_out[Pitch_target_Speed] = rc_data_pt->rc.ch1/10.0f;///< ËÙ¶È»·µ÷ÊÔ
                 Pitch_Angle_Limit(&pitch_angle_set, pitch_up_angle_limit, pitch_down_angle_limit); ///< pitch½Ç¶ÈÏŞ·ù
-                /* Ğ¡·ù¶ÈÏŞ·ù */
+                /* Ğ¡·ù¶ÈÏŞ·ù£ºÊ¹ÓÃĞ¡ÓÚ»úĞµÏŞ·ùÖµµÄ°²È«·ù¶È */
                 // Pitch_Angle_Limit(&pitch_angle_set, pitch_tree_up_limit,pitch_tree_down_limit); ///< pitch½Ç¶ÈÏŞ·ù
                 pid_out[Yaw_target_Speed] = -(rc_data_pt->rc.ch0) / 5.5f;
                 pid_out[Pitch_target_Speed] = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
@@ -160,7 +161,7 @@ void StartGimbalTask(void const *argument)
 
                 /*Á½Öá´®¼¶PIDµÄ½Ç¶È»·¼ÆËã*/
                 pid_out[Pitch_target_Speed] = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
-                pid_out[Yaw_target_Speed] = Calc_Yaw_Angle360_Pid(yaw_angle_set, imu_date_pt->pit);
+                pid_out[Yaw_target_Speed] = Calc_Yaw_Angle360_Pid(yaw_angle_set, imu_date_usart6->angle.yaw_z);
             }
 
             break;
@@ -171,6 +172,26 @@ void StartGimbalTask(void const *argument)
                  * Ò»¸öÌØÊâÖµ£¨Ö»ÄÜ±»¿ØÖÆÊı¾İ¸Ä±ä£¨Èçch0£©£©,ch0²»±äËû±ãÎ¬³ÖÉÏÒ»´ÎÖµ²»±ä£¬ÕâÑù¾Í´ïµ½ÁË×ÔÎÈÔÆÌ¨µÄĞ§¹û£¬pitch½Ç²»±»µ×ÅÌ»Î¸ÉÈÅ
                  *Ê¹ÓÃÄ¿Ç°µÄ"-="¿ÉÒÔ´ïµ½Ğ§¹û;
                  */
+                 /*Ä¿±ê½Ç¶ÈÉè¶¨*/
+                yaw_angle_set -= robot_mode_data_pt->virtual_rocker.ch0 / 58.0f; ///<±¶ÂÊĞèÒªµ÷Õû¡£Õâ¸öÊı¾İÊÇ²½±øµÄ
+                pitch_angle_set -= robot_mode_data_pt->virtual_rocker.ch1 / 1.6f;
+
+                // yaw½Ç¶È»Ø»·
+                if (yaw_angle_set > 360)
+                {
+                    yaw_angle_set -= 360;
+                }
+                if (yaw_angle_set < 0)
+                {
+                    yaw_angle_set += 360;
+                }
+                /*pitchÖá½Ç¶ÈÏŞ·ù*/
+                Pitch_Angle_Limit(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit);
+
+                /*Á½Öá´®¼¶PIDµÄ½Ç¶È»·¼ÆËã*/
+                pid_out[Pitch_target_Speed] = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
+                /* ÉÏÒ»¾äĞèÖØĞ´½Ç¶È»·PID¼ÆËãº¯Êı£¬pitchÖáÊ¹ÓÃÍÓÂİÒÇÊı¾İ */
+                pid_out[Yaw_target_Speed] = Calc_Yaw_Angle360_Pid(yaw_angle_set, imu_date_usart6->angle.yaw_z);
                 break;
             }
             case 3: ///<ÌØÊâÄ£Ê½£¨ÒÔÔÆÌ¨×ø±êÏµÎªÕû³µÔË¶¯×ø±êÏµ£¬Ç°ºó×óÓÒµÄÔË¶¯¾ùÒÔÔÆÌ¨ÊÓ½ÇÎª×¼£¬ÔÚChassis_task.cÓĞ¾ßÌåµÄËµÃ÷£©
@@ -191,39 +212,31 @@ void StartGimbalTask(void const *argument)
 
         YAW_SPEED_OUTPUT_LIMIT(&pid_out[Yaw_target_Speed], YAW_LIMIT_SPEED); // yawÖáËÙ¶ÈÏŞÖÆ
 
-    /* Ğ¡·¶Î§ÏŞ·ù£¨°²È«µ÷ÊÔ£© */
-        // if (gimbal_motor_parsed_feedback_data[pitch_motor_index].mechanical_angle > pitch_up_angle_limit)
-        // {
-        //     pid_out[Pitch_target_Speed] = 0;
-
-        // }
-        // else if (gimbal_motor_parsed_feedback_data[pitch_motor_index].mechanical_angle <pitch_down_angle_limit)
-        // {
-        //     pid_out[Pitch_target_Speed] = 0;
-        // }
         /**
          * @brief   ÔÆÌ¨ËÙ¶È»·¼ÆËãÒÔ¼°CAN2·¢ËÍµç»úÊı¾İ
          *
           */
-        Set_Gimbal_Motors_Speed(pid_out[Yaw_target_Speed],
-                                pid_out[Pitch_target_Speed],
-                                &gimbal_motor_parsed_feedback_data[yaw_motor_index],
-                                &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
+        // Set_Gimbal_Motors_Speed(
+        //     pid_out[Yaw_target_Speed],
+        //                         // pid_out[Pitch_target_Speed],
+        //                         0,
+        //                         &gimbal_motor_parsed_feedback_data[yaw_motor_index],
+        //                         &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
 
         /* ÓÃÓÚµ¥¶À²âÊÔµç»ú */
-        // Set_Gimbal_Motors_Speed(rc_data_pt->rc.ch1/100.0f,
-        //                         0,
-        // &gimbal_motor_parsed_feedback_data[yaw_motor_index],
-        // &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
+        Set_Gimbal_Motors_Speed(0,
+                                0,
+        &gimbal_motor_parsed_feedback_data[yaw_motor_index],
+        &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
 
         /* Ö±½ÓÊä³ö»áÓĞ²ÎÊıÀàĞÍ´íÎó£¬ËùÒÔÊ¹ÓÃĞÂ±äÁ¿´æ´¢µç»ú·µ»ØÖµ */
-        float new_moter_date = 0;
-        float new_moter_mac = 0;
-        new_moter_date = gimbal_motor_parsed_feedback_data[pitch_motor_index].speed_rpm;
-        new_moter_mac = gimbal_motor_parsed_feedback_data[pitch_motor_index].mechanical_angle;
-        Console.print("%0.2f,%0.2f,%0.2f,%0.2f\r\n", new_moter_date,pid_out[Pitch_target_Speed],pitch_angle_set,new_moter_mac);
+        // float new_moter_date = 0;
+        // float new_moter_mac = 0;
+       float new_moter_date = gimbal_motor_parsed_feedback_data[yaw_motor_index].speed_rpm;
+        float new_moter_mac = gimbal_motor_parsed_feedback_data[yaw_motor_index].mechanical_angle;
+        Console.print("%0.2f\r\n",new_moter_date);
+        // Console.print("%0.2f,%0.2f,%0.2f,%0.2f\r\n", new_moter_date,pid_out[Pitch_target_Speed],pitch_angle_set,new_moter_mac);
         // float motor_speed = gimbal_motor_parsed_feedback_data[pitch_motor_index].speed_rpm;
-        // Console.print("speed:%0.2f\r\n",motor_speed);
         osDelay(10);
     }
 }
@@ -243,6 +256,7 @@ void Gimbal_Init(void)
     rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();
     robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();
     imu_date_pt = Get_Imu_Date_Now(); ///<»ñÈ¡ÍÓÂİÒÇ½Ç¶È
+    imu_date_usart6 = Get_Gyroscope_Data_t();
     __OPEN_CAN2_RX_FIFO0_IT__;        ///<´ò¿ªCAN½ÓÊÕÖĞ¶Ï
     /* Ô­±¾ÔÚÑÓÊ±Ö®ºó£¬ÉÏ³µ²âÊÔÖ®ºó·¢ÏÖCAN2½âÎöÊı¾İÓĞ²»¶¨³¤µÄÑÓ³Ù£¬ËùÒÔÒÆÖ²µ½ÕâÀï£¬²âÊÔÖ®ºóÑÓÊ±ÏûÊ§ */
 }

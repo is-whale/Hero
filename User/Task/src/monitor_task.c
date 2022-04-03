@@ -1,7 +1,13 @@
 #include "monitor_task.h"
+#include "referee_system.h"
+#include "super_capacitor_task.h"
+
+
 
 static Module_status_t module_status[8]; ///< 模块数量
 
+static const Judge_data_t *referee_date_pt;
+static const Super_Capacitor_t *super_capacitor_date;
 static void Monitor_Task_Init(void);   ///< 初始化监听任务
 static void Monitor_All_Modules(void); ///< 执行监听
 
@@ -10,6 +16,11 @@ void StartMonitorTask(void const *argument)
 	Monitor_Task_Init(); ///< 监听任务初始化
 	Led_Flow_Flash();	 ///< 初始化流水灯
 	Buzzer_Bsp_Init();	 ///< 初始化时蜂鸣
+	uint8_t cap_send_cnt = 5;
+	referee_date_pt = Get_Referee_Data();
+	super_capacitor_date = Get_SuperCapacitor_Date();
+
+
 
 	osDelay(50);
 
@@ -17,6 +28,25 @@ void StartMonitorTask(void const *argument)
 	{
 		Monitor_All_Modules();
 
+		if (cap_send_cnt > 2)
+		{
+			/* 功率限制 */
+			if (module_status[judge_system].time_out_flag == 0 && module_status[super_capacitor].time_out_flag == 0) //判断裁判系统、底盘是否同时上线
+			{
+				//判断超级电容目标功率与裁判系统限制功率-2是否相符，否设置超级电容
+				if(referee_date_pt->power_heat_data.chassis_power - 2!= (uint8_t)super_capacitor_date->target_power);
+				// if ((judge_data->game_robot_status.chassis_power_limit - 2) != ((uint16_t)(super_capacitor_data->target_power)))
+				{
+					// Set_Super_Capacitor((judge_data->game_robot_status.chassis_power_limit - 2) * 100);
+					Set_Super_Capacitor((referee_date_pt->power_heat_data.chassis_power - 2) * 100);
+					cap_send_cnt = 0;
+				}
+			}
+		}
+		else
+		{
+			cap_send_cnt++;
+		}
 		osDelay(200);
 	}
 }

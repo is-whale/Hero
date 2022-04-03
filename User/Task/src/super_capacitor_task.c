@@ -61,3 +61,8 @@ void Info_Super_Capacitor_Parse_Data(void)
 {
     osSignalSet(superCapacitorTHandle, super_capacitor_get_data_signal);
 }
+
+const Super_Capacitor_t * Get_SuperCapacitor_Date(void)
+{
+    return &super_capacitor_t;
+}
