@@ -13,8 +13,8 @@
 #define CHASSIS_MOTOR_GYRO_BASE_RATE 5.0f       ///< Ð¡ÍÓÂÝµÄËÙ¶È±¶ÂÊ
 static const float motor_speed_multiple = 13.5; ///< µç»úËÙ¶È±¶ÂÊ
 /* ÏÞ·ù */
-#define POWER_LIMIT_FORM_SYSTEM 5.0f           ///<ÕâÀïºóÃæÒª»»³É²ÃÅÐÏµÍ³½âÎöµÄ¹¦ÂÊÏÞÖÆ£¬ÎªÁË±ÜÃâ¾¯¸æÔÝÊ±Ê¹ÓÃÊý×Ö´úÌæ
-static float chassis_motor_boost_rate = 10.0f; ///< ²âÊÔºóÌæ»»Îª²ÃÅÐÏµÍ³¶ÁÈ¡µÄµ×ÅÌ¹¦ÂÊÏÞÖÆ
+#define POWER_LIMIT_FORM_SYSTEM 5.0f         ///<ÕâÀïºóÃæÒª»»³É²ÃÅÐÏµÍ³½âÎöµÄ¹¦ÂÊÏÞÖÆ£¬ÎªÁË±ÜÃâ¾¯¸æÔÝÊ±Ê¹ÓÃÊý×Ö´úÌæ
+static float chassis_motor_boost_rate = 4.0f;///< ²âÊÔºóÌæ»»Îª²ÃÅÐÏµÍ³¶ÁÈ¡µÄµ×ÅÌ¹¦ÂÊÏÞÖÆ
 /* PID²ÎÊýÊµÀý»¯ */
 static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500); ///< µ×ÅÌ¸úËæPID
 /* Êý¾ÝÖ¸Õë */
@@ -23,7 +23,7 @@ static Robot_control_data_t *robot_mode_data_pt;            ///< Ö¸Ïò½âÎöºóµÄ»úÆ
 static Motor_Measure_t *chassis_motor_feedback_parsed_data; ///< Ö¸Ïò½âÎöºóµÄµ×ÅÌµç»úÊý¾Ý
 static Motor_Measure_t *gimbal_motor_feedback_parsed_data;  ///< Ö¸Ïò½âÎöºóµÄÔÆÌ¨µç»úÊý¾Ý
 static const uint8_t *yaw_motor_index;                      ///< Ö¸Ïòyaw Öáµç»úÔÚÔÆÌ¨µç»úÊý¾ÝÖÐµÄÏÂ±ê
-static const Judge_data_t *referee_date_pt;                 ///<Ö¸Ïò½âÎöºóµÄ²ÃÅÐÏµÍ³Êý¾Ý
+static const Judge_data_t *referee_date_pt;                 ///< Ö¸Ïò½âÎöºóµÄ²ÃÅÐÏµÍ³Êý¾Ý
 
 /* ÒÆÖ²×ÔCAN1½âÎö */
 // static const uint16_t can1_get_data_signal = 0x0001;
@@ -175,10 +175,11 @@ void StartChassisTask(void const *argument)
             }
         }
         /* ¶î¶¨×ªËÙ 469rpm,¼õËÙÏä¼õËÙ±ÈÔ¼Îª19:1 */
-        OUTPUT_LIMIT(&chassis_motor_speed[0], 8899);
-        OUTPUT_LIMIT(&chassis_motor_speed[1], 8899);
-        OUTPUT_LIMIT(&chassis_motor_speed[2], 8899);
-        OUTPUT_LIMIT(&chassis_motor_speed[3], 8899);
+        /* µ÷ÊÔ½×¶ÎËÙ¶ÈÏÞ·ù´Ó8899¸Ä³É889 */
+        OUTPUT_LIMIT(&chassis_motor_speed[0], 889);
+        OUTPUT_LIMIT(&chassis_motor_speed[1], 889);
+        OUTPUT_LIMIT(&chassis_motor_speed[2], 889);
+        OUTPUT_LIMIT(&chassis_motor_speed[3], 889);
 
 #if CHASSIS_SPEED_ZERO
         chassis_motor_speed[0] = 0;
@@ -186,7 +187,9 @@ void StartChassisTask(void const *argument)
         chassis_motor_speed[2] = 0;
         chassis_motor_speed[3] = 0;
 #endif
-        ///< ÉèÖÃµ×ÅÌµç»úËÙ¶È
+/**
+ * @brief   µ×ÅÌËÙ¶ÈPID»·¼ÆËãÒÔ¼°ÉèÖÃµ×ÅÌËÙ¶È
+  */
         Set_ChassisMotor_Speed(chassis_motor_speed[0],
                                chassis_motor_speed[1],
                                chassis_motor_speed[2],
@@ -248,9 +251,9 @@ void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed, float move_
     float y_y_speed = y_move_speed * radin_cos;
 
     motors_speed[0] += ((x_x_speed - x_y_speed) + (y_x_speed + y_y_speed));
-    motors_speed[1] += ((-x_x_speed - x_y_speed) + (-y_x_speed + y_y_speed));
+    motors_speed[3] += ((-x_x_speed - x_y_speed) + (-y_x_speed + y_y_speed));
     motors_speed[2] += ((x_x_speed + x_y_speed) + (y_x_speed - y_y_speed));
-    motors_speed[3] += ((-x_x_speed + x_y_speed) + (-y_x_speed - y_y_speed));
+    motors_speed[1] += ((-x_x_speed + x_y_speed) + (-y_x_speed - y_y_speed));
 }
 /**
  * @author          bashpow

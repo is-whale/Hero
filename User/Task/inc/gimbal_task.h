@@ -12,7 +12,7 @@
 
 /*yaw*/
 #define YAW_GM6020_HEAD_ANGLE   6090    ///<读取云台与底盘对齐时的GM6020电机机械角
-#define YAW_LIMIT_SPEED         150     ///<YAW轴速度限幅
+#define YAW_LIMIT_SPEED         15     ///<YAW轴速度限幅 原来150
 #define YAW_SPEED_OUTPUT_LIMIT(data, limit)     Float_Constraion(data, -limit, limit)
 
 /*pitch*/

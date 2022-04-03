@@ -54,3 +54,14 @@ void Can1_Process(CAN_RxHeaderTypeDef *can1_rx_message)
     }
     }
 }
+/**
+ * @brief   超级电容发送函数
+ * @param
+ *
+  */
+void Set_Super_Capacitor(uint16_t target_power)
+{
+     Can1_Send_4Msg(SUPER_CAPACITOR_SEND_ID, target_power, 0, 0, 0);
+}
+
+

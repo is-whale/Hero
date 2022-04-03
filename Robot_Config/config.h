@@ -13,7 +13,7 @@
 
 /* 调试安全配置 */
 #define LASER_OFF 0          ///<打开激光（调试时建议关闭防止伤人）
-#define CHASSIS_SPEED_ZERO 0 ///<底盘无力模式,防止底盘疯转
+#define CHASSIS_SPEED_ZERO 1 ///<底盘无力模式,防止底盘疯转
 #define LOSS_REMOTE_SIGNAL 1 ///<遥控器信号丢失检测以及错误处理（暂时未实现）
 
 /* 机器人属性参数 */

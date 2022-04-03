@@ -1,12 +1,15 @@
 #include "can2_device.h"
 #include "monitor_task.h"
+#include "user_commands.h"
 
 static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); ///< yawµç»úËÙ¶ÈPID
 // static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(600, 1, 0.2, 5000, 30000, 0, 1000, 500); 	///< yawµç»úËÙ¶ÈPID(µ¥µç»úµ÷ÊÔ)
 static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); ///< yawµç»ú½Ç¶ÈPID
 
-static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(20, 0, 3, 2000, 40000, 0, 1000, 500);		 ///< pitchµç»úËÙ¶ÈPID
-static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 1000, 0, 3000, 500); ///< pitchµç»ú½Ç¶ÈPID
+static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(380, 27, 0, 220, 15000, 0, 1000, 500);		 ///< pitchµç»úËÙ¶ÈPID
+// static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(300, 27, 0, 220, 30000, 0, 1000, 500);		 ///< pitchµç»úËÙ¶ÈPID
+static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.30, 0.00, 0.005, 100, 50, 0, 3000, 500); ///< pitchµç»ú½Ç¶ÈPID
+// static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.4, 0.008, 0.005, 100, 1000, 0, 1000, 500); ///< pitchµç»ú½Ç¶ÈPID
 
 static Pid_Position_t friction_motor_left_speed_pid = NEW_POSITION_PID(7, 0, 0.7, 2000, 16383, 0, 1000, 500);
 static Pid_Position_t friction_motor_right_speed_pid = NEW_POSITION_PID(7, 0, 0.7, 2000, 16383, 0, 1000, 500);
@@ -25,6 +28,14 @@ static CAN_RxHeaderTypeDef can2_rx_header; ///< ¸¨Öú±äÁ¿£¬ÓÃÓÚ HAL ¿âº¯Êý½ÓÊÜÊý¾
 
 static Motor_Measure_t wave_motor_feedback_data; ///<²¦ÂÖµç»ú·´À¡Êý¾Ý
 
+extern float easy_pid_p, easy_pid_i, easy_pid_d;
+
+void up_date_pid(void)
+{
+	motor_pitch_speed_pid.kp = easy_pid_p;
+	motor_pitch_speed_pid.ki = easy_pid_i;
+	motor_pitch_speed_pid.kd = easy_pid_d;
+}
 /**
  * @brief 			½âÎö²¦ÂÖµç»úÊý¾Ý
  * @param[in]		void

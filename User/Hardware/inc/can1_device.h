@@ -16,7 +16,7 @@ typedef enum
     SUPER_CAPACITOR_ID = 0x211,
     SUPER_CAPACITOR_SEND_ID = 0x210,
 } Can1_RxMsg_ID;
-void Can1_Process(CAN_RxHeaderTypeDef *can1_rx_message);
+void Can1_Process(CAN_RxHeaderTypeDef *can1_rx_message);///< 中断调用的CAN函数
 void Set_ChassisMotor_Speed(float speed_fl, float speed_fr, float speed_bl, float speed_br, Motor_Measure_t *chassis_motor_feedback_data);
-
+void Set_Super_Capacitor(uint16_t target_power);///< 超级电容数据发送函数声明
 #endif // __CAN1_DEVICE_H_

@@ -2,7 +2,7 @@
  * @file super_capacitor_task.c
  * @brief 超级电容解析发送任务
  * TODO: 添加裁判系统反馈数据,根据数据进行 can1 的发送,设置超级电容
- * 
+ *
  * @version 0.1
  * @date 2021-10-17
  * @copyright Copyright (c) 2021
@@ -20,19 +20,19 @@ void StartSuperCapacitorTask(void const *argument)
 {
     osEvent super_capacitor_get_data_event;
     can1_rx_header_t = Get_CAN1_Rx_Header();
-    can1_rxd_data = Get_CAN1_Rxd_Data();
+    can1_rxd_data = Get_CAN1_Rxd_Data();///< CAN1接收数据头
 
     osDelay(100);
 
     for (;;)
     {
-        super_capacitor_get_data_event = osSignalWait(super_capacitor_get_data_signal, osWaitForever);
+        super_capacitor_get_data_event = osSignalWait(super_capacitor_get_data_signal, osWaitForever);///< 赋值等待事件
 
         if (super_capacitor_get_data_event.status == osEventSignal)
         {
             if (super_capacitor_get_data_event.value.signals == super_capacitor_get_data_signal)
             {
-                Parse_Super_Capacitor_RxdData(can1_rx_header_t, &super_capacitor_t, can1_rxd_data);
+                Parse_Super_Capacitor_RxdData(can1_rx_header_t, &super_capacitor_t, can1_rxd_data);///< 解析超级电容数据
             }
         }
     }
