@@ -6,7 +6,7 @@ static volatile uint8_t usart1_dma_rx_buffer1[usart1_dma_rx_max_len]; ///< USART
 static volatile uint16_t usart1_dma_rxd_data_len;					  ///< USART1 DMA 已经接收到的数据长度
 
 /**
- * @brief       初始化串口 1 的接收 DMA 
+ * @brief       初始化串口 1 的接收 DMA
  * @param[in]   none
  * @retval      void
  */
@@ -30,7 +30,7 @@ void Usart1_RxDMA_Init(void)
 }
 
 /**
- * @brief           串口 1 的接收中断函数 
+ * @brief           串口 1 的接收中断函数
  * @param[in]       none
  * @retval          void
  */
@@ -73,7 +73,7 @@ void Usart1_DMA_RxCp_Callback(void)
  * @param[in]       none
  * @retval          USART1 DMA 的接受缓冲区地址
  */
-uint8_t *Get_Usart1_DMA_RxBuffer_One(void)
+uint8_t *Get_Usart1_DMA_RxBuffer_One()
 {
 	return (uint8_t *)usart1_dma_rx_buffer0;
 }

@@ -1,14 +1,18 @@
 #include "can2_device.h"
+#include "gimbal_task.h"
 #include "monitor_task.h"
-#include "user_commands.h"
 
-// static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); ///< yaw电机速度PID
-static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(600, 1, 0.2, 5000, 30000, 0, 1000, 500); 	///< yaw电机速度PID(单电机调试)
-static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(2.4, 0.01, 1.8, 5, 125, 0, 3000, 500); ///< yaw电机角度PID
+// extern float easy_pid_p, easy_pid_i, easy_pid_d;
+// static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); 		///< yaw电机速度PID
+// static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(600, 0, 0.02, 5000, 28000, 0, 1000, 500); ///< yaw电机速度PID(单电机调试)
+// static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(0.05, 0, 0, 5, 125, 0, 3000, 500);		///< yaw电机角度PID
+/* 暂时的数据 */
+static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(2000, 0.6, 0.2, 5000, 29000, 0, 1000, 500); //yaw电机速度PID
+static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(0.2, 0.0, 0.0, 5, 125, 0, 3000, 500);		 //yaw电机角度PID
 
-static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(380, 27, 0, 220, 15000, 0, 1000, 500);		 ///< pitch电机速度PID
-// static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(300, 27, 0, 220, 30000, 0, 1000, 500);		 ///< pitch电机速度PID
-static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.30, 0.00, 0.005, 100, 50, 0, 3000, 500); ///< pitch电机角度PID
+static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(350, 25, 0, 220, 15000, 0, 1000, 500); ///< pitch电机速度PID
+// static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(300, 27, 0, 220, 30000, 0, 1000, 500);		 	///< pitch电机速度PID
+static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.03, 0.02, 0.00, 100, 50, 0, 3000, 500); ///< pitch电机角度PID
 // static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.4, 0.008, 0.005, 100, 1000, 0, 1000, 500); ///< pitch电机角度PID
 
 static Pid_Position_t friction_motor_left_speed_pid = NEW_POSITION_PID(7, 0, 0.7, 2000, 16383, 0, 1000, 500);
@@ -17,7 +21,8 @@ static Pid_Position_t friction_motor_right_speed_pid = NEW_POSITION_PID(7, 0, 0.
 static Pid_Position_t wave_motor_speed_pid = NEW_POSITION_PID(9, 0, 3, 2000, 16000, 0, 1000, 500);
 static Pid_Position_t wave_motor_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 4500, 0, 3000, 500); ///<  拨轮电机角度PID
 /* 自稳云台pitch角度PID参数 */
-static Pid_Position_t motor_pitch_angle_pid_imu = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 1000, 0, 3000, 500);
+static Pid_Position_t motor_pitch_angle_pid_imu = NEW_POSITION_PID(0.2, 0.0, 0.0, 100, 1000, 0, 3000, 500);
+// static Pid_Position_t motor_pitch_speed_pid_imu = NEW_POSITION_PID(100, 0.0, 0.0, 100, 1000, 0, 3000, 500);
 
 static int error_integral = 0;
 static uint16_t last_machine_angle = 0;
@@ -30,12 +35,12 @@ static Motor_Measure_t wave_motor_feedback_data; ///<拨轮电机反馈数据
 
 extern float easy_pid_p, easy_pid_i, easy_pid_d;
 
-void up_date_pid(void)
-{
-	motor_pitch_speed_pid.kp = easy_pid_p;
-	motor_pitch_speed_pid.ki = easy_pid_i;
-	motor_pitch_speed_pid.kd = easy_pid_d;
-}
+// void up_date_pid(void)
+// {
+// 	motor_yaw_speed_pid.kp = easy_pid_p;
+// 	motor_yaw_speed_pid.ki = easy_pid_i;
+// 	motor_yaw_speed_pid.kd = easy_pid_d;
+// }
 /**
  * @brief 			解析拨轮电机数据
  * @param[in]		void
@@ -98,6 +103,7 @@ void Can2_Rx_FIFO0_IT_Callback(void)
 		i = can2_rx_header.StdId - CAN_YAW_MOTOR_ID;
 		//通知解析
 		Gimbal_Reload(i);
+		Can2_Parse_For_Callback();
 	}
 	}
 	// if (can2_rx_header.StdId == CAN_3508_WAVE_ID)
@@ -143,15 +149,36 @@ Motor_Measure_t *Get_Wave_Motor_Paresed_Data(void)
  * @param yaw_motor_parsed_feedback_data 	指向 yaw 轴电机解析后的结构体指针
  * @param pitch_motor_parsed_feedback_data  指向 pitch 轴电机解析后的结构体指针
  */
-void Set_Gimbal_Motors_Speed(float yaw_speed, float pitch_speed, Motor_Measure_t *yaw_motor_parsed_feedback_data, Motor_Measure_t *pitch_motor_parsed_feedback_data)
+//void Set_Gimbal_Motors_Speed(float yaw_speed, float pitch_speed, Motor_Measure_t *yaw_motor_parsed_feedback_data, Motor_Measure_t *pitch_motor_parsed_feedback_data)
+//{
+//	Can2_Send_4Msg(
+//		CAN_GIMBAL_ALL_ID,
+//		Pid_Position_Calc(&motor_yaw_speed_pid, yaw_speed, yaw_motor_parsed_feedback_data->speed_rpm),
+//		// Pid_Position_Calc(&motor_pitch_speed_pid, pitch_speed, pitch_motor_parsed_feedback_data->speed_rpm),
+//		0,
+//		0,
+//		0);
+//		//float new_date = yaw_motor_parsed_feedback_data->speed_rpm);
+//	// __printf("%0.2f,%0.2f,%.2f\r\n", yaw_speed, Pid_Position_Calc(&motor_yaw_speed_pid, yaw_speed, yaw_motor_parsed_feedback_data->speed_rpm), yaw_motor_parsed_feedback_data->speed_rpm);
+//}
+/**
+ * @brief 									云台串级PID的速度环计算以及向CAN2发送解析后的云台电机速度值
+ * @param yaw_speed 						设置的 yaw 轴电机的速度值
+ * @param pitch_speed 						设置的 pitch 轴电机的速度值
+ * @param yaw_motor_parsed_feedback_data 	指向 yaw 轴电机解析后的结构体指针
+ * @param pitch_motor_parsed_feedback_data  指向 pitch 轴电机解析后的结构体指针
+ */
+void Set_Gimbal_Motors_Speed(float yaw_speed, float pitch_speed, float yaw_speed_rpm, float pitch_speed_rpm)
 {
 	Can2_Send_4Msg(
 		CAN_GIMBAL_ALL_ID,
-		Pid_Position_Calc(&motor_yaw_speed_pid, yaw_speed, yaw_motor_parsed_feedback_data->speed_rpm),
-		Pid_Position_Calc(&motor_pitch_speed_pid, pitch_speed, pitch_motor_parsed_feedback_data->speed_rpm),
+		Pid_Position_Calc(&motor_yaw_speed_pid, yaw_speed, yaw_speed_rpm),
+		Pid_Position_Calc(&motor_pitch_speed_pid, pitch_speed, pitch_speed_rpm),
 		0,
 		0);
-	__printf("%0.2f\r\n",Pid_Position_Calc(&motor_yaw_speed_pid, yaw_speed, yaw_motor_parsed_feedback_data->speed_rpm));
+		/* 调试使用 */
+	//float new_date = yaw_motor_parsed_feedback_data->speed_rpm);
+	// __printf("%0.2f,%0.2f,%.2f\r\n", yaw_speed, Pid_Position_Calc(&motor_yaw_speed_pid, yaw_speed, yaw_speed_rpm), yaw_speed_rpm);
 }
 
 /**

@@ -16,9 +16,8 @@ extern osThreadId waveWheelTaskHandle;
 static Rc_Ctrl_t *rc_data_pt;
 static Robot_control_data_t *robot_control_data_pt;
 
-static float fric_speed = 0;///< 摩擦轮速度
-#define FRICTION_SPEED_1 fric_speed///< 未使用
-
+static float fric_speed = 0;        ///< 摩擦轮速度
+#define FRICTION_SPEED_1 fric_speed ///< 未使用
 
 static const uint8_t friction_motor_num = 2;
 static Motor_Measure_t friction_motor_feedback_data[friction_motor_num];
@@ -30,16 +29,16 @@ static CAN_RxHeaderTypeDef *can2_rx_header_p;
 static uint8_t *can2_rxd_data_buffer;
 const static Judge_data_t *judge_data;
 /* 初始化 */
-static int8_t is_ok_fire = 0;///< 摩擦轮就绪标志
+static int8_t is_ok_fire = 0; ///< 摩擦轮就绪标志
 
 static int16_t last_wave_ch_value = 1;
 static int16_t this_wave_ch_value = 1;
 
-static const int32_t fire_one_bullet = 0x00000001;///< 单发信号量
+static const int32_t fire_one_bullet = 0x00000001; ///< 单发信号量
 static const int32_t fire_five_bullet = 0x00000101;
 static const uint32_t wave_once_machine_angle = 50000;
 /* 移植射击控制结构体 */
-shoot_control_t shoot_control;          //射击数据
+shoot_control_t shoot_control; //射击数据
 void shooter_init(void);
 void shoot_init(void);
 void StartShootTask(void const *argument)
@@ -62,8 +61,8 @@ void StartShootTask(void const *argument)
 
     for (;;)
     {
-        Parse_Friction_Wave_Motor_Feedback_Data(can2_rx_header_p, can2_rxd_data_buffer);///< 解析拨轮数据
-        switch (robot_control_data_pt->mode.fric_cover_mode)///< 选择摩擦轮模式： 0关闭，1自适应，2高速，3低速
+        Parse_Friction_Wave_Motor_Feedback_Data(can2_rx_header_p, can2_rxd_data_buffer); ///< 解析拨轮数据
+        switch (robot_control_data_pt->mode.fric_cover_mode)                             ///< 选择摩擦轮模式： 0关闭，1自适应，2高速，3低速
         {
         case fric_cover_off_mode_ENUM: ///< 0
 
@@ -106,14 +105,14 @@ void StartShootTask(void const *argument)
         }
         ramp_calc(&shoot_control.fric1_ramp, fric_speed);
         ramp_calc(&shoot_control.fric1_ramp, fric_speed);
-    shoot_control.fric_send_speed1 = (uint16_t)(shoot_control.fric1_ramp.out);
-    shoot_control.fric_send_speed2 = (uint16_t)(shoot_control.fric2_ramp.out);
+        shoot_control.fric_send_speed1 = (uint16_t)(shoot_control.fric1_ramp.out);
+        shoot_control.fric_send_speed2 = (uint16_t)(shoot_control.fric2_ramp.out);
         if (Updata_Wave_Ch_Value(&last_wave_ch_value, &this_wave_ch_value))
         {
             osSignalSet(waveWheelTaskHandle, fire_one_bullet);
         }
 
-        Set_Friction_Motor_Speed(-fric_speed,fric_speed, friction_motor_feedback_data);///< 摩擦轮速度PID计算以及设置摩擦轮速度
+        Set_Friction_Motor_Speed(-fric_speed, fric_speed, friction_motor_feedback_data); ///< 摩擦轮速度PID计算以及设置摩擦轮速度
         // float motor_date1 = 0;
         // float motor_date2 = 0;
         // motor_date1 = shoot_control.fric_send_speed1;
@@ -141,8 +140,8 @@ void shoot_init(void)
     //更新数据
     // shoot_feedback_update();
     /* 斜坡函数初始化 */
-    ramp_init(&shoot_control.fric1_ramp, RAMP_STEP,0);
-    ramp_init(&shoot_control.fric2_ramp, RAMP_STEP,0);
+    ramp_init(&shoot_control.fric1_ramp, RAMP_STEP, 0);
+    ramp_init(&shoot_control.fric2_ramp, RAMP_STEP, 0);
     shoot_control.fric_send_speed1 = 0;
     shoot_control.fric_send_speed2 = 0;
 }

@@ -236,7 +236,7 @@ void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed, float move_
     float move_radin = move_direction * 3.14159f / 180.0f;
     float radin_sin = sinf(move_radin); ///< sin(x)
     float radin_cos = cosf(move_radin);
-
+  
     ///< ÍÓÂÝËÙ¶È¸³Öµ
     motors_speed[0] = rotate_speed;
     motors_speed[1] = rotate_speed;

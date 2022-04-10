@@ -71,7 +71,7 @@ typedef struct
 	float i_out;
 	float d_out;
 	float output;
-	
+
 	// void(*pid_init)( struct Pid_Position_t *pid, float kp, float ki, float kd, float poutmax, float ioutmax, float doutmax, float outmax);			//用来初始化pid
 	// void(*pid_reset)(struct Pid_Position_t *pid);
 	// /* 指向函数的指针。这里作为结构体成员
