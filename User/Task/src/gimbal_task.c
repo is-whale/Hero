@@ -20,8 +20,8 @@ static const uint16_t pitch_down_angle_limit = 2600; ///< pitch 轴云台最高角度  
 static float yaw_angle_set = 0;                    ///< 这里初始角是0，因为在chassis_task.c中，对于跟随根据初始机械角度进行了处理
 static float pitch_angle_set = pitch_middle_angle; ///< pitch 轴云台设置的角度
 /* 指向接收数据 */
-static CAN_RxHeaderTypeDef *can2_rx_header_pt;                              ///< can2 接收的头数据结构体指针
-static uint8_t *can2_rxd_data_buffer;                                       ///< can2 接收的数据存放的数组首地址
+// static CAN_RxHeaderTypeDef *can2_rx_header_pt;                              ///< can2 接收的头数据结构体指针
+// static uint8_t *can2_rxd_data_buffer;                                       ///< can2 接收的数据存放的数组首地址
 static Rc_Ctrl_t *rc_data_pt;                                               ///< 指向遥控器数据的结构体指针
 static Robot_control_data_t *robot_mode_data_pt;                            ///< 指向机器人模式的结构体指针
 static Imu_t *imu_date_pt;                                                  ///< 指向陀螺仪获取角度的结构体指针
@@ -237,8 +237,8 @@ void Gimbal_Init(void)
 {
     Can2_Filter_Init();
 
-    can2_rx_header_pt = Get_CAN2_Rx_Header();
-    can2_rxd_data_buffer = Get_CAN2_Rxd_Buffer();
+    // can2_rx_header_pt = Get_CAN2_Rx_Header();
+    // can2_rxd_data_buffer = Get_CAN2_Rxd_Buffer();
     rc_data_pt = Get_Rc_Parsed_RemoteData_Pointer();
     robot_mode_data_pt = Get_Parsed_RobotMode_Pointer();
     imu_date_pt = Get_Imu_Date_Now(); ///<获取陀螺仪角度
@@ -247,14 +247,14 @@ void Gimbal_Init(void)
     /* 原本在延时之后，上车测试之后发现CAN2解析数据有不定长的延迟，所以移植到这里，测试之后延时消失 */
 }
 
-/**
- * @brief   封装以供中断调用（解析进中断的暂时解决方案）
- * @note    后续需要把变量移植到can2_device.c中重构解析
-  */
-void Can2_Parse_For_Callback(void)
-{
-    Parse_Can2_Gimbal_Rxd_Data(can2_rx_header_pt, can2_rxd_data_buffer, gimbal_motor_parsed_feedback_data);
-}
+// /**
+//  * @brief   封装以供中断调用（解析进中断的暂时解决方案）
+//  * @note    后续需要把变量移植到can2_device.c中重构解析
+//   */
+// void Can2_Parse_For_Callback(void)
+// {
+//     Parse_Can2_Gimbal_Rxd_Data(can2_rx_header_pt, can2_rxd_data_buffer, gimbal_motor_parsed_feedback_data);
+// }
 /**
  * @brief                       解析 CAN2 解析云台接收到的两个云台的数据并进行解析
  * @param p_can_rx_header       指向接收 CAN2 数据头的结构体指针

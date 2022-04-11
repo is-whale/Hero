@@ -29,8 +29,10 @@ static uint16_t this_machine_angle = 0;
 
 static uint8_t can2_rxd_data_buffer[8];	   ///< 辅助变量，接受电机反馈的原始数据
 static CAN_RxHeaderTypeDef can2_rx_header; ///< 辅助变量，用于 HAL 库函数接受数据，存放关于 CAN 反馈数据的 ID 号等信息
-
-static Motor_Measure_t wave_motor_feedback_data; ///<拨轮电机反馈数据
+/* 电机数据结构体，解析使用 */
+static Motor_Measure_t wave_motor_feedback_data;  ///< 拨轮电机反馈数据
+static Motor_Measure_t yaw_motor_feedback_data;	  ///< yaw轴电机反馈数据
+static Motor_Measure_t pitch_motor_feedback_data; ///< pitch轴反馈数据
 
 /**
  * @brief 			解析拨轮电机数据
@@ -55,31 +57,36 @@ static void Parse_Wave_Motor_Feedback_Data(void)
 	error_integral += (this_ - last_);
 	last_machine_angle = this_machine_angle;
 }
-
+/**
+ * @brief	返回误差积分地址
+  */
 int *Get_Error_Integral(void)
 {
 	return &error_integral;
 }
-
+/**
+ * @brief	返回上次机械角度
+  */
 uint16_t *Get_Last_Machine_Angle(void)
 {
 	return &last_machine_angle;
 }
-
+/**
+ * @brief	返回此次机械角度
+  */
 uint16_t *Get_This_Machine_Angle(void)
 {
 	return &this_machine_angle;
 }
 
 /**
- * @brief 			can2 接收回调函数,在该函数内，只接受数据，而具体的数据解析在各自需要的任务里面
+ * @brief 			can2 接收回调函数,解析各电机数据
  * @param[in]		void
  * @retval			void
  */
 void Can2_Rx_FIFO0_IT_Callback(void)
 {
 	HAL_CAN_GetRxMessage(&hcan2, CAN_RX_FIFO0, &can2_rx_header, can2_rxd_data_buffer);
-	///< 所有 can 数据，只有拨轮电机的数据是直接在中断中进行解析的，因为要实时获取电机的绝对角度
 	switch (can2_rx_header.StdId)
 	{
 	case CAN_3508_WAVE_ID:
@@ -87,20 +94,19 @@ void Can2_Rx_FIFO0_IT_Callback(void)
 		Parse_Wave_Motor_Feedback_Data();
 	}
 	case CAN_YAW_MOTOR_ID:
+	{
+		Calculate_Motor_Data(&yaw_motor_feedback_data, can2_rxd_data_buffer);
+	}
+
 	case CAN_PITCH_MOTOR_ID:
 	{
-		uint8_t i = 0;
-		//处理电机ID号
-		i = can2_rx_header.StdId - CAN_YAW_MOTOR_ID;
-		//通知解析
-		Gimbal_Reload(i);
-		Can2_Parse_For_Callback();
+		Calculate_Motor_Data(&pitch_motor_feedback_data, can2_rxd_data_buffer);
 	}
 	}
-	// if (can2_rx_header.StdId == CAN_3508_WAVE_ID)
-	// {
-	// 	Parse_Wave_Motor_Feedback_Data();
-	// }
+	uint8_t i = 0;
+	/* 刷新云台离线检测离线检测 */
+	i = can2_rx_header.StdId - CAN_YAW_MOTOR_ID;
+	Gimbal_Reload(i);
 }
 
 /**
@@ -275,4 +281,18 @@ float Calc_Pitch_Angle8191_Imu_Pid(float tar_angle, Imu_t *imu_on_broad)
 	float pitch_cur_angle = imu_on_broad->pit * 500.0f;
 	Handle_Angle8191_PID_Over_Zero(&pitch_tar_angle, &pitch_cur_angle);
 	return Pid_Position_Calc(&motor_pitch_angle_pid_imu, pitch_tar_angle, pitch_cur_angle); ///< 这是第一层 PID，计算设定角度与实际角度之间的误差，得到下一步要设定的速度值，如果已经达到目标值，则输出为 0
+}
+/**
+ * @brief	返回yaw电机数据
+  */
+Motor_Measure_t *Get_Yaw_Motor_ParsedFeedBackData(void)
+{
+	return &yaw_motor_feedback_data;
+}
+/**
+ * @brief	返回Pitch电机数据
+  */
+Motor_Measure_t *Get_Pitch_Motor_ParsedFeedBackData(void)
+{
+	return &pitch_motor_feedback_data;
 }
