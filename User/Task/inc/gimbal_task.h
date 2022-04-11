@@ -5,14 +5,13 @@
 #include "can2_device.h"
 #include "cmsis_os.h"
 #include "config.h"
+#include "config.h" ///< 机器人配置数据
 #include "console_print.h"
 #include "imu_mpu6050.h"
 #include "math2.h"
 #include "pid.h"
 #include "remote_task.h"
-
 /*yaw*/
-#define YAW_LIMIT_SPEED 150 ///<YAW轴速度限幅 原来150
 #define YAW_SPEED_OUTPUT_LIMIT(data, limit) Float_Constraion(data, -limit, limit)
 
 /*pitch*/
