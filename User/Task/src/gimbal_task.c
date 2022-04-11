@@ -66,7 +66,7 @@ void StartGimbalTask(void const *argument)
                 pitch_angle_set -= (rc_data_pt->rc.ch1) / 12.0f; ///< 改之前是*10.0f
                 /*pitch轴角度限幅*/
                 Pitch_Angle_Limit(&pitch_angle_set, pitch_down_angle_limit, pitch_up_angle_limit);
-                yaw_angle_set -= (rc_data_pt->rc.ch0) / 10.0f;
+                yaw_angle_set = yaw_angle_set - ((rc_data_pt->rc.ch0) / 160.0f);
                 // yaw轴设定值角度回环
                 if (yaw_angle_set > 360)
                 {

@@ -2,16 +2,15 @@
 #include "gimbal_task.h"
 #include "monitor_task.h"
 
-// extern float easy_pid_p, easy_pid_i, easy_pid_d;
 // static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); 		///< yawµç»úËÙ¶ÈPID
 // static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(600, 0, 0.02, 5000, 28000, 0, 1000, 500); ///< yawµç»úËÙ¶ÈPID(µ¥µç»úµ÷ÊÔ)
 // static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(0.05, 0, 0, 5, 125, 0, 3000, 500);		///< yawµç»ú½Ç¶ÈPID
-/* ÔÝÊ±µÄÊý¾Ý */
-static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(2000, 0.6, 0.2, 5000, 29000, 0, 1000, 500); //yawµç»úËÙ¶ÈPID
-static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(0.2, 0.0, 0.0, 5, 125, 0, 3000, 500);		 //yawµç»ú½Ç¶ÈPID
+/* Ê¹ÓÃºÆ¸çµÄÊý¾Ý */
+Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(1.68, 0.08, 0.02, 15.56, 62, 0, 3000, 500);	  ///< yawµç»ú½Ç¶ÈPID
+static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1500, 0.01, 2, 10, 30000, 0, 1000, 500); ///< yawµç»úËÙ¶ÈPID
 
 static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(350, 25, 0, 220, 15000, 0, 1000, 500); ///< pitchµç»úËÙ¶ÈPID
-// static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(300, 27, 0, 220, 30000, 0, 1000, 500);		 	///< pitchµç»úËÙ¶ÈPID
+// static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(300, 27, 0, 220, 30000, 0, 1000, 500);	 ///< pitchµç»úËÙ¶ÈPID
 static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.03, 0.02, 0.00, 100, 50, 0, 3000, 500); ///< pitchµç»ú½Ç¶ÈPID
 // static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.4, 0.008, 0.005, 100, 1000, 0, 1000, 500); ///< pitchµç»ú½Ç¶ÈPID
 
@@ -33,14 +32,6 @@ static CAN_RxHeaderTypeDef can2_rx_header; ///< ¸¨Öú±äÁ¿£¬ÓÃÓÚ HAL ¿âº¯Êý½ÓÊÜÊý¾
 
 static Motor_Measure_t wave_motor_feedback_data; ///<²¦ÂÖµç»ú·´À¡Êý¾Ý
 
-extern float easy_pid_p, easy_pid_i, easy_pid_d;
-
-// void up_date_pid(void)
-// {
-// 	motor_yaw_speed_pid.kp = easy_pid_p;
-// 	motor_yaw_speed_pid.ki = easy_pid_i;
-// 	motor_yaw_speed_pid.kd = easy_pid_d;
-// }
 /**
  * @brief 			½âÎö²¦ÂÖµç»úÊý¾Ý
  * @param[in]		void
@@ -176,7 +167,7 @@ void Set_Gimbal_Motors_Speed(float yaw_speed, float pitch_speed, float yaw_speed
 		Pid_Position_Calc(&motor_pitch_speed_pid, pitch_speed, pitch_speed_rpm),
 		0,
 		0);
-		/* µ÷ÊÔÊ¹ÓÃ */
+	/* µ÷ÊÔÊ¹ÓÃ */
 	//float new_date = yaw_motor_parsed_feedback_data->speed_rpm);
 	// __printf("%0.2f,%0.2f,%.2f\r\n", yaw_speed, Pid_Position_Calc(&motor_yaw_speed_pid, yaw_speed, yaw_speed_rpm), yaw_speed_rpm);
 }
