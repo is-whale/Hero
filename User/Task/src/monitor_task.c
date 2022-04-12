@@ -35,9 +35,7 @@ void StartMonitorTask(void const *argument)
 			{
 				//判断超级电容目标功率与裁判系统限制功率-2是否相符，否设置超级电容
 				if(referee_date_pt->power_heat_data.chassis_power - 2!= (uint8_t)super_capacitor_date->target_power);
-				// if ((judge_data->game_robot_status.chassis_power_limit - 2) != ((uint16_t)(super_capacitor_data->target_power)))
 				{
-					// Set_Super_Capacitor((judge_data->game_robot_status.chassis_power_limit - 2) * 100);
 					Set_Super_Capacitor((referee_date_pt->power_heat_data.chassis_power - 2) * 100);
 					cap_send_cnt = 0;
 				}
