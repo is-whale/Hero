@@ -78,7 +78,27 @@ uint16_t *Get_This_Machine_Angle(void)
 {
 	return &this_machine_angle;
 }
-
+/**
+ * @brief	返回云台Yaw轴解析数据
+  */
+/**
+ * @brief                       获取解析后的云台电机数据
+ * @param[in]                   void
+ * @return {Motor_Measure_t*}   解析后的云台电机数据（数组首地址）
+ */
+Motor_Measure_t Get_Yaw_Data(void)
+{
+	return yaw_motor_feedback_data;
+}
+/**
+ * @brief                       获取解析后的云台电机数据
+ * @param[in]                   void
+ * @return {Motor_Measure_t*}   解析后的云台电机数据（数组首地址）
+ */
+Motor_Measure_t Get_Pitch_Data(void)
+{
+	return pitch_motor_feedback_data;
+}
 /**
  * @brief 			can2 接收回调函数,解析各电机数据
  * @param[in]		void
@@ -94,13 +114,15 @@ void Can2_Rx_FIFO0_IT_Callback(void)
 		Parse_Wave_Motor_Feedback_Data();
 	}
 	case CAN_YAW_MOTOR_ID:
-	{
-		Calculate_Motor_Data(&yaw_motor_feedback_data, can2_rxd_data_buffer);
-	}
+		// {
+		// 	Calculate_Motor_Data(&yaw_motor_feedback_data, can2_rxd_data_buffer);
+		// }
 
 	case CAN_PITCH_MOTOR_ID:
 	{
-		Calculate_Motor_Data(&pitch_motor_feedback_data, can2_rxd_data_buffer);
+		/* 继续使用任务内封装的解析，因为有问题 */
+		Can2_Parse_For_Callback();
+		// Calculate_Motor_Data(&pitch_motor_feedback_data, can2_rxd_data_buffer);
 	}
 	}
 	uint8_t i = 0;
@@ -281,18 +303,4 @@ float Calc_Pitch_Angle8191_Imu_Pid(float tar_angle, Imu_t *imu_on_broad)
 	float pitch_cur_angle = imu_on_broad->pit * 500.0f;
 	Handle_Angle8191_PID_Over_Zero(&pitch_tar_angle, &pitch_cur_angle);
 	return Pid_Position_Calc(&motor_pitch_angle_pid_imu, pitch_tar_angle, pitch_cur_angle); ///< 这是第一层 PID，计算设定角度与实际角度之间的误差，得到下一步要设定的速度值，如果已经达到目标值，则输出为 0
-}
-/**
- * @brief	返回yaw电机数据
-  */
-Motor_Measure_t *Get_Yaw_Motor_ParsedFeedBackData(void)
-{
-	return &yaw_motor_feedback_data;
-}
-/**
- * @brief	返回Pitch电机数据
-  */
-Motor_Measure_t *Get_Pitch_Motor_ParsedFeedBackData(void)
-{
-	return &pitch_motor_feedback_data;
 }

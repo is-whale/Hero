@@ -68,7 +68,7 @@ uint8_t Parse_Refere_System_Data(uint8_t *get_data, uint16_t data_len)
 		if (Analysis_Frame_Header(&get_data[(a5_position[i])], &data_length[i], NULL) == 0)
 		{
 			// debug_log("Analysis No.%d frame header error.", i);
-			Console.print("head_done%f\r\n", i);
+			// Console.print("head_done%f\r\n", i);
 			continue;
 		}
 
@@ -76,7 +76,7 @@ uint8_t Parse_Refere_System_Data(uint8_t *get_data, uint16_t data_len)
 		if (Check_Package_Crc16(&get_data[(a5_position[i])], (data_length[i] + 9)) == 0)
 		{
 			// debug_log("CRC16 check No.%d fail.", i);
-			Console.print("CRC_done\r\n");
+			// Console.print("CRC_done\r\n");
 
 			continue;
 		}
@@ -85,7 +85,7 @@ uint8_t Parse_Refere_System_Data(uint8_t *get_data, uint16_t data_len)
 		if (Analysis_Data(&get_data[(a5_position[i])], data_length[i]) == 0)
 		{
 			// debug_log("Analysis No.%d data fail.", i);
-			Console.print("par\r\n");
+			// Console.print("par\r\n");
 
 			continue;
 		}
