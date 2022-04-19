@@ -6,11 +6,11 @@
  * @date 2021-10-17
  * @copyright Copyright (c) 2021
  */
+/* 因使用外置陀螺仪数据，所以暂时注释陀螺仪任务函数内容，后续不需要就删除整个任务 */
 
-/*inlcude*/
 #include "gyroscope_task.h"
 #include "quaternion.h"
-// static Imu_t*imu_date;
+
 void StartGyroscopeTask(void const *argument)
 {
   osDelay(100);
@@ -21,11 +21,12 @@ void StartGyroscopeTask(void const *argument)
   for (;;)
   {
     //初始化及更新数据
-    Mpu6050_Get_Data();
+    /*Mpu6050_Get_Data();
     Imu_AHRS_Update();
 
-    Imu_Attitude_Update(); ///<检查是否需要数据检查函数
-                           //  imu_date = Get_imu_date_now;
+    Imu_Attitude_Update(); */
+    ///<检查是否需要数据检查函数
+    //  imu_date = Get_imu_date_now;
 
     osDelay(1);
   }

@@ -4,7 +4,7 @@
 pitch   低头    2520
         复位    3000
         抬头    3590
-yaw     角度    6440    Yaw角度会有偏移，震荡之后
+yaw     角度    6440    Yaw角度会有偏移，震荡之后所以需要每次维修之后重新测量参数
  */
 
 /* shooter send id change to 0X1FF form 0x200 */
@@ -20,6 +20,7 @@ static const uint16_t pitch_down_angle_limit = 2600; ///< pitch 轴云台最高角度  
 static float yaw_angle_set = 0;                    ///< 这里初始角是0，因为在chassis_task.c中，对于跟随根据初始机械角度进行了处理
 static float pitch_angle_set = pitch_middle_angle; ///< pitch 轴云台设置的角度
 /* 指向接收数据 */
+/* 移植完中断接收后应删除部分变量 */
 static CAN_RxHeaderTypeDef *can2_rx_header_pt;                              ///< can2 接收的头数据结构体指针
 static uint8_t *can2_rxd_data_buffer;                                       ///< can2 接收的数据存放的数组首地址
 static Rc_Ctrl_t *rc_data_pt;                                               ///< 指向遥控器数据的结构体指针
@@ -37,7 +38,8 @@ extern Pid_Position_t motor_pitch_speed_pid;
 
 void StartGimbalTask(void const *argument)
 {
-    //调试区域，调试结束删除或全部注释
+    //调试区域
+    /* 用于暂时调整初始化时的模式 */
     // robot_mode_data_pt->mode.control_device = 2;
     // robot_mode_data_pt->mode.rc_motion_mode = 4;///< 结构体内遥控器的特殊模式依然是5
     //调试区域结束
@@ -48,17 +50,18 @@ void StartGimbalTask(void const *argument)
     for (;;)
     {
         ///< 板放置上云台除Yaw轴其他两轴数据稳定数据稳定
-        //< 所有的调试打印全部采用debug-printf，在usart3.h中的宏定义控制条件编译，关闭宏之后debug_printf指向空宏
+        //< 所有的调试打印全部采用debug.printf()，在usart3.h中的宏定义控制条件编译，关闭宏之后debug_printf指向空宏
         /*选择操作设备*/
         if (robot_mode_data_pt->mode.control_device == remote_controller_device_ENUM) ///<遥控器模式
         {
-            // 底盘云台模式 1底盘跟随 2小陀螺  3垂稳云台 4垂稳+小陀螺 5特殊模式
+            // 底盘云台模式: 1底盘跟随 2小陀螺  3垂稳云台 4垂稳+小陀螺 5特殊模式
             switch (robot_mode_data_pt->mode.rc_motion_mode)
             {
 
             case 1: ///<底盘跟随
             {
-                /*底盘跟随模式和小陀螺模式在云台任务中逻辑共用，差别在底盘*/
+                /*底盘跟随模式和小陀螺模式在云台任务中逻辑共用
+                均是以陀螺仪做角度闭环作为速度值，差别在底盘任务*/
             }
 
             case 2: ///<底盘小陀螺+云台自由运动
@@ -76,11 +79,11 @@ void StartGimbalTask(void const *argument)
                 {
                     yaw_angle_set += 360;
                 }
-                // Console.print("%0.2f,%0.2f\r\n", rc_data_pt->rc.ch0 * 1.0f, rc_data_pt->rc.ch1 * 1.0f);
                 //陀螺仪数据，零漂太大，使用官方结算中不带磁力计矫正的程序可能可以解决这个问题
+                /* 目前使用外置串口陀螺仪，暂时解决问题。并且pitch轴数据也可以正常使用 */
                 pid_out[Yaw_target_Speed] = Calc_Yaw_Angle360_Pid(yaw_angle_set, imu_date_usart6->angle.yaw_z);
                 pid_out[Pitch_target_Speed] = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
-
+                // debug_print("%0.2f,%0.2f\r\n", rc_data_pt->rc.ch0 * 1.0f, rc_data_pt->rc.ch1 * 1.0f);
                 break;
             }
             case 3: ///< 自稳+云台自由移动
@@ -107,7 +110,7 @@ void StartGimbalTask(void const *argument)
                 pid_out[Pitch_target_Speed] = Calc_Pitch_Angle8191_Imu_Pid(pitch_angle_set, imu_date_pt);
                 // Console.print("%0.2f,%0.2f,%0.2f\r\n", imu_date_pt->pit, pitch_angle_set, pid_out[Pitch_target_Speed]);
                 /* bug_log:自稳模式下程序限位只对遥控器控制的响应有限制，而陀螺仪导致的漂移并不能被限制 */
-                /* 目前想到的方法：将板装车之后测量出对应的陀螺仪角度值，做两个死区。即0点附近的微小零漂以及超过云台的漂浮 */
+                /* 目前的解决方法：将板装车之后测量出对应的陀螺仪角度值，做两个死区。即0点附近的微小零漂以及超过云台的漂浮 */
                 break;
             }
             case 5: ///<特殊模式
@@ -135,6 +138,7 @@ void StartGimbalTask(void const *argument)
             switch (robot_mode_data_pt->mode.mouse_keyboard_gimbal_mode)
             {
             case 1: ///<手动模式（云台控制数据来自鼠标移动）
+
             {
                 /*目标角度设定*/
                 yaw_angle_set -= robot_mode_data_pt->virtual_rocker.ch0 / 58.0f; ///<倍率需要调整。这个数据是步兵的
@@ -221,7 +225,7 @@ void StartGimbalTask(void const *argument)
         // Console.print("%0.2f\r\n", new_moter_mac); ///输出机械角度
         pitch_angle_set -= (rc_data_pt->rc.ch1) / 12.0f;
         // Console.print("%0.2f,%0.2f,%0.2f,%0.2f\r\n", new_moter_date, pid_out[Yaw_target_Speed]);
-        Console.print("%0.2f,%0.2f,%0.2f\n", new_moter_angle, yaw_angle_set,rc_data_pt->rc.ch0);
+        Console.print("%0.2f,%0.2f,%0.2f\n", new_moter_angle, yaw_angle_set, rc_data_pt->rc.ch0);
         // Console.print("%0.2f,%0.2f\r\n", imu_date_usart6->angle.yaw_z, imu_date_usart6->angle.pitch_y);
         osDelay(5);
     }
