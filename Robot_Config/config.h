@@ -14,6 +14,7 @@
 /* 调试安全配置 */
 #define LASER_OFF 0          ///<打开激光（调试时建议关闭防止伤人）
 #define CHASSIS_SPEED_ZERO 0 ///<底盘无力模式,防止底盘疯转
+#define GIMBAL_SPEED_ZERO 0  ///<云台无力模式,防止底盘疯转
 #define LOSS_REMOTE_SIGNAL 1 ///<遥控器信号丢失检测以及错误处理（暂时未实现）
 
 /* 机器人属性参数 */
@@ -22,15 +23,15 @@
 // #define PITCH_MID_ANGLE 7490///<pitch中间附近
 // #define PITCH_DOWN_LIMIT 8010///<pitch下限位
 /* Yaw */
-#define YAW_GM6020_HEAD_ANGLE 6640 ///< 维修之后角度会变
-#define YAW_LIMIT_SPEED 150        ///<YAW轴速度限幅 原来150
+#define YAW_GM6020_HEAD_ANGLE 6600 ///< 维修之后角度会变
+#define YAW_LIMIT_SPEED 200        ///<YAW轴速度限幅 原来150
 
 /* PID */
 
 /* 调试模式 */
 #define INFORMATION 1
 #define DEBUG 0           ///< debug_printf()函数使能
-#define ERROE_FOR_SHELL 1 ///<文件错误信息输出开关（暂未完成）
+#define ERROE_FOR_SHELL 0 ///<文件错误信息输出开关（暂未完成）
 
 /* 添加机器人返回数据函数定义列表 */
 

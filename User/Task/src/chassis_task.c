@@ -16,6 +16,7 @@ static const float motor_speed_multiple = 13.5; ///< 电机速度倍率
 #define POWER_LIMIT_FORM_SYSTEM 5.0f         ///<这里后面要换成裁判系统解析的功率限制，为了避免警告暂时使用数字代替
 static float chassis_motor_boost_rate = 4.0f;///< 测试后替换为裁判系统读取的底盘功率限制
 /* PID参数实例化 */
+// static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500); ///< 底盘跟随PID
 static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500); ///< 底盘跟随PID
 /* 数据指针 */
 static Rc_Ctrl_t *rc_data_pt;                               ///< 指向解析后的遥控器结构体指针
@@ -148,8 +149,7 @@ void StartChassisTask(void const *argument)
             case rc_stable_chassis_gyro_mode_ENUM: ///< 4：底盘小陀螺+自稳云台
             {
                 Calc_Gyro_Motors_Speed(chassis_motor_speed,
-                                       // Calc_Gyro_Speed_By_Power_Limit(referee_date_pt->power_heat_data.chassis_power),整车使用裁判系统之后使用
-                                       Calc_Gyro_Speed_By_Power_Limit(chassis_motor_boost_rate),
+                                       Calc_Gyro_Speed_By_Power_Limit(referee_date_pt->power_heat_data.chassis_power),
                                        GM6020_YAW_Angle_To_360(gimbal_motor_feedback_parsed_data[*yaw_motor_index].mechanical_angle),
                                        rc_data_pt->rc.ch3 * 8.0f,
                                        rc_data_pt->rc.ch2 * 8.0f);
@@ -176,10 +176,15 @@ void StartChassisTask(void const *argument)
         }
         /* 额定转速 469rpm,减速箱减速比约为19:1 */
         /* 调试阶段速度限幅从8899改成889 */
-        OUTPUT_LIMIT(&chassis_motor_speed[0], 889);
-        OUTPUT_LIMIT(&chassis_motor_speed[1], 889);
-        OUTPUT_LIMIT(&chassis_motor_speed[2], 889);
-        OUTPUT_LIMIT(&chassis_motor_speed[3], 889);
+        OUTPUT_LIMIT(&chassis_motor_speed[0], 8899);
+        OUTPUT_LIMIT(&chassis_motor_speed[1], 8899);
+        OUTPUT_LIMIT(&chassis_motor_speed[2], 8899);
+        OUTPUT_LIMIT(&chassis_motor_speed[3], 8899);
+
+        // OUTPUT_LIMIT(&chassis_motor_speed[0], 8899);
+        // OUTPUT_LIMIT(&chassis_motor_speed[1], 8899);
+        // OUTPUT_LIMIT(&chassis_motor_speed[2], 8899);
+        // OUTPUT_LIMIT(&chassis_motor_speed[3], 8899);
 
 #if CHASSIS_SPEED_ZERO
         chassis_motor_speed[0] = 0;
@@ -196,6 +201,7 @@ void StartChassisTask(void const *argument)
                                chassis_motor_speed[3],
                                chassis_motor_feedback_parsed_data);
         // debug_print("%0.2f,%0.2f\r\n", referee_date_pt->power_heat_data.chassis_power, referee_date_pt->power_heat_data.shooter_id1_42mm_cooling_heat);
+        Console.print("%0.2f,%0.2f\r\n", referee_date_pt->power_heat_data.chassis_power,referee_date_pt->shoot_data.bullet_speed);
         osDelay(10);
     }
 }
@@ -236,7 +242,7 @@ void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed, float move_
     float move_radin = move_direction * 3.14159f / 180.0f;
     float radin_sin = sinf(move_radin); ///< sin(x)
     float radin_cos = cosf(move_radin);
-  
+
     ///< 陀螺速度赋值
     motors_speed[0] = rotate_speed;
     motors_speed[1] = rotate_speed;
@@ -250,10 +256,18 @@ void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed, float move_
     float y_x_speed = y_move_speed * radin_sin;
     float y_y_speed = y_move_speed * radin_cos;
 
+    // motors_speed[0] += ((x_x_speed - x_y_speed) + (y_x_speed + y_y_speed));
+    // motors_speed[1] += ((x_x_speed + x_y_speed) + (-y_x_speed - y_y_speed));
+    // motors_speed[2] += ((x_x_speed + x_y_speed) + (y_x_speed - y_y_speed));
+    // motors_speed[3] += ((x_x_speed - x_y_speed) + (-y_x_speed + y_y_speed));
+
     motors_speed[0] += ((x_x_speed - x_y_speed) + (y_x_speed + y_y_speed));
-    motors_speed[3] += ((-x_x_speed - x_y_speed) + (-y_x_speed + y_y_speed));
+    motors_speed[1] += ((-x_x_speed - x_y_speed) + (-y_x_speed + y_y_speed));
     motors_speed[2] += ((x_x_speed + x_y_speed) + (y_x_speed - y_y_speed));
-    motors_speed[1] += ((-x_x_speed + x_y_speed) + (-y_x_speed - y_y_speed));
+    motors_speed[3] += ((-x_x_speed + x_y_speed) + (-y_x_speed - y_y_speed));
+
+
+
 }
 /**
  * @author          bashpow

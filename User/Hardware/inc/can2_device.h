@@ -45,9 +45,9 @@ float Calc_Wave_Motor_Angle8191_Pid(float tar_angle, float current_angle);
 int *Get_Error_Integral(void);
 uint16_t *Get_Last_Machine_Angle(void);
 uint16_t *Get_This_Machine_Angle(void);
-float Calc_Pitch_Angle8191_Imu_Pid(float tar_angle, Imu_t *imu_on_broad);
 /* 重写函数 */
 void Set_Gimbal_Motors_Speed(float yaw_speed, float pitch_speed, float yaw_speed_rpm, float pitch_speed_rpm);
 Motor_Measure_t Get_Yaw_Data(void);
 Motor_Measure_t Get_Pitch_Data(void);
+float Calc_Pitch_Angle8191_Imu_Pid(float tar_angle, float imu_angle_data);
 #endif //__CAN2_DEVICE_H_
