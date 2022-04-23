@@ -13,8 +13,7 @@
 #define CHASSIS_MOTOR_GYRO_BASE_RATE 5.0f       ///< 小陀螺的速度倍率
 static const float motor_speed_multiple = 13.5; ///< 电机速度倍率
 /* 限幅 */
-#define POWER_LIMIT_FORM_SYSTEM 5.0f ///<这里后面要换成裁判系统解析的功率限制，为了避免警告暂时使用数字代替
-static float chassis_motor_boost_rate = 4.0f; ///< 测试后替换为裁判系统读取的底盘功率限制
+static float chassis_motor_boost_rate = 4.0f; ///< 底盘电机倍率
 /* PID参数实例化 */
 static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500); ///< 底盘跟随PID
 /* 数据指针 */
@@ -83,7 +82,7 @@ void StartChassisTask(void const *argument)
             {
                 ///< 计算小陀螺时的电机速度
                 Calc_Gyro_Motors_Speed(chassis_motor_speed,
-                                       Calc_Gyro_Speed_By_Power_Limit(POWER_LIMIT_FORM_SYSTEM),
+                                       Calc_Gyro_Speed_By_Power_Limit(referee_date_pt->power_heat_data.chassis_power),
                                        GM6020_YAW_Angle_To_360(gimbal_motor_feedback_parsed_data[*yaw_motor_index].mechanical_angle),
                                        (float)robot_mode_data_pt->virtual_rocker.ch3 * CHASSIS_MOTOR_GYRO_BASE_RATE * chassis_motor_boost_rate,
                                        (float)robot_mode_data_pt->virtual_rocker.ch2 * CHASSIS_MOTOR_GYRO_BASE_RATE * chassis_motor_boost_rate);

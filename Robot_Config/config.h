@@ -23,7 +23,7 @@
 // #define PITCH_MID_ANGLE 7490///<pitch中间附近
 // #define PITCH_DOWN_LIMIT 8010///<pitch下限位
 /* Yaw */
-#define YAW_GM6020_HEAD_ANGLE 6600 ///< 维修之后角度会变
+#define YAW_GM6020_HEAD_ANGLE 6640 ///< 维修之后角度会变
 #define YAW_LIMIT_SPEED 200        ///<YAW轴速度限幅 原来150
 
 /* PID */

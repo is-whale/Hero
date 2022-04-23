@@ -142,7 +142,7 @@ void StartGimbalTask(void const *argument)
 
                 /*两轴串级PID的角度环计算*/
                 pid_out[Pitch_target_Speed] = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
-                // pid_out[Yaw_target_Speed] = Calc_Yaw_Angle360_Pid(yaw_angle_set, imu_data_usart6->angle.yaw_z);
+                pid_out[Yaw_target_Speed] = Calc_Yaw_Angle360_Pid(yaw_angle_set, imu_data_usart6->angle.yaw_z);
             }
 
             break;
@@ -211,13 +211,13 @@ void StartGimbalTask(void const *argument)
 
         /* 直接输出会有参数类型错误，所以使用新变量存储电机返回值 */
         // float new_moter_speed = gimbal_motor_parsed_feedback_data[yaw_motor_index].speed_rpm;
-        // float new_moter_angle = gimbal_motor_parsed_feedback_data[yaw_motor_index].mechanical_angle;
-        // Console.print("%0.2f\r\n", new_moter_mac); ///输出机械角度
+        float new_moter_angle = gimbal_motor_parsed_feedback_data[yaw_motor_index].mechanical_angle;
+        Console.print("%0.2f\r\n", new_moter_angle); ///输出机械角度
         // Console.print("%0.2f,%0.2f,%0.2f,%0.2f\r\n", new_moter_date, pid_out[Yaw_target_Speed]);
         // Console.print("%0.2f,%0.2f,%0.2f\n", imu_data_usart6->angle.yaw_z, yaw_angle_set, pid_out[Yaw_target_Speed]);
         // Console.print("%0.2f", imu_data_usart6->angle.yaw_z);
         // Console.print("%0.2f,%0.2f\r\n", imu_data_usart6->angle.yaw_z, imu_data_usart6->angle.pitch_y);
-        
+
         osDelay(20);
     }
 }
