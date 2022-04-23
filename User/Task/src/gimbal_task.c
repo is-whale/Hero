@@ -1,11 +1,5 @@
 #include "gimbal_task.h"
 #include "externel_gyroscope_task.h"
-/*
-pitch   µÍÍ·    2520
-        ¸´Î»    3000
-        Ì§Í·    3590
-yaw     ½Ç¶È    6440    Yaw½Ç¶È»áÓĞÆ«ÒÆ£¬Õğµ´Ö®ºóËùÒÔĞèÒªÃ¿´ÎÎ¬ĞŞÖ®ºóÖØĞÂ²âÁ¿²ÎÊı
- */
 
 /* ÔÆÌ¨µç»úÏÂ±ê */
 static const uint8_t gimbal_motor_num = 2;  ///< ÔÆÌ¨µç»úµÄÊıÁ¿
@@ -14,35 +8,27 @@ static const uint8_t pitch_motor_index = 1; ///< pitch Öáµç»úÔÚµç»úÊı¾İ½á¹¹ÌåÖĞµ
 /* Pitch½Ç¶ÈÏŞ·ù */
 static const uint16_t pitch_up_angle_limit = 3460;   ///< pitch ÖáÔÆÌ¨×îµÍ½Ç¶È
 static const uint16_t pitch_middle_angle = 3000;     ///< pitch ÖáÔÆÌ¨ÖĞ¼ä½Ç¶È
-static const uint16_t pitch_down_angle_limit = 2600; ///< pitch ÖáÔÆÌ¨×î¸ß½Ç¶È  µÚÒ»´Î²âÁ¿½Ç¶È90£¬ºóÃæÊ¹ÓÃ8090Õı³£
+static const uint16_t pitch_down_angle_limit = 2600; ///< pitch ÖáÔÆÌ¨×î¸ß½Ç¶È
 /* Restart½Ç¶È */
 static float yaw_angle_set = 0;                    ///< ÕâÀï³õÊ¼½ÇÊÇ0£¬ÒòÎªÔÚchassis_task.cÖĞ£¬¶ÔÓÚ¸úËæ¸ù¾İ³õÊ¼»úĞµ½Ç¶È½øĞĞÁË´¦Àí
 static float pitch_angle_set = pitch_middle_angle; ///< pitch ÖáÔÆÌ¨ÉèÖÃµÄ½Ç¶È
 /* Ö¸Ïò½ÓÊÕÊı¾İ */
 /* ÒÆÖ²ÍêÖĞ¶Ï½ÓÊÕºóÓ¦É¾³ı²¿·Ö±äÁ¿ */
-static CAN_RxHeaderTypeDef *can2_rx_header_pt;                              ///< can2 ½ÓÊÕµÄÍ·Êı¾İ½á¹¹ÌåÖ¸Õë
-static uint8_t *can2_rxd_data_buffer;                                       ///< can2 ½ÓÊÕµÄÊı¾İ´æ·ÅµÄÊı×éÊ×µØÖ·
-static Rc_Ctrl_t *rc_data_pt;                                               ///< Ö¸ÏòÒ£¿ØÆ÷Êı¾İµÄ½á¹¹ÌåÖ¸Õë
-static Robot_control_data_t *robot_mode_data_pt;                            ///< Ö¸Ïò»úÆ÷ÈËÄ£Ê½µÄ½á¹¹ÌåÖ¸Õë
-// static Imu_t *imu_date_pt;                                                  ///< Ö¸ÏòÍÓÂİÒÇ»ñÈ¡½Ç¶ÈµÄ½á¹¹ÌåÖ¸Õë
+static CAN_RxHeaderTypeDef *can2_rx_header_pt;   ///< can2 ½ÓÊÕµÄÍ·Êı¾İ½á¹¹ÌåÖ¸Õë
+static uint8_t *can2_rxd_data_buffer;            ///< can2 ½ÓÊÕµÄÊı¾İ´æ·ÅµÄÊı×éÊ×µØÖ·
+static Rc_Ctrl_t *rc_data_pt;                    ///< Ö¸ÏòÒ£¿ØÆ÷Êı¾İµÄ½á¹¹ÌåÖ¸Õë
+static Robot_control_data_t *robot_mode_data_pt; ///< Ö¸Ïò»úÆ÷ÈËÄ£Ê½µÄ½á¹¹ÌåÖ¸Õë
+// static Imu_t *imu_date_pt;                                                  ///< Ö¸Ïò°åÔØÍÓÂİÒÇ»ñÈ¡½Ç¶ÈµÄ½á¹¹ÌåÖ¸Õë
 static Motor_Measure_t gimbal_motor_parsed_feedback_data[gimbal_motor_num]; ///< ½âÎöºóµÄÔÆÌ¨µç»úÊı¾İÊı×é(Yaw:0;Pitch:1)
 static Wt61c_Data_t *imu_data_usart6;                                       ///< Ö¸Ïò½âÎöºóµÄ´®¿ÚÍÓÂİÒÇÊı¾İ
 
-/* pid¼ÆËãÖ®ºóµÄÊä³ö */
+/* ´æ·Åpid¼ÆËãÖ®ºóµÄÊä³ö */
 float pid_out[ALL_PID] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; ///< Õâ¸ö²ÎÊıÒ²¿É·ÅÔÚÃ¿¸ötask.cÖĞ£¬¶¨ÒåÎª¾²Ì¬±äÁ¿
 /* ÔÆÌ¨³õÊ¼»¯º¯ÊıÉùÃ÷ */
 void Gimbal_Init(void);
-/* ´®¿Úµ÷²ÎµÄ±äÁ¿ */
-extern Pid_Position_t motor_pitch_speed_pid;
 
 void StartGimbalTask(void const *argument)
 {
-    //µ÷ÊÔÇøÓò
-    /* ÓÃÓÚÔİÊ±µ÷Õû³õÊ¼»¯Ê±µÄÄ£Ê½ */
-    // robot_mode_data_pt->mode.control_device = 2;
-    // robot_mode_data_pt->mode.rc_motion_mode = 4;///< ½á¹¹ÌåÄÚÒ£¿ØÆ÷µÄÌØÊâÄ£Ê½ÒÀÈ»ÊÇ5
-    //µ÷ÊÔÇøÓò½áÊø
-
     Gimbal_Init();
 
     osDelay(1000);
@@ -50,6 +36,7 @@ void StartGimbalTask(void const *argument)
     {
         ///< °å·ÅÖÃÉÏÔÆÌ¨³ıYawÖáÆäËûÁ½ÖáÊı¾İÎÈ¶¨Êı¾İÎÈ¶¨
         //< ËùÓĞµÄµ÷ÊÔ´òÓ¡È«²¿²ÉÓÃdebug.printf()£¬ÔÚusart3.hÖĞµÄºê¶¨Òå¿ØÖÆÌõ¼ş±àÒë£¬¹Ø±ÕºêÖ®ºódebug_printfÖ¸Ïò¿Õºê
+
         /*Ñ¡Ôñ²Ù×÷Éè±¸*/
         if (robot_mode_data_pt->mode.control_device == remote_controller_device_ENUM) ///<Ò£¿ØÆ÷Ä£Ê½
         {
@@ -59,7 +46,7 @@ void StartGimbalTask(void const *argument)
 
             case 1: ///<µ×ÅÌ¸úËæ
             {
-                /*µ×ÅÌ¸úËæÄ£Ê½ºÍĞ¡ÍÓÂİÄ£Ê½ÔÚÔÆÌ¨ÈÎÎñÖĞÂß¼­¹²ÓÃ
+                /*µ×ÅÌ¸úËæÄ£Ê½ºÍĞ¡ÍÓÂİÄ£Ê½ÔÚÔÆÌ¨ÈÎÎñÖĞÂß¼­¹²ÓÃ,
                 ¾ùÊÇÒÔÍÓÂİÒÇ×ö½Ç¶È±Õ»·×÷ÎªËÙ¶ÈÖµ£¬²î±ğÔÚµ×ÅÌÈÎÎñ*/
             }
 
@@ -117,11 +104,8 @@ void StartGimbalTask(void const *argument)
             {
 
                 pitch_angle_set -= (rc_data_pt->rc.ch1) / 12.0f;
-                // pid_out[Pitch_target_Speed] = rc_data_pt->rc.ch1/10.0f;///< ËÙ¶È»·µ÷ÊÔ
                 Pitch_Angle_Limit(&pitch_angle_set, pitch_up_angle_limit, pitch_down_angle_limit); ///< pitch½Ç¶ÈÏŞ·ù
-                /* Ğ¡·ù¶ÈÏŞ·ù£ºÊ¹ÓÃĞ¡ÓÚ»úĞµÏŞ·ùÖµµÄ°²È«·ù¶È */
                 /* ÒÔÏÂÊÇÌØÊâÄ£Ê½µÄyawÖá */
-                // pid_out[Yaw_target_Speed] = -(rc_data_pt->rc.ch0) / 1.0f;///Ô­À´µ÷ÊÔµÄ²ÎÊı¶ÔÓ¦µÄÄ¿±êÖµ
                 pid_out[Yaw_target_Speed] = -(rc_data_pt->rc.ch0) / 6.0f;
                 pid_out[Pitch_target_Speed] = Calc_Pitch_Angle8191_Pid(pitch_angle_set, &gimbal_motor_parsed_feedback_data[pitch_motor_index]);
                 break;
@@ -209,7 +193,7 @@ void StartGimbalTask(void const *argument)
 
         YAW_SPEED_OUTPUT_LIMIT(&pid_out[Yaw_target_Speed], YAW_LIMIT_SPEED); // yawÖáËÙ¶ÈÏŞÖÆ
 
-#if GIMBAL_SPEED_ZERO //ÔÆÌ¨ÎŞÁ¦Ä£Ê½
+#if GIMBAL_SPEED_ZERO //ÔÆÌ¨ÎŞÁ¦Ä£Ê½¿ª¹Ø
         {
             pid_out[Yaw_target_Speed] = 0;
             pid_out[Pitch_target_Speed] = 0;
@@ -233,6 +217,7 @@ void StartGimbalTask(void const *argument)
         // Console.print("%0.2f,%0.2f,%0.2f\n", imu_data_usart6->angle.yaw_z, yaw_angle_set, pid_out[Yaw_target_Speed]);
         // Console.print("%0.2f", imu_data_usart6->angle.yaw_z);
         // Console.print("%0.2f,%0.2f\r\n", imu_data_usart6->angle.yaw_z, imu_data_usart6->angle.pitch_y);
+        
         osDelay(20);
     }
 }

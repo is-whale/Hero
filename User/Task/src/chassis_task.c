@@ -13,10 +13,9 @@
 #define CHASSIS_MOTOR_GYRO_BASE_RATE 5.0f       ///< 小陀螺的速度倍率
 static const float motor_speed_multiple = 13.5; ///< 电机速度倍率
 /* 限幅 */
-#define POWER_LIMIT_FORM_SYSTEM 5.0f         ///<这里后面要换成裁判系统解析的功率限制，为了避免警告暂时使用数字代替
-static float chassis_motor_boost_rate = 4.0f;///< 测试后替换为裁判系统读取的底盘功率限制
+#define POWER_LIMIT_FORM_SYSTEM 5.0f ///<这里后面要换成裁判系统解析的功率限制，为了避免警告暂时使用数字代替
+static float chassis_motor_boost_rate = 4.0f; ///< 测试后替换为裁判系统读取的底盘功率限制
 /* PID参数实例化 */
-// static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500); ///< 底盘跟随PID
 static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500); ///< 底盘跟随PID
 /* 数据指针 */
 static Rc_Ctrl_t *rc_data_pt;                               ///< 指向解析后的遥控器结构体指针
@@ -48,10 +47,6 @@ void StartChassisTask(void const *argument)
 
     Chassis_Init(); ///<底盘初始化
 
-    /* 调试区域 */
-    (void)referee_date_pt; ///<避免警告
-    /* 调试区域结束 */
-
     osDelay(1000);
 
     for (;;)
@@ -70,8 +65,6 @@ void StartChassisTask(void const *argument)
             {
             case mk_chassis_follow_mode_ENUM: ///<底盘跟随
             {
-                //后面看需要封装成函数
-
                 follow_pid_output = Calc_Chassis_Follow(); ///< 计算跟随PID输出
 
                 chassis_motor_speed[0] = robot_mode_data_pt->virtual_rocker.ch2 + robot_mode_data_pt->virtual_rocker.ch3 + follow_pid_output + rc_data_pt->mouse.x / 0.38f;
@@ -176,10 +169,10 @@ void StartChassisTask(void const *argument)
         }
         /* 额定转速 469rpm,减速箱减速比约为19:1 */
         /* 调试阶段速度限幅从8899改成889 */
-        OUTPUT_LIMIT(&chassis_motor_speed[0], 8899);
-        OUTPUT_LIMIT(&chassis_motor_speed[1], 8899);
-        OUTPUT_LIMIT(&chassis_motor_speed[2], 8899);
-        OUTPUT_LIMIT(&chassis_motor_speed[3], 8899);
+        OUTPUT_LIMIT(&chassis_motor_speed[0], 1899);
+        OUTPUT_LIMIT(&chassis_motor_speed[1], 1899);
+        OUTPUT_LIMIT(&chassis_motor_speed[2], 1899);
+        OUTPUT_LIMIT(&chassis_motor_speed[3], 1899);
 
         // OUTPUT_LIMIT(&chassis_motor_speed[0], 8899);
         // OUTPUT_LIMIT(&chassis_motor_speed[1], 8899);
@@ -192,7 +185,7 @@ void StartChassisTask(void const *argument)
         chassis_motor_speed[2] = 0;
         chassis_motor_speed[3] = 0;
 #endif
-/**
+        /**
  * @brief   底盘速度PID环计算以及设置底盘速度
   */
         Set_ChassisMotor_Speed(chassis_motor_speed[0],
@@ -200,8 +193,7 @@ void StartChassisTask(void const *argument)
                                chassis_motor_speed[2],
                                chassis_motor_speed[3],
                                chassis_motor_feedback_parsed_data);
-        // debug_print("%0.2f,%0.2f\r\n", referee_date_pt->power_heat_data.chassis_power, referee_date_pt->power_heat_data.shooter_id1_42mm_cooling_heat);
-        Console.print("%0.2f,%0.2f\r\n", referee_date_pt->power_heat_data.chassis_power,referee_date_pt->shoot_data.bullet_speed);
+        // Console.print("%0.2f,%0.2f\r\n", referee_date_pt->power_heat_data.chassis_power, referee_date_pt->shoot_data.bullet_speed);
         osDelay(10);
     }
 }
@@ -265,9 +257,6 @@ void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed, float move_
     motors_speed[1] += ((-x_x_speed - x_y_speed) + (-y_x_speed + y_y_speed));
     motors_speed[2] += ((x_x_speed + x_y_speed) + (y_x_speed - y_y_speed));
     motors_speed[3] += ((-x_x_speed + x_y_speed) + (-y_x_speed - y_y_speed));
-
-
-
 }
 /**
  * @author          bashpow
