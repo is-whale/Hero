@@ -23,8 +23,8 @@
 // #define PITCH_MID_ANGLE 7490///<pitch中间附近
 // #define PITCH_DOWN_LIMIT 8010///<pitch下限位
 /* Yaw */
-#define YAW_GM6020_HEAD_ANGLE 6640 ///< 维修之后角度会变
-#define YAW_LIMIT_SPEED 200        ///<YAW轴速度限幅 原来150
+#define YAW_GM6020_HEAD_ANGLE 6640 ///< 维修之后角度会变    2468
+#define YAW_LIMIT_SPEED 150        ///<YAW轴速度限幅 原来150
 
 /* PID */
 
@@ -34,5 +34,19 @@
 #define ERROE_FOR_SHELL 0 ///<文件错误信息输出开关（暂未完成）
 
 /* 添加机器人返回数据函数定义列表 */
+
+typedef signed char int8_t;
+typedef signed short int int16_t;
+typedef signed int int32_t;
+typedef signed long long int64_t;
+
+/* exact-width unsigned integer types */
+typedef unsigned char uint8_t;
+typedef unsigned short int uint16_t;
+typedef unsigned int uint32_t;
+typedef unsigned long long uint64_t;
+typedef unsigned char bool_t;
+typedef float fp32;
+typedef double fp64;
 
 #endif

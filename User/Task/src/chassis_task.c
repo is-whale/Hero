@@ -12,6 +12,14 @@
 #define CHASSIS_MOTOR_DEFAULT_BASE_RATE 5.5f    ///< 底盘默认速度的倍率
 #define CHASSIS_MOTOR_GYRO_BASE_RATE 5.0f       ///< 小陀螺的速度倍率
 static const float motor_speed_multiple = 13.5; ///< 电机速度倍率
+/* power */
+#define POWER_LIMIT 80.0f
+#define WARNING_POWER 40.0f
+#define WARNING_POWER_BUFF 50.0f
+
+#define NO_JUDGE_TOTAL_CURRENT_LIMIT 64000.0f //16000 * 4,
+#define BUFFER_TOTAL_CURRENT_LIMIT 16000.0f
+#define POWER_TOTAL_CURRENT_LIMIT 20000.0f
 /* 限幅 */
 static float chassis_motor_boost_rate = 4.0f; ///< 底盘电机倍率
 /* PID参数实例化 */
@@ -38,6 +46,7 @@ void Chassis_Init(void);                                              ///<底盘初
 static uint16_t Calc_Gyro_Speed_By_Power_Limit(uint16_t power_limit); ///<计算功率限制下的小陀螺或者底盘跟随时的电机速度目标值
 void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed,
                             float move_direction, float x_move_speed, float y_move_speed); ///< 计算小陀螺时的电机速度
+
 
 void StartChassisTask(void const *argument)
 {
@@ -296,7 +305,7 @@ float Calc_Chassis_Follow(void)
 
     Handle_Angle8191_PID_Over_Zero(&follow_tar, &follow_cur);
 
-    return Pid_Position_Calc(&chassis_follow_pid, follow_tar, follow_cur);
+    return -(Pid_Position_Calc(&chassis_follow_pid, follow_tar, follow_cur));
 
 #undef YAW_INIT_ANGLE
 }
@@ -343,4 +352,96 @@ void Info_Can1_ParseData_Task(void)
 {
     Parse_Can1_Rxd_Data();
     // osSignalSet(parseCan1RxDataHandle, can1_get_data_signal);
+}
+
+/**
+  * @brief          限制功率，主要限制电机电流
+  * @param[in]      chassis_power_control: 底盘数据
+  * @retval         none
+  */
+void chassis_power_control(int16_t*chassis_motor1, int16_t*chassis_motor2, int16_t*chassis_motor3, int16_t*chassis_motor4)
+{
+    fp32 chassis_power = 0.0f;
+    fp32 chassis_power_buffer = 0.0f;
+    fp32 total_current_limit = 0.0f;
+    fp32 total_current = 0.0f;
+    // uint8_t robot_id = get_robot_id();
+    // if (toe_is_error(REFEREE_TOE))
+    // {
+    //     total_current_limit = NO_JUDGE_TOTAL_CURRENT_LIMIT;
+    // }
+    // else if (robot_id == RED_ENGINEER || robot_id == BLUE_ENGINEER || robot_id == 0)
+    // {
+    //     total_current_limit = NO_JUDGE_TOTAL_CURRENT_LIMIT;
+    // }
+    // else
+    // {
+    chassis_power = referee_date_pt->power_heat_data.chassis_power;
+    chassis_power_buffer = referee_date_pt->power_heat_data.chassis_power_buffer;
+    // power > 80w and buffer < 60j, because buffer < 60 means power has been more than 80w
+    //功率超过80w 和缓冲能量小于60j,因为缓冲能量小于60意味着功率超过80w
+    if (chassis_power_buffer < WARNING_POWER_BUFF)
+    {
+        fp32 power_scale;
+        if (chassis_power_buffer > 5.0f)
+        {
+            //scale down WARNING_POWER_BUFF
+            //缩小WARNING_POWER_BUFF
+            power_scale = chassis_power_buffer / WARNING_POWER_BUFF;
+        }
+        else
+        {
+            //only left 10% of WARNING_POWER_BUFF
+            power_scale = 5.0f / WARNING_POWER_BUFF;
+        }
+        //scale down
+        //缩小
+        total_current_limit = BUFFER_TOTAL_CURRENT_LIMIT * power_scale;
+    }
+    else
+    {
+        //power > WARNING_POWER
+        //功率大于WARNING_POWER
+        if (chassis_power > WARNING_POWER)
+        {
+            fp32 power_scale;
+            //power < 80w
+            //功率小于80w
+            if (chassis_power < POWER_LIMIT)
+            {
+                //scale down
+                //缩小
+                power_scale = (POWER_LIMIT - chassis_power) / (POWER_LIMIT - WARNING_POWER);
+            }
+            //power > 80w
+            //功率大于80w
+            else
+            {
+                power_scale = 0.0f;
+            }
+
+            total_current_limit = BUFFER_TOTAL_CURRENT_LIMIT + POWER_TOTAL_CURRENT_LIMIT * power_scale;
+        }
+        //power < WARNING_POWER
+        //功率小于WARNING_POWER
+        else
+        {
+            total_current_limit = BUFFER_TOTAL_CURRENT_LIMIT + POWER_TOTAL_CURRENT_LIMIT;
+        }
+        // }
+    }
+
+    total_current = 0.0f;
+    //calculate the original motor current set
+    //计算原本电机电流设定
+    total_current += fabs(*chassis_motor1) + fabs(*chassis_motor2) + fabs(*chassis_motor3) + fabs(*chassis_motor4);
+
+    if (total_current > total_current_limit)
+    {
+        fp32 current_scale = total_current_limit / total_current;
+        *chassis_motor1 *= current_scale;
+        *chassis_motor2*= current_scale;
+        *chassis_motor3 *= current_scale;
+        *chassis_motor4 *= current_scale;
+    }
 }
