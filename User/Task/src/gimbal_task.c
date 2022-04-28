@@ -6,9 +6,9 @@ static const uint8_t gimbal_motor_num = 2;  ///< 云台电机的数量
 static const uint8_t yaw_motor_index = 0;   ///< yaw 轴电机在电机数据结构体中的下标
 static const uint8_t pitch_motor_index = 1; ///< pitch 轴电机在电机数据结构体中的下标
 /* Pitch角度限幅 */
-static const uint16_t pitch_up_angle_limit = 3460;   ///< pitch 轴云台最低角度
-static const uint16_t pitch_middle_angle = 3000;     ///< pitch 轴云台中间角度
-static const uint16_t pitch_down_angle_limit = 2600; ///< pitch 轴云台最高角度
+static const uint16_t pitch_up_angle_limit = 5200;   ///< pitch 轴云台最低角度
+static const uint16_t pitch_middle_angle = 5630;     ///< pitch 轴云台中间角度
+static const uint16_t pitch_down_angle_limit = 6200; ///< pitch 轴云台最高角度
 /* Restart角度 */
 static float yaw_angle_set = 0;                    ///< 这里初始角是0，因为在chassis_task.c中，对于跟随根据初始机械角度进行了处理
 static float pitch_angle_set = pitch_middle_angle; ///< pitch 轴云台设置的角度
@@ -211,7 +211,7 @@ void StartGimbalTask(void const *argument)
 
         /* 直接输出会有参数类型错误，所以使用新变量存储电机返回值 */
         // float new_moter_speed = gimbal_motor_parsed_feedback_data[yaw_motor_index].speed_rpm;
-        float new_moter_angle = gimbal_motor_parsed_feedback_data[yaw_motor_index].mechanical_angle;
+        float new_moter_angle = gimbal_motor_parsed_feedback_data[pitch_motor_index].mechanical_angle;
         Console.print("%0.2f\r\n", new_moter_angle); ///输出机械角度
         // Console.print("%0.2f,%0.2f,%0.2f,%0.2f\r\n", new_moter_date, pid_out[Yaw_target_Speed]);
         // Console.print("%0.2f,%0.2f,%0.2f\n", imu_data_usart6->angle.yaw_z, yaw_angle_set, pid_out[Yaw_target_Speed]);

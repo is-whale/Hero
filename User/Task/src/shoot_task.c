@@ -1,6 +1,6 @@
 /**
  * @file    shoot_task.c
- * @brief   发射机构，两个波轮 3508 电机的 id 分别为 201 和 202, 挂载在 can2 总线上
+ * @brief   发射机构，两个摩擦轮3508 电机的 id 分别为 201 和 202, 挂载在 can2 总线上
  *          解析后的数据分别放在 shoot_motor_feedback_data[0]、shoot_motor_feedback_data[1]
  * @note    暂未完成自适应摩擦轮速度
  * @version 0.1
@@ -61,7 +61,7 @@ void StartShootTask(void const *argument)
 
     for (;;)
     {
-        Parse_Friction_Wave_Motor_Feedback_Data(can2_rx_header_p, can2_rxd_data_buffer); ///< 解析拨轮数据
+        // Parse_Friction_Wave_Motor_Feedback_Data(can2_rx_header_p, can2_rxd_data_buffer); ///< 解析摩擦轮数据
         switch (robot_control_data_pt->mode.fric_cover_mode)                             ///< 选择摩擦轮模式： 0关闭，1自适应，2高速，3低速
         {
         case fric_cover_off_mode_ENUM: ///< 0
@@ -76,7 +76,7 @@ void StartShootTask(void const *argument)
         case fric_adaptive_speed_mode_ENUM: ///< 1
 
         {
-            fric_speed = 6000;
+            fric_speed = 8000;
             is_ok_fire = 1;
             break;
         }
@@ -84,7 +84,7 @@ void StartShootTask(void const *argument)
         case fric_high_speed_mode_ENUM: ///< 2
 
         {
-            fric_speed = 10000;
+            fric_speed = 14000;
             is_ok_fire = 1;
             break;
         }
@@ -92,7 +92,7 @@ void StartShootTask(void const *argument)
         case cover_on_ENUM: ///< 3
 
         {
-            fric_speed = 8000;
+            fric_speed = 16000;
             is_ok_fire = 1;
 
             break;
@@ -120,6 +120,13 @@ void StartShootTask(void const *argument)
         // Console.print("%0.2f,%0.2f\r\n", motor_date1,-motor_date2);
         osDelay(10);
     }
+}
+/**
+*@brief 封装解析摩擦轮数据，中断中使用
+ */
+void Parse_Friction__Data_ISR(void)
+{
+    Parse_Friction_Wave_Motor_Feedback_Data(can2_rx_header_p, can2_rxd_data_buffer); ///< 解析摩擦轮数据
 }
 /**
   * @brief          射击初始化，初始化PID，遥控器指针，电机指针
@@ -164,7 +171,7 @@ void shooter_init(void)
 /**
  * @brief                           解析云台两个摩擦轮电机和波轮电机的数据
  * @param CAN_RxHeaderTypeDef       can2 接受结构体头指针
- * @param uint8_t_*                 can2 接受到的数据
+ * @param uint8_t*                 can2 接受到的数据
  * @retval                          void
  */
 void Parse_Friction_Wave_Motor_Feedback_Data(CAN_RxHeaderTypeDef *can_rx_header, uint8_t *can2_rxd_data_buffer)
