@@ -211,7 +211,7 @@ void StartGimbalTask(void const *argument)
 
         /* 直接输出会有参数类型错误，所以使用新变量存储电机返回值 */
         // float new_moter_speed = gimbal_motor_parsed_feedback_data[yaw_motor_index].speed_rpm;
-        float new_moter_angle = gimbal_motor_parsed_feedback_data[pitch_motor_index].mechanical_angle;
+        float new_moter_angle = gimbal_motor_parsed_feedback_data[yaw_motor_index].mechanical_angle;
         Console.print("%0.2f\r\n", new_moter_angle); ///输出机械角度
         // Console.print("%0.2f,%0.2f,%0.2f,%0.2f\r\n", new_moter_date, pid_out[Yaw_target_Speed]);
         // Console.print("%0.2f,%0.2f,%0.2f\n", imu_data_usart6->angle.yaw_z, yaw_angle_set, pid_out[Yaw_target_Speed]);

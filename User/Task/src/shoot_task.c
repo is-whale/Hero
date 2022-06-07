@@ -62,7 +62,7 @@ void StartShootTask(void const *argument)
     for (;;)
     {
         // Parse_Friction_Wave_Motor_Feedback_Data(can2_rx_header_p, can2_rxd_data_buffer); ///< 解析摩擦轮数据
-        switch (robot_control_data_pt->mode.fric_cover_mode)                             ///< 选择摩擦轮模式： 0关闭，1自适应，2高速，3低速
+        switch (robot_control_data_pt->mode.fric_cover_mode) ///< 选择摩擦轮模式： 0关闭，1自适应，2高速，3低速
         {
         case fric_cover_off_mode_ENUM: ///< 0
 
@@ -117,10 +117,11 @@ void StartShootTask(void const *argument)
         // float motor_date2 = 0;
         // motor_date1 = shoot_control.fric_send_speed1;
         // motor_date2 = friction_motor_feedback_data[0].speed_rpm;
-        // Console.print("%0.2f,%0.2f\r\n", motor_date1,-motor_date2);
+        Console.print("fric_speed:%0.2f,%0.2f\r\n", fric_speed, friction_motor_feedback_data[0].speed_rpm);
         osDelay(10);
     }
 }
+
 /**
 *@brief 封装解析摩擦轮数据，中断中使用
  */
