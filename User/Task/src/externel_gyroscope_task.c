@@ -1,17 +1,20 @@
 #include "externel_gyroscope_task.h"
+#include "usart6.h" //为了消除警告从头文件引出 function "Get_Usart6_Available_Bufferx" declared implicitly
 
 extern osThreadId referenceGyroscHandle;
 static const int32_t gyroscope_get_data_signal = 0x00110011;
 static uint8_t usart6_rx_available_buffer_index;
 static const uint8_t wt631_package_len = 33;
 static uint16_t *externel_gyroscope_rxd_len;
-static uint8_t *externel_gyroscope_rxd_buffer[2];
-static Wt61c_Data_t wt61c_data;
+static uint8_t *externel_gyroscope_rxd_buffer[2]; /* 陀螺仪接收缓冲区指针数组 */
+static Wt61c_Data_t wt61c_data;                   /* 陀螺仪数据结构体 */
 
 void StartextErnalGyroscopeParseTask(void const *argument)
 {
-    osEvent gyroscope_get_data_event;
+    osEvent gyroscope_get_data_event; /* 陀螺仪接收数据事件 */
+
     Usart6_RxDMA_Init();
+
     externel_gyroscope_rxd_len = Get_Usart6_DMA_Rxd_DataLen();
     externel_gyroscope_rxd_buffer[0] = Get_Usart6_DMA_RxBuffer_One();
     externel_gyroscope_rxd_buffer[1] = Get_Usart6_DMA_RxBuffer_Two();
@@ -33,7 +36,7 @@ void StartextErnalGyroscopeParseTask(void const *argument)
                     Module_Reload(gyroscope);
                     switch (externel_gyroscope_rxd_buffer[usart6_rx_available_buffer_index][23])
                     {
-                    //!依照数据协议，解析角度数据包
+                    //依照数据协议，解析角度数据包
                     case 0x53:
                         wt61c_data.angle.roll_x =
                             ((short)(externel_gyroscope_rxd_buffer[usart6_rx_available_buffer_index][25] << 8 |
@@ -49,6 +52,7 @@ void StartextErnalGyroscopeParseTask(void const *argument)
                             wt61c_data.angle.yaw_z += 360;
                         break;
                     }
+                    /* 下一行是是否打印陀螺仪数据 */
                     // __printf("angle  roll_x:%.2f\tpitch_y:%.2f\tyaw_z:%.2f\r\n", wt61c_data.angle.roll_x, wt61c_data.angle.pitch_y, wt61c_data.angle.yaw_z);
                 }
             }
@@ -62,11 +66,17 @@ void StartextErnalGyroscopeParseTask(void const *argument)
     }
 }
 
+/**
+* @brief    通知陀螺仪解析task解析数据
+ */
 void Inform_Gyroscope_Task_Parse_Data(void)
 {
     osSignalSet(referenceGyroscHandle, gyroscope_get_data_signal);
 }
 
+/**
+* @brief    检查陀螺仪数据是否正确
+ */
 uint8_t Check_Wt61c_Data_Available(const uint8_t *wt61c_raw_buf, uint16_t length)
 {
     uint8_t sum_add = 0;
@@ -88,8 +98,10 @@ uint8_t Check_Wt61c_Data_Available(const uint8_t *wt61c_raw_buf, uint16_t length
     }
     return 1;
 }
-
-Wt61c_Data_t* Get_Gyroscope_Data_t(void)
+/**
+* @brief    返回陀螺仪数据地址
+ */
+Wt61c_Data_t *Get_Gyroscope_Data_t(void)
 {
     return &wt61c_data;
 }

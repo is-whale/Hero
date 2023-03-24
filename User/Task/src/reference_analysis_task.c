@@ -40,6 +40,7 @@ void StartReferenceTaskTask(void const *argument)
                 // debug_print("\r\n");
 
                 Parse_Refere_System_Data(date_copy, *rxd_data_len); ///<解析裁判系统数据
+                /* 打印解析的数据 */
                 // Console.print("%0.2f\r\n", juder_date_finish->power_heat_data.chassis_power_buffer);
                 // Console.print("%0.2f\r\n", juder_date_finish->power_heat_data.chassis_power);
                 // Console.print("%0.2f\r\n", juder_date_finish->ext_bullet_remaining_t.bullet_remaining_num);

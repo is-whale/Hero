@@ -244,10 +244,10 @@ void Gimbal_Init(void)
     /* 原本在延时之后，上车测试之后发现CAN2解析数据有不定长的延迟，所以移植到这里，测试之后延时消失 */
 }
 
-// /**
-//  * @brief   封装以供中断调用（解析进中断的暂时解决方案）
-//  * @note    后续需要把变量移植到can2_device.c中重构解析
-//   */
+ /**
+  * @brief   封装以供中断调用（解析进中断的暂时解决方案）
+  * @note    后续需要把变量移植到can2_device.c中重构解析
+ */
 void Can2_Parse_For_Callback(void)
 {
     Parse_Can2_Gimbal_Rxd_Data(can2_rx_header_pt, can2_rxd_data_buffer, gimbal_motor_parsed_feedback_data);

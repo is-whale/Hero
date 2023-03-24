@@ -13,10 +13,11 @@
 
 extern osThreadId waveWheelTaskHandle;
 
-static Rc_Ctrl_t *rc_data_pt;
-static Robot_control_data_t *robot_control_data_pt;
+static Rc_Ctrl_t *rc_data_pt; //遥控器信息
+static Robot_control_data_t *robot_control_data_pt; //机器人控制信息
 
 static float fric_speed = 0;        ///< 摩擦轮速度
+
 #define FRICTION_SPEED_1 fric_speed ///< 未使用
 
 static const uint8_t friction_motor_num = 2;
@@ -28,6 +29,7 @@ static uint16_t *this_machine_angle;
 static CAN_RxHeaderTypeDef *can2_rx_header_p;
 static uint8_t *can2_rxd_data_buffer;
 const static Judge_data_t *judge_data;
+
 /* 初始化 */
 static int8_t is_ok_fire = 0; ///< 摩擦轮就绪标志
 
@@ -117,7 +119,7 @@ void StartShootTask(void const *argument)
         // float motor_date2 = 0;
         // motor_date1 = shoot_control.fric_send_speed1;
         // motor_date2 = friction_motor_feedback_data[0].speed_rpm;
-        Console.print("fric_speed:%0.2f,%0.2f\r\n", fric_speed, friction_motor_feedback_data[0].speed_rpm);
+        //Console.print("fric_speed:%0.2f,%0.2f\r\n", fric_speed, friction_motor_feedback_data[0].speed_rpm);
         osDelay(10);
     }
 }

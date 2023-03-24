@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_FULL_LL_DRIVER,STM32F427xx,USE_HAL_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc; ../Drivers/STM32F4xx_HAL_Driver/Inc; ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy; ../Middlewares/Third_Party/FreeRTOS/Source/include; ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS; ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F; ../Drivers/CMSIS/Device/ST/STM32F4xx/Include; ../Drivers/CMSIS/Include; ..\User\Device\inc; ..\User\Hardware\inc; ..\User\Lib\inc; ..\User\Task\inc; ..\User\Lib\Shell; ..\Robot_Config</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;..\User\Device\inc;..\User\Hardware\inc;..\User\Lib\inc;..\User\Task\inc;..\User\Lib\Shell;..\RobotConfig</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -3194,7 +3194,7 @@
             <File>
               <FileName>config.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Robot_Config\config.h</FilePath>
+              <FilePath>..\RobotConfig\config.h</FilePath>
             </File>
           </Files>
         </Group>
