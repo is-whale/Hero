@@ -13,10 +13,10 @@
 
 extern osThreadId waveWheelTaskHandle;
 
-static Rc_Ctrl_t *rc_data_pt; //遥控器信息
+static Rc_Ctrl_t *rc_data_pt;                       //遥控器信息
 static Robot_control_data_t *robot_control_data_pt; //机器人控制信息
 
-static float fric_speed = 0;        ///< 摩擦轮速度
+static float fric_speed = 0; ///< 摩擦轮速度
 
 #define FRICTION_SPEED_1 fric_speed ///< 未使用
 
