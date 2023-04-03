@@ -78,13 +78,6 @@ static void Emission_Once_Time(void)
 		}
 		end_time = osKernelSysTick();
 		cal_pid_time += (end_time - start_time);
-		///< 是否使用 pid 计算时间作为结束条件待决定
-		// if (cal_pid_time > 340)
-		// {
-		// 	*angle_integral = 0;
-		// 	wave_motor_speed = 0.0;
-		// 	break;
-		// }
 	}
 	*angle_integral = 0;
 	wave_motor_speed = 0.0;

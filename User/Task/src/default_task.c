@@ -9,7 +9,7 @@ void StartDefaultTask(void const *argument)
 	Laser_ON(); ///<打开激光
 	for (;;)
 	{
-		LED_GREEN_TOGGLE();
+		LED_GREEN_TOGGLE();//绿色LED切换，用来判断系统是否卡死，正常情况是0.5s反转一次
 		osDelay(500);
 	}
 }

@@ -18,13 +18,9 @@
 #define LOSS_REMOTE_SIGNAL 1 ///<遥控器信号丢失检测以及错误处理（暂时未实现）
 
 /* 机器人属性参数 */
-/* 机械角 */
-// #define PITCH_UP_LIMIT 6960///<pitch上限位
-// #define PITCH_MID_ANGLE 7490///<pitch中间附近
-// #define PITCH_DOWN_LIMIT 8010///<pitch下限位
 /* Yaw */
 #define YAW_GM6020_HEAD_ANGLE 6640 ///< 维修之后角度会变    2468
-#define YAW_LIMIT_SPEED 150        ///<YAW轴速度限幅 原来150
+#define YAW_LIMIT_SPEED 150        ///<YAW轴速度限幅 
 
 /* PID */
 

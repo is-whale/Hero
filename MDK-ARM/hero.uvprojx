@@ -3132,16 +3132,6 @@
               <FilePath>..\User\Task\src\super_capacitor_task.c</FilePath>
             </File>
             <File>
-              <FileName>parse_can1_rx_data_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Task\src\parse_can1_rx_data_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>referee_system_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Task\src\referee_system_task.c</FilePath>
-            </File>
-            <File>
               <FileName>gyroscope_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Task\src\gyroscope_task.c</FilePath>

@@ -13,5 +13,6 @@ const uint16_t *Get_Usart6_DMA_RxMaxLen(void);
 uint16_t *Get_Usart6_DMA_Rxd_DataLen(void);
 uint8_t Get_USART6_DMA_Available_Bufferx(void);
 void Usart6_Rx_DMA_Reset(void);
+uint8_t Get_Usart6_Available_Bufferx(void);
 
 #endif //__USART1_H_

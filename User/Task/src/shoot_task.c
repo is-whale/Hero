@@ -18,8 +18,6 @@ static Robot_control_data_t *robot_control_data_pt; //机器人控制信息
 
 static float fric_speed = 0; ///< 摩擦轮速度
 
-#define FRICTION_SPEED_1 fric_speed ///< 未使用
-
 static const uint8_t friction_motor_num = 2;
 static Motor_Measure_t friction_motor_feedback_data[friction_motor_num];
 static Motor_Measure_t *wave_motor_feedback_data;
@@ -49,7 +47,6 @@ void StartShootTask(void const *argument)
     shooter_init();
     shoot_init();
 
-    /* 调试区域 */
     (void)rc_data_pt; ///< 避免 warning
     (void)judge_data;
     (void)last_machine_angle;
@@ -57,13 +54,12 @@ void StartShootTask(void const *argument)
     (void)wave_motor_feedback_data;
     (void)erroe_integral;
     (void)wave_once_machine_angle;
-    /* 调试区域结束 */
 
     osDelay(100);
 
     for (;;)
     {
-        // Parse_Friction_Wave_Motor_Feedback_Data(can2_rx_header_p, can2_rxd_data_buffer); ///< 解析摩擦轮数据
+        Parse_Friction_Wave_Motor_Feedback_Data(can2_rx_header_p, can2_rxd_data_buffer); ///< 解析摩擦轮数据
         switch (robot_control_data_pt->mode.fric_cover_mode) ///< 选择摩擦轮模式： 0关闭，1自适应，2高速，3低速
         {
         case fric_cover_off_mode_ENUM: ///< 0
@@ -213,41 +209,6 @@ int8_t Updata_Wave_Ch_Value(int16_t *last_wave_ch_value, int16_t *this_wave_ch_v
         return 0;
     }
 }
-
-/* void Emission_Once_Time(void)
-{
-    uint32_t start_time = 0;
-    uint32_t cal_pid_time = 0;
-    uint32_t end_time = 0;
-    wave_motor_speed = Calc_Wave_Motor_Angle8191_Pid(wave_once_machine_angle, *erroe_integral);
-
-    ///< 初步测试，发射一颗弹丸的 pid 计算时间最多是 320 ms,时间在 290-320 之间徘徊
-    while ((fabs(wave_motor_speed) > 10) && (*erroe_integral < 119900))
-    {
-        start_time = osKernelSysTick();
-        wave_motor_speed = Calc_Wave_Motor_Angle8191_Pid(wave_once_machine_angle, *erroe_integral);
-        Set_Wave_Motor_Speed(wave_motor_speed, wave_motor_feedback_data);
-        osDelay(5);
-        if (abs((int)(wave_motor_feedback_data->speed_rpm)) < 5)
-        {
-            *erroe_integral = 0;
-            wave_motor_speed = 0.0;
-            break;
-        }
-        end_time = osKernelSysTick();
-        cal_pid_time += (end_time - start_time);
-        if (cal_pid_time > 340)
-        {
-            *erroe_integral = 0;
-            wave_motor_speed = 0.0;
-            break;
-        }
-    }
-
-    debug_print("ok time %d\r\n", cal_pid_time);
-    *erroe_integral = 0;
-    wave_motor_speed = 0.0;
-} */
 
 int8_t *Get_Is_OK_Fire(void)
 {

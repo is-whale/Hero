@@ -1,5 +1,5 @@
 #include "externel_gyroscope_task.h"
-#include "usart6.h" //为了消除警告从头文件引出 function "Get_Usart6_Available_Bufferx" declared implicitly
+#include "usart6.h"
 
 extern osThreadId referenceGyroscHandle;
 static const int32_t gyroscope_get_data_signal = 0x00110011;
@@ -52,8 +52,6 @@ void StartextErnalGyroscopeParseTask(void const *argument)
                             wt61c_data.angle.yaw_z += 360;
                         break;
                     }
-                    /* 下一行是是否打印陀螺仪数据 */
-                    // __printf("angle  roll_x:%.2f\tpitch_y:%.2f\tyaw_z:%.2f\r\n", wt61c_data.angle.roll_x, wt61c_data.angle.pitch_y, wt61c_data.angle.yaw_z);
                 }
             }
         }

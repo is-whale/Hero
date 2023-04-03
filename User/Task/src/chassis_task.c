@@ -33,9 +33,7 @@ static const uint8_t *yaw_motor_index;                      ///< Ö¸Ïòyaw Öáµç»úÔ
 static const Judge_data_t *referee_date_pt;                 ///< Ö¸Ïò½âÎöºóµÄ²ÃÅÐÏµÍ³Êý¾Ý
 
 /* ÒÆÖ²×ÔCAN1½âÎö */
-// static const uint16_t can1_get_data_signal = 0x0001;
 static const uint8_t can1_motor_device_number = 4;
-// static const uint8_t can1_rx_data_overtime = 100;
 static uint8_t *can1_rxd_data;
 static CAN_RxHeaderTypeDef *can1_rx_header;
 static uint8_t *can1_rxd_data;
@@ -46,7 +44,6 @@ void Chassis_Init(void);                                              ///<µ×ÅÌ³õ
 static uint16_t Calc_Gyro_Speed_By_Power_Limit(uint16_t power_limit); ///<¼ÆËã¹¦ÂÊÏÞÖÆÏÂµÄÐ¡ÍÓÂÝ»òÕßµ×ÅÌ¸úËæÊ±µÄµç»úËÙ¶ÈÄ¿±êÖµ
 void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed,
                             float move_direction, float x_move_speed, float y_move_speed); ///< ¼ÆËãÐ¡ÍÓÂÝÊ±µÄµç»úËÙ¶È
-
 
 void StartChassisTask(void const *argument)
 {
@@ -182,11 +179,7 @@ void StartChassisTask(void const *argument)
         OUTPUT_LIMIT(&chassis_motor_speed[2], 8899);
         OUTPUT_LIMIT(&chassis_motor_speed[3], 8899);
 
-        // OUTPUT_LIMIT(&chassis_motor_speed[0], 8899);
-        // OUTPUT_LIMIT(&chassis_motor_speed[1], 8899);
-        // OUTPUT_LIMIT(&chassis_motor_speed[2], 8899);
-        // OUTPUT_LIMIT(&chassis_motor_speed[3], 8899);
-
+//µ×ÅÌ¹Ø±Õºê¶¨Òå£¬ÔÚconfig.h
 #if CHASSIS_SPEED_ZERO
         chassis_motor_speed[0] = 0;
         chassis_motor_speed[1] = 0;
@@ -201,8 +194,6 @@ void StartChassisTask(void const *argument)
                                chassis_motor_speed[2],
                                chassis_motor_speed[3],
                                chassis_motor_feedback_parsed_data);
-        // Console.print("%0.2f,%0.2f\r\n", referee_date_pt->power_heat_data.chassis_power, referee_date_pt->shoot_data.bullet_speed);
-        // Console.print("%0.2f\r\n", referee_date_pt->power_heat_data.chassis_power);
         osDelay(10);
     }
 }
@@ -256,11 +247,6 @@ void Calc_Gyro_Motors_Speed(float *motors_speed, float rotate_speed, float move_
 
     float y_x_speed = y_move_speed * radin_sin;
     float y_y_speed = y_move_speed * radin_cos;
-
-    // motors_speed[0] += ((x_x_speed - x_y_speed) + (y_x_speed + y_y_speed));
-    // motors_speed[1] += ((x_x_speed + x_y_speed) + (-y_x_speed - y_y_speed));
-    // motors_speed[2] += ((x_x_speed + x_y_speed) + (y_x_speed - y_y_speed));
-    // motors_speed[3] += ((x_x_speed - x_y_speed) + (-y_x_speed + y_y_speed));
 
     motors_speed[0] += ((x_x_speed - x_y_speed) + (y_x_speed + y_y_speed));
     motors_speed[1] += ((-x_x_speed - x_y_speed) + (-y_x_speed + y_y_speed));
@@ -352,7 +338,6 @@ const uint8_t *Get_Can1_Motor_DeviceNumber(void)
 void Info_Can1_ParseData_Task(void)
 {
     Parse_Can1_Rxd_Data();
-    // osSignalSet(parseCan1RxDataHandle, can1_get_data_signal);
 }
 
 /**
@@ -360,23 +345,13 @@ void Info_Can1_ParseData_Task(void)
   * @param[in]      chassis_power_control: µ×ÅÌÊý¾Ý
   * @retval         none
   */
-void chassis_power_control(int16_t*chassis_motor1, int16_t*chassis_motor2, int16_t*chassis_motor3, int16_t*chassis_motor4)
+void chassis_power_control(int16_t *chassis_motor1, int16_t *chassis_motor2, int16_t *chassis_motor3, int16_t *chassis_motor4)
 {
     fp32 chassis_power = 0.0f;
     fp32 chassis_power_buffer = 0.0f;
     fp32 total_current_limit = 0.0f;
     fp32 total_current = 0.0f;
-    // uint8_t robot_id = get_robot_id();
-    // if (toe_is_error(REFEREE_TOE))
-    // {
-    //     total_current_limit = NO_JUDGE_TOTAL_CURRENT_LIMIT;
-    // }
-    // else if (robot_id == RED_ENGINEER || robot_id == BLUE_ENGINEER || robot_id == 0)
-    // {
-    //     total_current_limit = NO_JUDGE_TOTAL_CURRENT_LIMIT;
-    // }
-    // else
-    // {
+
     chassis_power = referee_date_pt->power_heat_data.chassis_power;
     chassis_power_buffer = referee_date_pt->power_heat_data.chassis_power_buffer;
     // power > 80w and buffer < 60j, because buffer < 60 means power has been more than 80w
@@ -386,7 +361,6 @@ void chassis_power_control(int16_t*chassis_motor1, int16_t*chassis_motor2, int16
         fp32 power_scale;
         if (chassis_power_buffer > 5.0f)
         {
-            //scale down WARNING_POWER_BUFF
             //ËõÐ¡WARNING_POWER_BUFF
             power_scale = chassis_power_buffer / WARNING_POWER_BUFF;
         }
@@ -395,26 +369,21 @@ void chassis_power_control(int16_t*chassis_motor1, int16_t*chassis_motor2, int16
             //only left 10% of WARNING_POWER_BUFF
             power_scale = 5.0f / WARNING_POWER_BUFF;
         }
-        //scale down
         //ËõÐ¡
         total_current_limit = BUFFER_TOTAL_CURRENT_LIMIT * power_scale;
     }
     else
     {
-        //power > WARNING_POWER
         //¹¦ÂÊ´óÓÚWARNING_POWER
         if (chassis_power > WARNING_POWER)
         {
             fp32 power_scale;
-            //power < 80w
             //¹¦ÂÊÐ¡ÓÚ80w
             if (chassis_power < POWER_LIMIT)
             {
-                //scale down
                 //ËõÐ¡
                 power_scale = (POWER_LIMIT - chassis_power) / (POWER_LIMIT - WARNING_POWER);
             }
-            //power > 80w
             //¹¦ÂÊ´óÓÚ80w
             else
             {
@@ -423,7 +392,6 @@ void chassis_power_control(int16_t*chassis_motor1, int16_t*chassis_motor2, int16
 
             total_current_limit = BUFFER_TOTAL_CURRENT_LIMIT + POWER_TOTAL_CURRENT_LIMIT * power_scale;
         }
-        //power < WARNING_POWER
         //¹¦ÂÊÐ¡ÓÚWARNING_POWER
         else
         {
@@ -433,7 +401,6 @@ void chassis_power_control(int16_t*chassis_motor1, int16_t*chassis_motor2, int16
     }
 
     total_current = 0.0f;
-    //calculate the original motor current set
     //¼ÆËãÔ­±¾µç»úµçÁ÷Éè¶¨
     total_current += fabs(*chassis_motor1) + fabs(*chassis_motor2) + fabs(*chassis_motor3) + fabs(*chassis_motor4);
 
@@ -441,7 +408,7 @@ void chassis_power_control(int16_t*chassis_motor1, int16_t*chassis_motor2, int16
     {
         fp32 current_scale = total_current_limit / total_current;
         *chassis_motor1 *= current_scale;
-        *chassis_motor2*= current_scale;
+        *chassis_motor2 *= current_scale;
         *chassis_motor3 *= current_scale;
         *chassis_motor4 *= current_scale;
     }

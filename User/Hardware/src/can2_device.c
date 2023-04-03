@@ -3,31 +3,19 @@
 #include "monitor_task.h"
 #include "shoot_task.h"
 
-/* 自己调试的数据 */
-// static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1800, 0.8, 0.2, 5000, 30000, 0, 1000, 500); 		///< yaw电机速度PID
-// static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(600, 0, 0.02, 5000, 28000, 0, 1000, 500); ///< yaw电机速度PID(单电机调试)
-// static Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(0.05, 0, 0, 5, 125, 0, 3000, 500);		///< yaw电机角度PID
-/* 使用浩哥的数据 */
-// Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(1.68, 0.08, 0.02, 15.56, 62, 0, 3000, 500);	  ///< yaw电机角度PID
 Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(1.5, 0, 0, 15.56, 60, 0, 3000, 500);			  ///< yaw电机角度PID
 static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1500, 0.01, 2, 10, 30000, 0, 1000, 500); ///< yaw电机速度PID
-// static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1500, 0.0, 0, 10, 30000, 0, 1000, 500); ///< yaw电机速度PID
 
 static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(350, 25, 0, 220, 15000, 0, 1000, 500); ///< pitch电机速度PID
-// static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(300, 27, 0, 220, 30000, 0, 1000, 500);	 ///< pitch电机速度PID
 static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.03, 0.02, 0.00, 100, 50, 0, 3000, 500); ///< pitch电机角度PID
-// static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.4, 0.008, 0.005, 100, 1000, 0, 1000, 500); ///< pitch电机角度PID
 
 static Pid_Position_t friction_motor_left_speed_pid = NEW_POSITION_PID(13, 0, 0.7, 2000, 16383, 0, 1000, 500);
 static Pid_Position_t friction_motor_right_speed_pid = NEW_POSITION_PID(13, 0, 0.7, 2000, 16383, 0, 1000, 500);
-// static Pid_Position_t friction_motor_left_speed_pid = NEW_POSITION_PID(7, 0, 0.7, 2000, 16383, 0, 1000, 500);
-// static Pid_Position_t friction_motor_right_speed_pid = NEW_POSITION_PID(7, 0, 0.7, 2000, 16383, 0, 1000, 500);
 
 static Pid_Position_t wave_motor_speed_pid = NEW_POSITION_PID(9, 0, 3, 2000, 16000, 0, 1000, 500);
 static Pid_Position_t wave_motor_angle_pid = NEW_POSITION_PID(0.25, 0.018, 0.005, 100, 4500, 0, 3000, 500); ///<  拨轮电机角度PID
 /* 自稳云台pitch角度PID参数 */
 static Pid_Position_t motor_pitch_angle_pid_imu = NEW_POSITION_PID(0.2, 0.0, 0.0, 100, 1000, 0, 3000, 500);
-// static Pid_Position_t motor_pitch_speed_pid_imu = NEW_POSITION_PID(100, 0.0, 0.0, 100, 1000, 0, 3000, 500);
 
 static int error_integral = 0;
 static uint16_t last_machine_angle = 0;
@@ -120,15 +108,13 @@ void Can2_Rx_FIFO0_IT_Callback(void)
 		Parse_Wave_Motor_Feedback_Data();
 	}
 	case CAN_YAW_MOTOR_ID:
-		// {
-		// 	Calculate_Motor_Data(&yaw_motor_feedback_data, can2_rxd_data_buffer);
-		// }
+		 {
+		 	Calculate_Motor_Data(&yaw_motor_feedback_data, can2_rxd_data_buffer);
+		 }
 
 	case CAN_PITCH_MOTOR_ID:
 	{
-		/* 继续使用任务内封装的解析，因为有问题 */
 		Can2_Parse_For_Callback();
-		// Calculate_Motor_Data(&pitch_motor_feedback_data, can2_rxd_data_buffer);
 	}
 	case CAN_3508_FRIC_ID_LEFT:
 	case CAN_3508_FRIC_ID_RIGHT:
@@ -187,15 +173,6 @@ void Set_Gimbal_Motors_Speed(float yaw_speed, float pitch_speed, float yaw_speed
 		Pid_Position_Calc(&motor_pitch_speed_pid, pitch_speed, pitch_speed_rpm),
 		0,
 		0);
-	/* 调试使用 */
-	// Can2_Send_4Msg(
-	// 	CAN_GIMBAL_ALL_ID,
-	// 	0,
-	// 	0,
-	// 	0,
-	// 	0);
-	//float new_date = yaw_motor_parsed_feedback_data->speed_rpm);
-	// __printf("%0.2f,%0.2f,%.2f\r\n", yaw_speed, Pid_Position_Calc(&motor_yaw_speed_pid, yaw_speed, yaw_speed_rpm), yaw_speed_rpm);
 }
 
 /**
@@ -256,7 +233,7 @@ float Calc_Wave_Motor_Angle8191_Pid(float tar_angle, float current_angle)
 {
 	float wave_motor_tar_angle = tar_angle;
 	float wave_motor_cur_angle = current_angle;
-	// Handle_Angle8191_PID_Over_Zero(&tar_angle, &current_angle);
+	 Handle_Angle8191_PID_Over_Zero(&tar_angle, &current_angle);
 	return Pid_Position_Calc(&wave_motor_angle_pid, wave_motor_tar_angle, wave_motor_cur_angle); ///< 这是第一层 PID，计算设定角度与实际角度之间的误差，得到下一步要设定的速度值，如果已经达到目标值，则输出为 0
 }
 
@@ -281,12 +258,6 @@ void Set_Friction_Motor_Speed(float speed_left, float speed_right, Motor_Measure
 void Set_Wave_Motor_Speed(float wave_motor_speed, Motor_Measure_t *wave_motor_feedback_data)
 {
 	int16_t wave_motor_pid_out_speed = Pid_Position_Calc(&wave_motor_speed_pid, wave_motor_speed, wave_motor_feedback_data->speed_rpm);
-	// Can2_Send_4Msg(
-	// 	CAN_3508_WAVE_ID,
-	// 	0,
-	// 	0,
-	// 	wave_motor_pid_out_speed,
-	// 	0);
 	Can2_Send_4Msg(
 		0x1FF,
 		wave_motor_pid_out_speed,

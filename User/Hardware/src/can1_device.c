@@ -36,7 +36,7 @@ void Can1_Process(CAN_RxHeaderTypeDef *can1_rx_message)
     case CAN_3508_M3_ID:
     case CAN_3508_M4_ID:
     {
-        Info_Can1_ParseData_Task();///< 通知CAN1解析
+        Info_Can1_ParseData_Task();///< 解析CAN1数据，删掉了解析任务
         uint8_t i = 0;
         //处理电机ID号
         i = can1_rx_message->StdId - CAN_3508_M1_ID;

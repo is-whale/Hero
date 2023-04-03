@@ -3,9 +3,7 @@
 extern osThreadId ReferenceTaskHandle;
 
 static const int32_t reference_task_get_date_signal = 0x000000ff;
-// static const uint32_t reference_data_overtime = 50; //< 裁判系统数据未按时接收，即超时时间
 static uint8_t uart8_rx_available_buffer_index; //< 返回双缓冲中可读取的区域[0&1，作为数组下标]
-// static uint16_t *reference_system_rxd_len;          //< 本次裁判系统接收到的数据长度
 static uint8_t *reference_system_rxd_buffer[2]; //< 裁判系统双缓冲接收数组
 static uint16_t *rxd_data_len;                  //< 裁判系统接收数据长度
 static uint8_t date_copy[128];                  ///< 复制收到的数据
@@ -30,24 +28,17 @@ void StartReferenceTaskTask(void const *argument)
                 memcpy(date_copy, reference_system_rxd_buffer[uart8_rx_available_buffer_index], *rxd_data_len); ///< 拷贝原始数据
 
                 debug_showdata1("judge_buf_len", *rxd_data_len); ///< 打印数据长度
-                /**
+                                                                 /**
                  * @brief   打印原始数据
                  */
-                // for (uint8_t i = 0; i < *rxd_data_len; i++)
-                // {
-                //     debug_print("%d ", date_copy[i]);
-                // }
-                // debug_print("\r\n");
+                for (uint8_t i = 0; i < *rxd_data_len; i++)
+                {
+                    debug_print("%d ", date_copy[i]);
+                }
+                debug_print("\r\n");
 
                 Parse_Refere_System_Data(date_copy, *rxd_data_len); ///<解析裁判系统数据
-                /* 打印解析的数据 */
-                // Console.print("%0.2f\r\n", juder_date_finish->power_heat_data.chassis_power_buffer);
-                // Console.print("%0.2f\r\n", juder_date_finish->power_heat_data.chassis_power);
-                // Console.print("%0.2f\r\n", juder_date_finish->ext_bullet_remaining_t.bullet_remaining_num);
-
-                // Console.print("buffer :%d\r\n", uart8_rx_available_buffer_index);
-                // Console.print("hello: %f \r\n", reference_system_rxd_buffer[uart8_rx_available_buffer_index]);
-                Module_Reload(judge_system); ///< 裁判系统离线检测
+                Module_Reload(judge_system);                        ///< 裁判系统离线检测
             }
         }
         else if (reference_get_data_event.status == osEventTimeout)
