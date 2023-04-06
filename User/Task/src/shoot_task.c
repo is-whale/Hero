@@ -59,7 +59,7 @@ void StartShootTask(void const *argument)
 
     for (;;)
     {
-        Parse_Friction_Wave_Motor_Feedback_Data(can2_rx_header_p, can2_rxd_data_buffer); ///< 解析摩擦轮数据
+        //Parse_Friction_Wave_Motor_Feedback_Data(can2_rx_header_p, can2_rxd_data_buffer); ///< 摩擦轮数据在中断中解析了
         switch (robot_control_data_pt->mode.fric_cover_mode) ///< 选择摩擦轮模式： 0关闭，1自适应，2高速，3低速
         {
         case fric_cover_off_mode_ENUM: ///< 0
