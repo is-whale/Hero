@@ -4,7 +4,8 @@
 #include "shoot_task.h"
 
 Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(1.5, 0, 0, 15.56, 60, 0, 3000, 500);			  ///< yaw电机角度PID
-static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1500, 0.01, 2, 10, 30000, 0, 1000, 500); ///< yaw电机速度PID
+/* static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1500, 0.01, 2, 10, 30000, 0, 1000, 500); ///< yaw电机速度PID */
+static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(150, 0, 0, 10, 30000, 0, 1000, 500); ///< yaw电机速度PID
 
 static Pid_Position_t motor_pitch_speed_pid = NEW_POSITION_PID(350, 25, 0, 220, 15000, 0, 1000, 500); ///< pitch电机速度PID
 static Pid_Position_t motor_pitch_angle_pid = NEW_POSITION_PID(0.03, 0.02, 0.00, 100, 50, 0, 3000, 500); ///< pitch电机角度PID
