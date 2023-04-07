@@ -15,7 +15,10 @@ void Set_ChassisMotor_Speed(float speed_fl, float speed_fr, float speed_bl, floa
     int16_t speed3 = Pid_Position_Calc(&motor_bl_speed_pid, speed_bl, chassis_motor_feedback_data[2].speed_rpm);
     int16_t speed4 = Pid_Position_Calc(&motor_br_speed_pid, speed_br, chassis_motor_feedback_data[3].speed_rpm);
 
-    chassis_power_control(&speed1,&speed2,&speed3,&speed4);
+#if CHASSIS_LIMIT_WITH_REFERENCE
+    chassis_power_control(&speed1, &speed2, &speed3, &speed4);
+#endif
+
     Can1_Send_4Msg(
         CAN_CHASSIS_ALL_ID,
         speed1,
@@ -36,7 +39,7 @@ void Can1_Process(CAN_RxHeaderTypeDef *can1_rx_message)
     case CAN_3508_M3_ID:
     case CAN_3508_M4_ID:
     {
-        Info_Can1_ParseData_Task();///< 解析CAN1数据，删掉了解析任务
+        Info_Can1_ParseData_Task(); ///< 解析CAN1数据，删掉了解析任务
         uint8_t i = 0;
         //处理电机ID号
         i = can1_rx_message->StdId - CAN_3508_M1_ID;
@@ -64,5 +67,5 @@ void Can1_Process(CAN_RxHeaderTypeDef *can1_rx_message)
   */
 void Set_Super_Capacitor(uint16_t target_power)
 {
-     Can1_Send_4Msg(SUPER_CAPACITOR_SEND_ID, target_power, 0, 0, 0);
+    Can1_Send_4Msg(SUPER_CAPACITOR_SEND_ID, target_power, 0, 0, 0);
 }

@@ -12,15 +12,16 @@
 #define __CONFIG_H
 
 /* 调试安全配置 */
-#define LASER_OFF 0          ///<打开激光（调试时建议关闭防止伤人）
-#define CHASSIS_SPEED_ZERO 0 ///<底盘无力模式,防止底盘疯转
-#define GIMBAL_SPEED_ZERO 0  ///<云台无力模式,防止底盘疯转
-#define LOSS_REMOTE_SIGNAL 1 ///<遥控器信号丢失检测以及错误处理（暂时未实现）
+#define LASER_OFF 0                    ///<打开激光（调试时建议关闭防止伤人）
+#define CHASSIS_SPEED_ZERO 0           ///<底盘无力模式,防止底盘疯转
+#define GIMBAL_SPEED_ZERO 0            ///<云台无力模式,防止底盘疯转
+#define LOSS_REMOTE_SIGNAL 1           ///<遥控器信号丢失检测以及错误处理（暂时未实现）
+#define CHASSIS_LIMIT_WITH_REFERENCE 1 ///<使用裁判系统限制底盘功率
 
 /* 机器人属性参数 */
 /* Yaw */
-#define YAW_GM6020_HEAD_ANGLE 6640 ///< 维修之后角度会变    2468
-#define YAW_LIMIT_SPEED 150        ///<YAW轴速度限幅 
+#define YAW_GM6020_HEAD_ANGLE 5610 ///< 维修之后角度会变
+#define YAW_LIMIT_SPEED 300        ///<YAW轴速度限幅150
 
 /* PID */
 

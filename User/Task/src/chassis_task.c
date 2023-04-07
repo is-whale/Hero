@@ -9,9 +9,9 @@
 /* 宏定义 */
 #define OUTPUT_LIMIT(data, limit) Float_Constraion(data, -limit, limit) ///< 输出限幅
 /* 速度倍率 */
-#define CHASSIS_MOTOR_DEFAULT_BASE_RATE 5.5f    ///< 底盘默认速度的倍率
-#define CHASSIS_MOTOR_GYRO_BASE_RATE 5.0f       ///< 小陀螺的速度倍率
-static const float motor_speed_multiple = 13.5; ///< 电机速度倍率
+#define CHASSIS_MOTOR_DEFAULT_BASE_RATE 6.0f   ///< 底盘默认速度的倍率改自5.5
+#define CHASSIS_MOTOR_GYRO_BASE_RATE 5.0f      ///< 小陀螺的速度倍率
+static const float motor_speed_multiple = 7.0; ///< 电机速度倍率
 /* power */
 #define POWER_LIMIT 60.0f
 #define WARNING_POWER 55.0f
@@ -21,9 +21,9 @@ static const float motor_speed_multiple = 13.5; ///< 电机速度倍率
 #define BUFFER_TOTAL_CURRENT_LIMIT 16000.0f
 #define POWER_TOTAL_CURRENT_LIMIT 20000.0f
 /* 限幅 */
-static float chassis_motor_boost_rate = 4.0f; ///< 底盘电机倍率
+static float chassis_motor_boost_rate = 8.0f; ///< 底盘电机倍率4.0
 /* PID参数实例化 */
-static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.26, 0, 0.8, 5000, 500, 0, 1000, 500); ///< 底盘跟随PID
+static Pid_Position_t chassis_follow_pid = NEW_POSITION_PID(0.35, 0, 0.8, 7000, 500, 0, 1000, 500); ///< 底盘跟随PID
 /* 数据指针 */
 static Rc_Ctrl_t *rc_data_pt;                               ///< 指向解析后的遥控器结构体指针
 static Robot_control_data_t *robot_mode_data_pt;            ///< 指向解析后的机器人模式结构体指针(也包括了虚拟键鼠通道的值)
@@ -147,10 +147,16 @@ void StartChassisTask(void const *argument)
             case rc_stable_chassis_gyro_mode_ENUM: ///< 4：底盘小陀螺+自稳云台
             {
                 Calc_Gyro_Motors_Speed(chassis_motor_speed,
-                                       Calc_Gyro_Speed_By_Power_Limit(referee_date_pt->power_heat_data.chassis_power),
+                                       1200,
                                        GM6020_YAW_Angle_To_360(gimbal_motor_feedback_parsed_data[*yaw_motor_index].mechanical_angle),
                                        rc_data_pt->rc.ch3 * 8.0f,
                                        rc_data_pt->rc.ch2 * 8.0f);
+                //下面使用了裁判系统串口数据，暂时没有测试，所以和以前一样使用固定数据值
+                /*                 Calc_Gyro_Motors_Speed(chassis_motor_speed,
+                                       Calc_Gyro_Speed_By_Power_Limit(referee_date_pt->power_heat_data.chassis_power),
+                                       GM6020_YAW_Angle_To_360(gimbal_motor_feedback_parsed_data[*yaw_motor_index].mechanical_angle),
+                                       rc_data_pt->rc.ch3 * 8.0f,
+                                       rc_data_pt->rc.ch2 * 8.0f); */
                 break;
             }
 
@@ -272,7 +278,7 @@ static uint16_t Calc_Gyro_Speed_By_Power_Limit(uint16_t power_limit)
     }
     else if (power_limit > 120)
     {
-        return 6000;
+        return 3000; //从6000修改，解算自官方步兵
     }
 
     return power_limit * 60;

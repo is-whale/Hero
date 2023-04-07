@@ -3,7 +3,8 @@
 #include "monitor_task.h"
 #include "shoot_task.h"
 
-Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(1.5, 0, 0, 15.56, 60, 0, 3000, 500);			  ///< yaw电机角度PID
+Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(0.3, 0, 0, 6, 8, 0, 3000, 500);			  ///< yaw电机角度PID
+//Pid_Position_t motor_yaw_angle_pid = NEW_POSITION_PID(1.5, 0, 0, 15.56, 60, 0, 3000, 500);			  ///< yaw电机角度PID
 /* static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(1500, 0.01, 2, 10, 30000, 0, 1000, 500); ///< yaw电机速度PID */
 static Pid_Position_t motor_yaw_speed_pid = NEW_POSITION_PID(150, 0, 0, 10, 30000, 0, 1000, 500); ///< yaw电机速度PID
 

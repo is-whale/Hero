@@ -26,25 +26,26 @@ void StartReferenceTaskTask(void const *argument)
             {
                 uart8_rx_available_buffer_index = Get_Reference_Available_Bufferx();
                 memcpy(date_copy, reference_system_rxd_buffer[uart8_rx_available_buffer_index], *rxd_data_len); ///< 拷贝原始数据
-
-                debug_showdata1("judge_buf_len", *rxd_data_len); ///< 打印数据长度
+                //debug_showdata1("judge_buf_len", *rxd_data_len); ///< 打印数据长度
                                                                  /**
                  * @brief   打印原始数据
                  */
-                for (uint8_t i = 0; i < *rxd_data_len; i++)
+/*                 for (uint8_t i = 0; i < *rxd_data_len; i++)
                 {
                     debug_print("%d ", date_copy[i]);
                 }
-                debug_print("\r\n");
+                debug_print("\r\n"); */
 
                 Parse_Refere_System_Data(date_copy, *rxd_data_len); ///<解析裁判系统数据
-                Module_Reload(judge_system);                        ///< 裁判系统离线检测
+                Module_Reload(judge_system); ///< 裁判系统离线检测
             }
         }
         else if (reference_get_data_event.status == osEventTimeout)
         {
             // TODO: 未按时接收到裁判系统数据，进行相应的处理，比如说离线处理
         }
+        //Console.print("juder_date_finish:%0.2f,buffer:%0.2f", juder_date_finish->power_heat_data.chassis_power, juder_date_finish->power_heat_data.chassis_power_buffer);
+
         osDelay(200);
     }
 }
