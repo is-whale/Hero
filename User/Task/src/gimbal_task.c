@@ -5,6 +5,7 @@
 static const uint8_t gimbal_motor_num = 2;  ///< 云台电机的数量
 static const uint8_t yaw_motor_index = 0;   ///< yaw 轴电机在电机数据结构体中的下标
 static const uint8_t pitch_motor_index = 1; ///< pitch 轴电机在电机数据结构体中的下标
+
 /* Pitch角度限幅 */
 static const uint16_t pitch_up_angle_limit = 5200;   ///< pitch 轴云台最低角度
 static const uint16_t pitch_middle_angle = 5630;     ///< pitch 轴云台中间角度
@@ -189,8 +190,6 @@ void StartGimbalTask(void const *argument)
             pid_out[Pitch_target_Speed] = 0;
         }
 #endif
-
-
 
         /**
          * @brief   云台速度环计算以及CAN2发送电机数据
